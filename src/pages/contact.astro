@@ -1,0 +1,72 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { SOCIALS, WEB3FORMS_ACCESS_KEY } from '../config';
+---
+<BaseLayout title="Contact" description="Start a project or say hello. Typography, lettering, and book design commissions welcome.">
+  <p class="folio">Contact</p>
+  <h1>Start a project</h1>
+  <p class="lede">
+    Tell me what you're making and where letters fit into it. The more concrete
+    the brief, the faster I can tell you whether I'm the right fit.
+  </p>
+
+  <form action="https://api.web3forms.com/submit" method="POST">
+    <input type="hidden" name="access_key" value={WEB3FORMS_ACCESS_KEY} />
+    <input type="hidden" name="subject" value="New project inquiry — vincentvi.me" />
+    <!-- honeypot: invisible to humans, catches bots -->
+    <input type="checkbox" name="botcheck" class="hidden" tabindex="-1" autocomplete="off" />
+
+    <label>
+      Your name
+      <input type="text" name="name" required autocomplete="name" />
+    </label>
+
+    <label>
+      Email
+      <input type="email" name="email" required autocomplete="email" />
+    </label>
+
+    <label>
+      About the project
+      <textarea
+        name="message"
+        rows="7"
+        required
+        placeholder="What are you making? Timeline? Budget range if you have one. Links to references welcome."
+      ></textarea>
+    </label>
+
+    <button type="submit">Send inquiry</button>
+    <p class="folio">Replies usually within 1–2 working days.</p>
+  </form>
+
+  <hr />
+  <p class="folio">Elsewhere</p>
+  <p>
+    {SOCIALS.map((s, i) => (
+      <>
+        <a href={s.url} rel="me noopener" target="_blank">{s.label}</a>{i < SOCIALS.length - 1 && ' · '}
+      </>
+    ))}
+  </p>
+</BaseLayout>
+
+<style>
+  .lede { font-size: var(--step-1); color: var(--ink-muted); }
+  form { display: grid; gap: 1.25rem; max-width: 40rem; margin-top: 2rem; }
+  label { display: grid; gap: 0.4rem; font-family: var(--font-utility); font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-muted); }
+  input[type='text'], input[type='email'], textarea {
+    font-family: var(--font-body); font-size: var(--step-0); color: var(--ink);
+    padding: 0.7rem 0.85rem; border: 1px solid var(--hairline); border-radius: 4px;
+    background: #fff;
+  }
+  input:focus, textarea:focus { border-color: var(--cloth); outline: none; }
+  button {
+    justify-self: start; cursor: pointer;
+    font-family: var(--font-utility); font-size: 0.82rem; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--paper); background: var(--ink);
+    border: 0; border-radius: 4px; padding: 0.85rem 1.6rem;
+  }
+  button:hover { background: var(--cloth); }
+  .hidden { display: none; }
+</style>

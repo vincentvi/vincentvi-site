@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
+  <rect width="800" height="600" fill="#1b1b18"/>
+  <rect x="290" y="120" width="220" height="330" fill="none" stroke="#8e6f2f" stroke-width="3"/>
+  <line x1="400" y1="120" x2="400" y2="450" stroke="#8e6f2f" stroke-width="2"/>
+  <text x="50%" y="88%" text-anchor="middle" font-family="monospace" font-size="20" letter-spacing="6" fill="#7a7a70">REPLACE WITH PROJECT IMAGE</text>
+</svg>
