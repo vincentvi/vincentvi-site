@@ -54,7 +54,7 @@ const cards = [
   <div class="stage" id="stage">
     <div class="track" id="track">
       {cards.map((c, i) => (
-        <div class={`flip${i === 0 ? ' active' : ''}`} data-index={i}>
+        <div class={`flip${i === 0 ? ' active' : ''}`} data-index={i} data-share={c.title.join(' ')}>
           <div class="flip-inner">
             <div class="face front">
               <span class="word" aria-hidden="true">{c.title[0]}<br />{c.title[1]}</span>
@@ -81,6 +81,15 @@ const cards = [
   </div>
 
   <p class="center folio counter"><span id="counter">1</span> / {cards.length}</p>
+
+  <div class="share" aria-label="Share this deck">
+    <span class="folio share-label">Share</span>
+    <button class="share-btn folio" data-net="x" type="button">X</button>
+    <button class="share-btn folio" data-net="facebook" type="button">Facebook</button>
+    <button class="share-btn folio" data-net="linkedin" type="button">LinkedIn</button>
+    <button class="share-btn folio" data-net="copy" type="button" id="copy-btn">Copy link</button>
+    <button class="share-btn folio" data-net="native" type="button" id="native-share" hidden>More…</button>
+  </div>
 
   <p class="center">
     <button id="motion-btn" class="motion" hidden>Enable tilt (motion sensor)</button>
@@ -241,6 +250,19 @@ const cards = [
   .prev { left: clamp(0.25rem, 2vw, 1.25rem); }
   .next { right: clamp(0.25rem, 2vw, 1.25rem); }
 
+  .share {
+    display: flex; flex-wrap: wrap; justify-content: center; align-items: center;
+    gap: 0.6rem; margin-top: 1rem;
+  }
+  .share-label { color: var(--ink-muted); margin-right: 0.25rem; }
+  .share-btn {
+    cursor: pointer; background: none;
+    border: 1px solid var(--hairline); border-radius: 4px;
+    padding: 0.4rem 0.85rem; color: var(--ink-muted);
+    transition: border-color 0.25s ease, color 0.25s ease;
+  }
+  .share-btn:hover { border-color: var(--foil); color: var(--foil); }
+
   .motion {
     cursor: pointer; font-family: var(--font-utility);
     font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase;
@@ -377,6 +399,44 @@ const cards = [
       startGyro();
     }
   }
+
+  // ---- share: links built on click so they carry the ACTIVE card ----
+  const nativeBtn = document.getElementById('native-share');
+  if (navigator.share && nativeBtn) nativeBtn.hidden = false;
+
+  function shareData() {
+    const name = flips[active].dataset.share || 'Mental model cards';
+    return {
+      url: window.location.href,
+      text: `${name} — a holographic mental model card`,
+      title: document.title,
+    };
+  }
+
+  document.querySelectorAll('.share-btn').forEach((b) => {
+    b.addEventListener('click', async () => {
+      const { url, text, title } = shareData();
+      const eu = encodeURIComponent(url);
+      const et = encodeURIComponent(text);
+      const net = b.dataset.net;
+      if (net === 'x') {
+        window.open(`https://twitter.com/intent/tweet?text=${et}&url=${eu}`, '_blank', 'noopener');
+      } else if (net === 'facebook') {
+        window.open(`https://www.facebook.com/sharer/sharer.php?u=${eu}`, '_blank', 'noopener');
+      } else if (net === 'linkedin') {
+        window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${eu}`, '_blank', 'noopener');
+      } else if (net === 'copy') {
+        try {
+          await navigator.clipboard.writeText(url);
+          const old = b.textContent;
+          b.textContent = 'Copied ✓';
+          setTimeout(() => { b.textContent = old; }, 1600);
+        } catch { /* clipboard blocked — no-op */ }
+      } else if (net === 'native') {
+        try { await navigator.share({ url, text, title }); } catch { /* cancelled */ }
+      }
+    });
+  });
 
   // initial
   go(0);
