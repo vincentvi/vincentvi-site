@@ -1,27 +1,86 @@
 ---
 import '@fontsource-variable/cinzel';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+
+// ------------------------------------------------------------------
+// THE DECK. Each card is one object — add a new mental model by
+// adding an entry here. No other code changes needed.
+// title: lines of the front word. back: paragraphs (own words).
+// ------------------------------------------------------------------
+const cards = [
+  {
+    num: '№ 001',
+    title: ['ANTI', 'FRAGILE'],
+    subtitle: 'Beyond resilience — what gains from disorder.',
+    back: [
+      'Some things break under stress. Some merely endure it. A rare third kind improves from it — gaining strength from shocks, volatility, and disorder.',
+      'The resilient resists a blow and stays the same; the antifragile is remade stronger by it — muscle under load, immunity after exposure, a system that needs a little chaos to stay alive.',
+    ],
+    attrib: 'after Nassim Taleb, Antifragile (2012)',
+  },
+  {
+    num: '№ 002',
+    title: ['BARBELL', 'STRATEGY'],
+    subtitle: 'Extreme safety plus small extreme risk — never the middle.',
+    back: [
+      'Put most of what you have where almost nothing can hurt it, and a small remainder where the upside is unlimited. Avoid the deceptive middle ground that is neither safe nor rewarding.',
+      'The shape caps your worst case while leaving your best case open — you can only lose the small side, but you can win with it enormously.',
+    ],
+    attrib: 'after Nassim Taleb, Antifragile (2012)',
+  },
+  {
+    num: '№ 003',
+    title: ['VIA', 'NEGATIVA'],
+    subtitle: 'Improve by removing, not by adding.',
+    back: [
+      'Knowledge of what is wrong is more durable than knowledge of what is right. So subtract first: remove the harmful, the fragile, the unnecessary — before reaching for anything new.',
+      'Health by removing the toxin, clarity by cutting the clutter, strength by deleting the weakness. The absence of a negative often beats the presence of a positive.',
+    ],
+    attrib: 'after Nassim Taleb & classical theology',
+  },
+];
 ---
 <BaseLayout
-  title="Antifragile — holographic model card"
-  description="An experiment: a black card carrying a mental model, its letterforms catching white light as you move your cursor or tilt your phone."
+  title="Holographic model cards"
+  description="A deck of mental models as holographic cards. Browse with the arrows, watch light cross the letterforms, click a card to flip it for the definition."
 >
   <p class="folio"><a href="/tinkering/">Tinkering</a> · experiment 001</p>
-  <h1>Holographic model card</h1>
+  <h1>Holographic model cards</h1>
   <p class="lede">
-    A mental model as an object. Move your cursor over the card — or tilt
-    your phone — and the light crosses the letters.
+    A deck of mental models. Browse with the arrows, move your cursor for the
+    light, click the center card to flip it.
   </p>
 
   <div class="stage" id="stage">
-    <div class="holo-card" id="card">
-      <span class="word" aria-hidden="true">ANTI<br />FRAGILE</span>
-      <p class="subtitle">Beyond resilience — what gains from disorder.<br />A mental model, after Nassim Taleb.</p>
-      <span class="sr-only">Black card reading Antifragile: beyond resilience — what gains from disorder. A mental model, after Nassim Taleb.</span>
-      <span class="corner folio tl">Mental model</span>
-      <span class="corner folio br">№ 001</span>
+    <div class="track" id="track">
+      {cards.map((c, i) => (
+        <div class={`flip${i === 0 ? ' active' : ''}`} data-index={i}>
+          <div class="flip-inner">
+            <div class="face front">
+              <span class="word" aria-hidden="true">{c.title[0]}<br />{c.title[1]}</span>
+              <p class="subtitle">{c.subtitle}<br />A mental model.</p>
+              <span class="corner folio tl">Mental model</span>
+              <span class="corner folio br">{c.num}</span>
+              <span class="flip-hint folio">click to flip ↻</span>
+            </div>
+            <div class="face back">
+              <span class="corner folio tl">{c.title.join('')}</span>
+              <div class="back-body">
+                {c.back.map((p) => <p>{p}</p>)}
+                <p class="attrib folio">— {c.attrib}</p>
+              </div>
+              <span class="corner folio br">↻ flip back</span>
+            </div>
+          </div>
+        </div>
+      ))}
     </div>
+
+    <button class="nav prev" id="prev" aria-label="Previous card">‹</button>
+    <button class="nav next" id="next" aria-label="Next card">›</button>
   </div>
+
+  <p class="center folio counter"><span id="counter">1</span> / {cards.length}</p>
 
   <p class="center">
     <button id="motion-btn" class="motion" hidden>Enable tilt (motion sensor)</button>
@@ -30,180 +89,267 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
   <div class="prose">
     <h2>How it works</h2>
     <p>
-      The card listens to your pointer (or the phone's gyroscope) and turns the
-      position into four CSS variables: two rotation angles and a light
-      coordinate. The reflection is a white radial gradient clipped inside the
-      letterforms — the light exists only where there is ink. JavaScript only
-      reports where the light source is; CSS does all the drawing.
+      The cards are data, not markup — each mental model is an entry in a list,
+      and the page renders the whole deck from it. The carousel is a single row
+      shifted with a transform; the center card is live (pointer-driven light,
+      click to flip), the neighbors wait faded at the sides. Arrow keys work too.
     </p>
     <p>
-      Honest notes: on iPhone, motion sensors need a permission tap (the button
-      above appears there). And if your system has reduced motion switched on,
-      the card politely holds still — as it should.
+      Honest notes: while a card is flipped, its light pauses. On iPhone, motion
+      sensors need a permission tap. With reduced motion switched on, slides and
+      flips become instant cuts.
     </p>
   </div>
 </BaseLayout>
 
 <style>
   .lede { font-size: var(--step-1); color: var(--ink-muted); }
-  .center { text-align: center; }
+  .center { text-align: center; max-width: none; margin-inline: auto; }
+  .counter { margin-top: 0.5rem; letter-spacing: 0.2em; }
 
   .stage {
-    display: grid;
-    place-items: center;
-    padding: 3.5rem 1rem;
-    perspective: 900px;
-    touch-action: none;
+    position: relative;
+    overflow: hidden;
+    padding: 3.5rem 0;
+    perspective: 1100px;
+    touch-action: manipulation;
   }
 
-  .holo-card {
-    --rx: 0deg;
-    --ry: 0deg;
-    --mx: 50%;
-    --my: 42%;
-    position: relative;
-    width: min(420px, 86vw);
-    aspect-ratio: 5 / 7;
-    border-radius: 12px;
-    /* matte black, barely-there depth — lacquer, not disco */
-    background:
-      radial-gradient(140% 110% at 30% 8%, #191c25 0%, #14161d 55%, #101218 100%);
-    box-shadow:
-      0 24px 60px rgba(8, 10, 16, 0.5),
-      inset 0 0 0 1px rgba(255, 255, 255, 0.05);
-    display: grid;
-    place-content: center;
-    row-gap: 1.6rem;
-    padding: 2rem;
-    overflow: hidden;
-    transform: rotateX(var(--rx)) rotateY(var(--ry));
-    transition: transform 0.12s ease-out;
+  .track {
+    display: flex;
+    gap: 2.25rem;
+    transition: transform 0.55s cubic-bezier(0.25, 0.8, 0.3, 1);
     will-change: transform;
   }
-  /* a single hairline of light along the top edge — the one indulgence */
-  .holo-card::before {
-    content: '';
-    position: absolute;
-    inset: 0 0 auto 0;
-    height: 1px;
+
+  .flip {
+    --rx: 0deg; --ry: 0deg; --mx: 50%; --my: 42%;
+    flex: 0 0 auto;
+    width: min(400px, 78vw);
+    aspect-ratio: 5 / 7;
+    transform: rotateX(var(--rx)) rotateY(var(--ry));
+    scale: 0.82;
+    transition: transform 0.12s ease-out, scale 0.45s ease, opacity 0.45s ease, filter 0.45s ease;
+    opacity: 0.3;
+    filter: saturate(0.6);
+    cursor: pointer;
+    will-change: transform;
+  }
+  .flip.active {
+    scale: 1;
+    opacity: 1;
+    filter: none;
+  }
+
+  .flip-inner {
+    position: relative; width: 100%; height: 100%;
+    transform-style: preserve-3d;
+    transition: transform 0.7s cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+  .flip.flipped .flip-inner { transform: rotateY(180deg); }
+
+  .face {
+    position: absolute; inset: 0;
+    backface-visibility: hidden; -webkit-backface-visibility: hidden;
+    border-radius: 12px; overflow: hidden;
+    background: radial-gradient(140% 110% at 30% 8%, #191c25 0%, #14161d 55%, #101218 100%);
+    box-shadow: 0 24px 60px rgba(8, 10, 16, 0.5), inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+    display: grid; place-content: center; padding: 2rem;
+  }
+  .face::before {
+    content: ''; position: absolute; inset: 0 0 auto 0; height: 1px;
     background: linear-gradient(90deg, transparent 8%, rgba(255,255,255,0.28) 50%, transparent 92%);
     pointer-events: none;
   }
+  .back { transform: rotateY(180deg); }
 
-  /* the words: white light clipped INSIDE the letterforms only.
-     Base metal is dark graphite; the highlight is a white radial
-     gradient centered on the light coordinate. No ink, no light. */
+  .front { row-gap: 1.6rem; }
   .word {
     font-family: 'Cinzel Variable', 'Trajan Pro', Georgia, serif;
     font-weight: 560;
-    font-size: clamp(2.6rem, 13vw, 4.2rem);
-    letter-spacing: 0.06em;
-    line-height: 1.12;
-    text-align: center;
+    font-size: clamp(2.1rem, 10vw, 3.6rem);
+    letter-spacing: 0.06em; line-height: 1.12; text-align: center;
     background-image:
-      radial-gradient(
-        420px 420px at var(--mx) var(--my),
-        #ffffff 0%,
-        rgba(255, 255, 255, 0.82) 18%,
-        rgba(160, 168, 190, 0.45) 42%,
-        rgba(77, 83, 102, 0.92) 70%
-      ),
+      radial-gradient(420px 420px at var(--mx) var(--my),
+        #ffffff 0%, rgba(255,255,255,0.82) 18%,
+        rgba(160,168,190,0.45) 42%, rgba(77,83,102,0.92) 70%),
       linear-gradient(#4d5366, #424859);
-    background-clip: text;
-    -webkit-background-clip: text;
-    color: transparent;
+    background-clip: text; -webkit-background-clip: text; color: transparent;
     user-select: none;
   }
-
   .subtitle {
-    font-family: var(--font-body);
-    font-size: 0.92rem;
-    font-style: italic;
-    line-height: 1.55;
-    text-align: center;
-    color: #8d93a8;
-    margin: 0;
-    max-width: 28ch;
-    justify-self: center;
+    font-family: var(--font-body); font-size: 0.9rem; font-style: italic;
+    line-height: 1.55; text-align: center; color: #8d93a8;
+    margin: 0; max-width: 28ch; justify-self: center;
   }
+
+  .back-body { max-width: 30ch; text-align: center; }
+  .back-body p {
+    font-family: var(--font-body); color: #c9cedd;
+    font-size: 0.95rem; line-height: 1.6; margin: 0 0 0.85rem; max-width: none;
+  }
+  .attrib { color: #7e849a !important; font-style: normal; margin-top: 0.35rem !important; }
 
   .corner { position: absolute; color: rgba(205, 210, 225, 0.38); }
   .tl { top: 1rem; left: 1.2rem; }
   .br { bottom: 1rem; right: 1.2rem; }
+  .flip-hint {
+    position: absolute; bottom: 1rem; left: 50%; transform: translateX(-50%);
+    color: rgba(205, 210, 225, 0.3); font-size: 0.62rem;
+  }
+
+  .nav {
+    position: absolute; top: 50%; translate: 0 -50%;
+    z-index: 2; cursor: pointer;
+    width: 2.75rem; height: 2.75rem; border-radius: 50%;
+    border: 1px solid var(--hairline); background: var(--paper);
+    color: var(--ink); font-size: 1.4rem; line-height: 1;
+    display: grid; place-items: center;
+    box-shadow: 0 2px 10px rgba(20, 22, 29, 0.12);
+    transition: border-color 0.25s ease, color 0.25s ease, opacity 0.25s ease;
+  }
+  .nav:hover { border-color: var(--foil); color: var(--foil); }
+  .nav:disabled { opacity: 0.25; cursor: default; }
+  .nav:disabled:hover { border-color: var(--hairline); color: var(--ink); }
+  .prev { left: clamp(0.25rem, 2vw, 1.25rem); }
+  .next { right: clamp(0.25rem, 2vw, 1.25rem); }
 
   .motion {
-    cursor: pointer;
-    font-family: var(--font-utility);
+    cursor: pointer; font-family: var(--font-utility);
     font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase;
     color: var(--ink); background: none;
-    border: 1px solid var(--ink); border-radius: 4px;
-    padding: 0.7rem 1.3rem;
+    border: 1px solid var(--ink); border-radius: 4px; padding: 0.7rem 1.3rem;
   }
   .motion:hover { border-color: var(--cloth); color: var(--cloth); }
 
-  .sr-only {
-    position: absolute; width: 1px; height: 1px;
-    clip-path: inset(50%); overflow: hidden; white-space: nowrap;
-  }
-
   .prose { margin-top: 3rem; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .track, .flip, .flip-inner { transition: none; }
+  }
 </style>
 
 <script>
   const stage = document.getElementById('stage');
-  const card = document.getElementById('card');
+  const track = document.getElementById('track');
+  const prev = document.getElementById('prev');
+  const next = document.getElementById('next');
+  const counter = document.getElementById('counter');
   const btn = document.getElementById('motion-btn');
+  const flips = Array.from(track.querySelectorAll('.flip'));
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const MAX_TILT = 16;
 
-  const MAX_TILT = 8; // degrees — quieter than before; luxury doesn't lunge
+  let active = 0;
 
-  function setLight(px, py) {
-    card.style.setProperty('--ry', `${(px * 2 * MAX_TILT).toFixed(2)}deg`);
-    card.style.setProperty('--rx', `${(-py * 2 * MAX_TILT).toFixed(2)}deg`);
-    card.style.setProperty('--mx', `${(50 + px * 110).toFixed(1)}%`);
-    card.style.setProperty('--my', `${(42 + py * 110).toFixed(1)}%`);
+  // ---- carousel positioning: center the active card ----
+  function layout() {
+    const card = flips[active];
+    const stageW = stage.clientWidth;
+    const cardW = card.offsetWidth;
+    const gap = parseFloat(getComputedStyle(track).gap) || 0;
+    const offset = active * (cardW + gap);
+    const centerShift = (stageW - cardW) / 2;
+    track.style.transform = `translateX(${centerShift - offset}px)`;
   }
 
-  function reset() {
-    card.style.setProperty('--rx', '0deg');
-    card.style.setProperty('--ry', '0deg');
-    card.style.setProperty('--mx', '50%');
-    card.style.setProperty('--my', '42%');
+  function go(index) {
+    active = Math.max(0, Math.min(flips.length - 1, index));
+    flips.forEach((f, i) => {
+      f.classList.toggle('active', i === active);
+      f.classList.remove('flipped'); // arrive at fronts, always
+      resetTilt(f);
+    });
+    prev.disabled = active === 0;
+    next.disabled = active === flips.length - 1;
+    counter.textContent = active + 1;
+    layout();
   }
 
-  if (!reduced && stage && card) {
+  prev.addEventListener('click', () => go(active - 1));
+  next.addEventListener('click', () => go(active + 1));
+  window.addEventListener('resize', layout);
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowLeft') go(active - 1);
+    if (e.key === 'ArrowRight') go(active + 1);
+  });
+
+  // side cards navigate on click (they're pointer-events:none, so
+  // catch it on the track via elementFromPoint fallback: simplest is
+  // enabling clicks through a delegated handler on stage)
+  stage.addEventListener('click', (e) => {
+    const el = e.target.closest('.flip');
+    if (el && !el.classList.contains('active')) {
+      go(Number(el.dataset.index));
+    }
+  });
+
+  // ---- flip: only the active card ----
+  flips.forEach((f) => {
+    f.addEventListener('click', () => {
+      if (!f.classList.contains('active')) return;
+      f.classList.toggle('flipped');
+    });
+    f.setAttribute('tabindex', '0');
+    f.setAttribute('role', 'button');
+    f.addEventListener('keydown', (e) => {
+      if ((e.key === 'Enter' || e.key === ' ') && f.classList.contains('active')) {
+        e.preventDefault(); f.classList.toggle('flipped');
+      }
+    });
+  });
+
+  // ---- light + tilt on the active card ----
+  function setLight(f, px, py) {
+    f.style.setProperty('--ry', `${(px * 2 * MAX_TILT).toFixed(2)}deg`);
+    f.style.setProperty('--rx', `${(-py * 2 * MAX_TILT).toFixed(2)}deg`);
+    f.style.setProperty('--mx', `${(50 + px * 110).toFixed(1)}%`);
+    f.style.setProperty('--my', `${(42 + py * 110).toFixed(1)}%`);
+  }
+  function resetTilt(f) {
+    f.style.setProperty('--rx', '0deg');
+    f.style.setProperty('--ry', '0deg');
+    f.style.setProperty('--mx', '50%');
+    f.style.setProperty('--my', '42%');
+  }
+
+  if (!reduced) {
     stage.addEventListener('pointermove', (e) => {
-      const r = card.getBoundingClientRect();
+      const f = flips[active];
+      if (f.classList.contains('flipped')) return;
+      const r = f.getBoundingClientRect();
       const px = (e.clientX - r.left) / r.width - 0.5;
       const py = (e.clientY - r.top) / r.height - 0.5;
-      setLight(Math.max(-0.5, Math.min(0.5, px)), Math.max(-0.5, Math.min(0.5, py)));
+      setLight(f, Math.max(-0.5, Math.min(0.5, px)), Math.max(-0.5, Math.min(0.5, py)));
     });
-    stage.addEventListener('pointerleave', reset);
+    stage.addEventListener('pointerleave', () => resetTilt(flips[active]));
 
     const hasOrientation = 'DeviceOrientationEvent' in window;
-    const needsPermission =
-      hasOrientation &&
+    const needsPermission = hasOrientation &&
       typeof window.DeviceOrientationEvent.requestPermission === 'function';
-
     function startGyro() {
       window.addEventListener('deviceorientation', (e) => {
-        if (e.beta == null || e.gamma == null) return;
+        const f = flips[active];
+        if (f.classList.contains('flipped') || e.beta == null || e.gamma == null) return;
         const px = Math.max(-0.5, Math.min(0.5, e.gamma / 60));
         const py = Math.max(-0.5, Math.min(0.5, (e.beta - 40) / 60));
-        setLight(px, py);
+        setLight(f, px, py);
       });
     }
-
     if (needsPermission && btn) {
       btn.hidden = false;
-      btn.addEventListener('click', async () => {
+      btn.addEventListener('click', async (ev) => {
+        ev.stopPropagation();
         try {
           const state = await window.DeviceOrientationEvent.requestPermission();
           if (state === 'granted') { startGyro(); btn.hidden = true; }
-        } catch { /* declined — pointer still works */ }
+        } catch { /* declined */ }
       });
     } else if (hasOrientation) {
       startGyro();
     }
   }
+
+  // initial
+  go(0);
 </script>
