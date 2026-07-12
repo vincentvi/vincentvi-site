@@ -15,7 +15,7 @@ export const SITE = {
 // Shown in the footer and on /contact. Replace # with real URLs,
 // remove any you do not use. Order here = order on screen.
 export const SOCIALS = [
-  { label: 'Behance', url: '#' },
+  { label: 'Behance', url: 'https://www.behance.net/vincentvi' },
   { label: 'Dribbble', url: '#' },
   { label: 'Instagram', url: '#' },
   { label: 'Fiverr', url: 'https://www.fiverr.com/sinsin' },
@@ -24,4 +24,4 @@ export const SOCIALS = [
 
 // Get a free access key at https://web3forms.com (takes 1 minute,
 // only needs your email). Paste it between the quotes.
-export const WEB3FORMS_ACCESS_KEY = 'REPLACE_WITH_YOUR_WEB3FORMS_KEY';
+export const WEB3FORMS_ACCESS_KEY = '6f9abc9e-b523-4cd6-9f3a-9dd2fca4300e';
