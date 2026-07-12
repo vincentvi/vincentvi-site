@@ -1,0 +1,221 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+---
+<BaseLayout
+  title="Holographic type card"
+  description="An experiment: a holographic card that tilts with your cursor or phone gyroscope, iridescent light sweeping across the letterforms."
+>
+  <p class="folio"><a href="/tinkering/">Tinkering</a> · experiment 001</p>
+  <h1>Holographic type card</h1>
+  <p class="lede">
+    Move your cursor over the card — or tilt your phone. The light follows.
+  </p>
+
+  <div class="stage" id="stage">
+    <div class="holo-card" id="card">
+      <span class="word" aria-hidden="true">TYPO</span>
+      <span class="sr-only">Holographic card reading TYPO</span>
+      <div class="sheen"></div>
+      <div class="glare"></div>
+      <span class="corner folio tl">VV·26</span>
+      <span class="corner folio br">№ 001</span>
+    </div>
+  </div>
+
+  <p class="center">
+    <button id="motion-btn" class="motion" hidden>Enable tilt (motion sensor)</button>
+  </p>
+
+  <div class="prose">
+    <h2>How it works</h2>
+    <p>
+      The card listens to your pointer (or the phone's gyroscope) and turns the
+      position into four CSS variables: two rotation angles and a light
+      coordinate. Everything visible — the 3D tilt, the rainbow sheen, the
+      glare spot, the shimmer inside the letters — is plain CSS reading those
+      variables. JavaScript only reports where the light source is; CSS does
+      all the drawing.
+    </p>
+    <p>
+      Honest notes: on iPhone, motion sensors need a permission tap (the button
+      above appears there). And if your system has reduced motion switched on,
+      the card politely holds still — as it should.
+    </p>
+  </div>
+</BaseLayout>
+
+<style>
+  .lede { font-size: var(--step-1); color: var(--ink-muted); }
+  .center { text-align: center; }
+
+  .stage {
+    display: grid;
+    place-items: center;
+    padding: 3.5rem 1rem;
+    /* perspective lives on the parent so the card tilts in real 3D */
+    perspective: 900px;
+    touch-action: none;
+  }
+
+  .holo-card {
+    --rx: 0deg;   /* rotateX */
+    --ry: 0deg;   /* rotateY */
+    --mx: 50%;    /* light x */
+    --my: 50%;    /* light y */
+    position: relative;
+    width: min(420px, 86vw);
+    aspect-ratio: 5 / 7;
+    border-radius: 14px;
+    background:
+      radial-gradient(120% 120% at 20% 10%, #26262b 0%, #131316 55%, #0b0b0d 100%);
+    box-shadow:
+      0 18px 45px rgba(10, 10, 15, 0.35),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    transform: rotateX(var(--rx)) rotateY(var(--ry));
+    transition: transform 0.12s ease-out;
+    will-change: transform;
+  }
+
+  /* the word: iridescent gradient clipped into the letterforms,
+     its position driven by the light coordinate */
+  .word {
+    font-family: var(--font-display);
+    font-weight: 640;
+    font-variation-settings: 'opsz' 144;
+    font-size: clamp(4.5rem, 22vw, 7.5rem);
+    letter-spacing: -0.02em;
+    line-height: 1;
+    background-image: linear-gradient(
+      115deg,
+      #8d7737 0%, #e8d489 18%, #9adcff 34%, #c5a3ff 50%,
+      #ffa3c3 64%, #ffe29a 80%, #8d7737 100%
+    );
+    background-size: 260% 260%;
+    background-position: var(--mx) var(--my);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    filter: drop-shadow(0 2px 12px rgba(0, 0, 0, 0.45));
+    user-select: none;
+  }
+
+  /* rainbow diffraction stripes, revealed near the light */
+  .sheen {
+    position: absolute;
+    inset: 0;
+    background:
+      repeating-linear-gradient(
+        115deg,
+        rgba(255, 80, 120, 0.16) 0 8px,
+        rgba(255, 220, 120, 0.16) 8px 16px,
+        rgba(120, 255, 190, 0.16) 16px 24px,
+        rgba(120, 190, 255, 0.16) 24px 32px,
+        rgba(200, 140, 255, 0.16) 32px 40px
+      );
+    mix-blend-mode: color-dodge;
+    -webkit-mask-image: radial-gradient(280px 280px at var(--mx) var(--my), #000 0%, transparent 70%);
+    mask-image: radial-gradient(280px 280px at var(--mx) var(--my), #000 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  /* the moving specular glare */
+  .glare {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+      340px 340px at var(--mx) var(--my),
+      rgba(255, 255, 255, 0.22) 0%,
+      rgba(255, 255, 255, 0.05) 35%,
+      transparent 65%
+    );
+    pointer-events: none;
+  }
+
+  .corner { position: absolute; color: rgba(255, 255, 255, 0.4); }
+  .tl { top: 0.9rem; left: 1.1rem; }
+  .br { bottom: 0.9rem; right: 1.1rem; }
+
+  .motion {
+    cursor: pointer;
+    font-family: var(--font-utility);
+    font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--ink); background: none;
+    border: 1px solid var(--ink); border-radius: 4px;
+    padding: 0.7rem 1.3rem;
+  }
+  .motion:hover { border-color: var(--cloth); color: var(--cloth); }
+
+  .sr-only {
+    position: absolute; width: 1px; height: 1px;
+    clip-path: inset(50%); overflow: hidden; white-space: nowrap;
+  }
+
+  .prose { margin-top: 3rem; }
+</style>
+
+<script>
+  const stage = document.getElementById('stage');
+  const card = document.getElementById('card');
+  const btn = document.getElementById('motion-btn');
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const MAX_TILT = 10; // degrees
+
+  function setLight(px, py) {
+    // px, py in [-0.5, 0.5]
+    card.style.setProperty('--ry', `${(px * 2 * MAX_TILT).toFixed(2)}deg`);
+    card.style.setProperty('--rx', `${(-py * 2 * MAX_TILT).toFixed(2)}deg`);
+    card.style.setProperty('--mx', `${(50 + px * 100).toFixed(1)}%`);
+    card.style.setProperty('--my', `${(50 + py * 100).toFixed(1)}%`);
+  }
+
+  function reset() {
+    card.style.setProperty('--rx', '0deg');
+    card.style.setProperty('--ry', '0deg');
+    card.style.setProperty('--mx', '50%');
+    card.style.setProperty('--my', '50%');
+  }
+
+  if (!reduced && stage && card) {
+    // --- pointer drive ---
+    stage.addEventListener('pointermove', (e) => {
+      const r = card.getBoundingClientRect();
+      const px = (e.clientX - r.left) / r.width - 0.5;
+      const py = (e.clientY - r.top) / r.height - 0.5;
+      setLight(Math.max(-0.5, Math.min(0.5, px)), Math.max(-0.5, Math.min(0.5, py)));
+    });
+    stage.addEventListener('pointerleave', reset);
+
+    // --- gyroscope drive (phones/tablets) ---
+    const hasOrientation = 'DeviceOrientationEvent' in window;
+    const needsPermission =
+      hasOrientation &&
+      typeof window.DeviceOrientationEvent.requestPermission === 'function';
+
+    function startGyro() {
+      window.addEventListener('deviceorientation', (e) => {
+        if (e.beta == null || e.gamma == null) return;
+        // gamma: left-right [-90,90], beta: front-back [-180,180]
+        const px = Math.max(-0.5, Math.min(0.5, e.gamma / 60));
+        const py = Math.max(-0.5, Math.min(0.5, (e.beta - 40) / 60));
+        setLight(px, py);
+      });
+    }
+
+    if (needsPermission && btn) {
+      // iOS: sensors need a user-gesture permission grant
+      btn.hidden = false;
+      btn.addEventListener('click', async () => {
+        try {
+          const state = await window.DeviceOrientationEvent.requestPermission();
+          if (state === 'granted') { startGyro(); btn.hidden = true; }
+        } catch { /* declined or unavailable — pointer still works */ }
+      });
+    } else if (hasOrientation) {
+      startGyro();
+    }
+  }
+</script>

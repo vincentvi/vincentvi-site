@@ -1,0 +1,53 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+// Experiments are hand-listed here: each one is its own .astro page
+// in this folder, because experiments carry their own code.
+const experiments = [
+  {
+    href: '/tinkering/holo-card/',
+    title: 'Holographic type card',
+    summary: 'A gyro-and-cursor-reactive card. Iridescent light sweeps across the letterforms as you tilt or move.',
+    tags: 'CSS · JS · variable fonts',
+    date: '2026-07',
+  },
+];
+---
+<BaseLayout
+  title="Tinkering"
+  description="Experiments and small studies in typography, CSS, animation, and interactive design — the workbench next to the portfolio."
+>
+  <p class="folio">Tinkering · the workbench</p>
+  <h1>Experiments</h1>
+  <p class="lede">
+    Not client work — studies. Small tests in type, motion, and code,
+    shown mid-process. Some become techniques; some just teach me something.
+  </p>
+
+  <ul class="experiments">
+    {experiments.map((x) => (
+      <li>
+        <a href={x.href}>
+          <h2>{x.title}</h2>
+          <p>{x.summary}</p>
+          <p class="folio">{x.tags} · {x.date}</p>
+        </a>
+      </li>
+    ))}
+  </ul>
+</BaseLayout>
+
+<style>
+  .lede { font-size: var(--step-1); color: var(--ink-muted); }
+  .experiments { list-style: none; padding: 0; margin-top: 2.5rem; display: grid; gap: 2rem; max-width: 46rem; }
+  .experiments a {
+    display: block; text-decoration: none; color: var(--ink);
+    border: 1px solid var(--hairline); padding: 1.5rem 1.75rem;
+    transition: border-color 0.3s ease, transform 0.3s ease;
+  }
+  .experiments h2 { margin: 0 0 0.4rem; font-size: var(--step-1); }
+  .experiments p { margin: 0 0 0.5rem; color: var(--ink-muted); }
+  @media (hover: hover) {
+    .experiments a:hover { border-color: var(--foil); transform: translateY(-3px); }
+  }
+</style>
