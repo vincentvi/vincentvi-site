@@ -1,0 +1,160 @@
+---
+import '@fontsource-variable/fraunces/full.css';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+---
+<BaseLayout
+  title="Variable font playground"
+  description="An interactive instrument: drag the sliders to morph the live axes of Fraunces — weight, optical size, softness, and its 'wonk' — across the phrase Gradatim Ferociter."
+>
+  <p class="folio"><a href="/tinkering/">Tinkering</a> · experiment 002</p>
+  <h1>Variable font playground</h1>
+  <p class="lede">
+    One typeface, five dials. Drag the sliders and watch the letterforms
+    change shape in real time — this is what "variable font" actually means.
+  </p>
+
+  <div class="panel">
+    <div class="specimen" id="specimen">Gradatim<br />Ferociter</div>
+  </div>
+
+  <div class="controls">
+    <label>
+      <span class="row"><span class="folio">Weight</span><output id="out-wght">340</output></span>
+      <input type="range" id="wght" min="100" max="900" step="1" value="340" />
+    </label>
+    <label>
+      <span class="row"><span class="folio">Optical size</span><output id="out-opsz">120</output></span>
+      <input type="range" id="opsz" min="9" max="144" step="1" value="120" />
+    </label>
+    <label>
+      <span class="row"><span class="folio">Softness</span><output id="out-soft">0</output></span>
+      <input type="range" id="soft" min="0" max="100" step="1" value="0" />
+    </label>
+    <label class="toggles">
+      <span class="folio">Wonk <input type="checkbox" id="wonk" /></span>
+      <span class="folio">Italic <input type="checkbox" id="ital" /></span>
+    </label>
+    <button id="reset" class="reset folio">Reset</button>
+  </div>
+
+  <div class="prose">
+    <h2>How it works</h2>
+    <p>
+      Fraunces is a <em>variable font</em>: instead of shipping separate files for
+      bold, light, and italic, it ships one file containing a continuous space of
+      possibilities along named axes. Each slider writes to a CSS property —
+      <code>font-variation-settings</code> — and the browser redraws the outlines
+      instantly. No images, no separate files: the letters are being
+      re-interpolated live.
+    </p>
+    <p>
+      The axes here are real ones Fraunces exposes: <strong>weight</strong> (thin
+      to black), <strong>optical size</strong> (fine text detailing up to
+      display-scale drama), <strong>softness</strong> (rounding the terminals),
+      and <strong>wonk</strong> — the designer's toggle for the quirkier
+      alternate letterforms. "Gradatim ferociter" — step by step, ferociously.
+    </p>
+  </div>
+</BaseLayout>
+
+<style>
+  .lede { font-size: var(--step-1); color: var(--ink-muted); }
+
+  .panel {
+    background: radial-gradient(120% 130% at 50% 0%, #191c25 0%, #14161d 60%, #101218 100%);
+    border-radius: 12px;
+    padding: clamp(2.5rem, 7vw, 5rem) 1.5rem;
+    margin: 2rem 0 1.75rem;
+    display: grid;
+    place-items: center;
+    min-height: 40vh;
+  }
+  .specimen {
+    font-family: 'Fraunces Variable', Georgia, serif;
+    font-variation-settings: 'wght' 340, 'opsz' 120, 'SOFT' 0, 'WONK' 0;
+    font-style: normal;
+    font-size: clamp(2.8rem, 12vw, 6rem);
+    line-height: 1.02;
+    text-align: center;
+    color: #e9ebf2;
+    letter-spacing: -0.01em;
+    /* keep redraws cheap while dragging */
+    will-change: font-variation-settings;
+  }
+
+  .controls {
+    display: grid;
+    gap: 1.5rem;
+    max-width: 34rem;
+  }
+  label { display: grid; gap: 0.5rem; }
+  .row { display: flex; justify-content: space-between; align-items: baseline; }
+  output { font-family: var(--font-utility); font-size: 0.8rem; color: var(--ink); }
+
+  input[type='range'] {
+    -webkit-appearance: none; appearance: none;
+    width: 100%; height: 2px; background: var(--hairline);
+    border-radius: 2px; cursor: pointer;
+  }
+  input[type='range']::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none;
+    width: 18px; height: 18px; border-radius: 50%;
+    background: var(--foil); border: 2px solid var(--paper);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.25);
+  }
+  input[type='range']::-moz-range-thumb {
+    width: 18px; height: 18px; border-radius: 50%;
+    background: var(--foil); border: 2px solid var(--paper);
+  }
+
+  .toggles { display: flex; gap: 2rem; }
+  .toggles .folio { display: inline-flex; align-items: center; gap: 0.5rem; }
+  input[type='checkbox'] { width: 1rem; height: 1rem; accent-color: var(--foil); cursor: pointer; }
+
+  .reset {
+    justify-self: start; cursor: pointer;
+    background: none; border: 1px solid var(--ink); border-radius: 4px;
+    padding: 0.55rem 1.1rem; color: var(--ink);
+  }
+  .reset:hover { border-color: var(--foil); color: var(--foil); }
+
+  .prose { margin-top: 3rem; }
+  .prose code { font-family: var(--font-utility); font-size: 0.85em; background: #f0efe8; padding: 0.1em 0.35em; border-radius: 3px; }
+</style>
+
+<script>
+  const specimen = document.getElementById('specimen');
+  const wght = document.getElementById('wght');
+  const opsz = document.getElementById('opsz');
+  const soft = document.getElementById('soft');
+  const wonk = document.getElementById('wonk');
+  const ital = document.getElementById('ital');
+  const reset = document.getElementById('reset');
+  const outW = document.getElementById('out-wght');
+  const outO = document.getElementById('out-opsz');
+  const outS = document.getElementById('out-soft');
+
+  const DEFAULTS = { wght: 340, opsz: 120, soft: 0, wonk: false, ital: false };
+
+  function apply() {
+    specimen.style.setProperty(
+      'font-variation-settings',
+      `'wght' ${wght.value}, 'opsz' ${opsz.value}, 'SOFT' ${soft.value}, 'WONK' ${wonk.checked ? 1 : 0}`
+    );
+    specimen.style.fontStyle = ital.checked ? 'italic' : 'normal';
+    outW.textContent = wght.value;
+    outO.textContent = opsz.value;
+    outS.textContent = soft.value;
+  }
+
+  [wght, opsz, soft].forEach((el) => el.addEventListener('input', apply));
+  [wonk, ital].forEach((el) => el.addEventListener('change', apply));
+
+  reset.addEventListener('click', () => {
+    wght.value = DEFAULTS.wght; opsz.value = DEFAULTS.opsz; soft.value = DEFAULTS.soft;
+    wonk.checked = DEFAULTS.wonk; ital.checked = DEFAULTS.ital;
+    apply();
+  });
+
+  apply();
+</script>
