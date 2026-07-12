@@ -4,12 +4,12 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 ---
 <BaseLayout
   title="Variable font playground"
-  description="An interactive instrument: drag the sliders to morph the live axes of Fraunces — weight, optical size, softness, and its 'wonk' — across the phrase Gradatim Ferociter."
+  description="An interactive instrument: drag the sliders to morph the live weight and optical size of Fraunces across the phrase Gradatim Ferociter."
 >
   <p class="folio"><a href="/tinkering/">Tinkering</a> · experiment 002</p>
   <h1>Variable font playground</h1>
   <p class="lede">
-    One typeface, five dials. Drag the sliders and watch the letterforms
+    One typeface, two dials. Drag the sliders and watch the letterforms
     change shape in real time — this is what "variable font" actually means.
   </p>
 
@@ -21,19 +21,22 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
     <label>
       <span class="row"><span class="folio">Weight</span><output id="out-wght">340</output></span>
       <input type="range" id="wght" min="100" max="900" step="1" value="340" />
+      <span class="hint folio">From hairline thin to full black — the vertical thickness of every stroke.</span>
     </label>
     <label>
       <span class="row"><span class="folio">Optical size</span><output id="out-opsz">120</output></span>
       <input type="range" id="opsz" min="9" max="144" step="1" value="120" />
+      <span class="hint folio">The axis Fraunces was built for: at small values, letters are plain and text-like; at large values they grow high contrast and dramatic flourishes meant for display.</span>
     </label>
-    <label>
-      <span class="row"><span class="folio">Softness</span><output id="out-soft">0</output></span>
-      <input type="range" id="soft" min="0" max="100" step="1" value="0" />
+    <label class="ital-row folio">
+      Italic <input type="checkbox" id="ital" />
     </label>
-    <label class="toggles">
-      <span class="folio">Wonk <input type="checkbox" id="wonk" /></span>
-      <span class="folio">Italic <input type="checkbox" id="ital" /></span>
-    </label>
+    <div class="presets">
+      <span class="folio">Jump to:</span>
+      <button type="button" data-w="150" data-o="12" class="preset folio">Fine text</button>
+      <button type="button" data-w="500" data-o="72" class="preset folio">Subhead</button>
+      <button type="button" data-w="900" data-o="144" class="preset folio">Display</button>
+    </div>
     <button id="reset" class="reset folio">Reset</button>
   </div>
 
@@ -44,15 +47,15 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
       bold, light, and italic, it ships one file containing a continuous space of
       possibilities along named axes. Each slider writes to a CSS property —
       <code>font-variation-settings</code> — and the browser redraws the outlines
-      instantly. No images, no separate files: the letters are being
-      re-interpolated live.
+      instantly. No images, no separate files: the letters are re-interpolated live.
     </p>
     <p>
-      The axes here are real ones Fraunces exposes: <strong>weight</strong> (thin
-      to black), <strong>optical size</strong> (fine text detailing up to
-      display-scale drama), <strong>softness</strong> (rounding the terminals),
-      and <strong>wonk</strong> — the designer's toggle for the quirkier
-      alternate letterforms. "Gradatim ferociter" — step by step, ferociously.
+      The two axes here are the ones that carry Fraunces' character:
+      <strong>weight</strong> and <strong>optical size</strong>. Optical size is
+      the interesting one — historically, metal type was cut differently at
+      different sizes, delicate for text and bold-featured for headlines. A
+      variable font restores that lost craft as a living dial. "Gradatim
+      ferociter" — step by step, ferociously.
     </p>
   </div>
 </BaseLayout>
@@ -65,56 +68,51 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
     border-radius: 12px;
     padding: clamp(2.5rem, 7vw, 5rem) 1.5rem;
     margin: 2rem 0 1.75rem;
-    display: grid;
-    place-items: center;
-    min-height: 40vh;
+    display: grid; place-items: center; min-height: 40vh;
   }
   .specimen {
     font-family: 'Fraunces Variable', Georgia, serif;
-    font-variation-settings: 'wght' 340, 'opsz' 120, 'SOFT' 0, 'WONK' 0;
+    font-variation-settings: 'wght' 340, 'opsz' 120;
     font-style: normal;
     font-size: clamp(2.8rem, 12vw, 6rem);
-    line-height: 1.02;
-    text-align: center;
-    color: #e9ebf2;
+    line-height: 1.02; text-align: center; color: #e9ebf2;
     letter-spacing: -0.01em;
-    /* keep redraws cheap while dragging */
     will-change: font-variation-settings;
   }
 
-  .controls {
-    display: grid;
-    gap: 1.5rem;
-    max-width: 34rem;
-  }
+  .controls { display: grid; gap: 1.6rem; max-width: 34rem; }
   label { display: grid; gap: 0.5rem; }
-  .row { display: flex; justify-content: space-between; align-items: baseline; }
+  .row { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; }
   output { font-family: var(--font-utility); font-size: 0.8rem; color: var(--ink); }
 
   input[type='range'] {
     -webkit-appearance: none; appearance: none;
-    width: 100%; height: 2px; background: var(--hairline);
-    border-radius: 2px; cursor: pointer;
+    width: 100%; height: 2px; background: var(--hairline); border-radius: 2px; cursor: pointer;
   }
   input[type='range']::-webkit-slider-thumb {
     -webkit-appearance: none; appearance: none;
     width: 18px; height: 18px; border-radius: 50%;
-    background: var(--foil); border: 2px solid var(--paper);
-    box-shadow: 0 1px 4px rgba(0,0,0,0.25);
+    background: var(--foil); border: 2px solid var(--paper); box-shadow: 0 1px 4px rgba(0,0,0,0.25);
   }
   input[type='range']::-moz-range-thumb {
-    width: 18px; height: 18px; border-radius: 50%;
-    background: var(--foil); border: 2px solid var(--paper);
+    width: 18px; height: 18px; border-radius: 50%; background: var(--foil); border: 2px solid var(--paper);
   }
 
-  .toggles { display: flex; gap: 2rem; }
-  .toggles .folio { display: inline-flex; align-items: center; gap: 0.5rem; }
+  .ital-row { display: inline-flex; align-items: center; gap: 0.5rem; }
   input[type='checkbox'] { width: 1rem; height: 1rem; accent-color: var(--foil); cursor: pointer; }
 
+  .presets { display: flex; flex-wrap: wrap; gap: 0.6rem; align-items: center; padding-top: 0.25rem; }
+  .preset {
+    cursor: pointer; background: none; border: 1px solid var(--hairline); border-radius: 4px;
+    padding: 0.4rem 0.85rem; color: var(--ink-muted);
+  }
+  .preset:hover { border-color: var(--foil); color: var(--foil); }
+
+  .hint { display: block; color: var(--ink-muted); font-size: 0.7rem; letter-spacing: 0.02em; text-transform: none; line-height: 1.5; }
+
   .reset {
-    justify-self: start; cursor: pointer;
-    background: none; border: 1px solid var(--ink); border-radius: 4px;
-    padding: 0.55rem 1.1rem; color: var(--ink);
+    justify-self: start; cursor: pointer; background: none;
+    border: 1px solid var(--ink); border-radius: 4px; padding: 0.55rem 1.1rem; color: var(--ink);
   }
   .reset:hover { border-color: var(--foil); color: var(--foil); }
 
@@ -126,33 +124,33 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
   const specimen = document.getElementById('specimen');
   const wght = document.getElementById('wght');
   const opsz = document.getElementById('opsz');
-  const soft = document.getElementById('soft');
-  const wonk = document.getElementById('wonk');
   const ital = document.getElementById('ital');
   const reset = document.getElementById('reset');
   const outW = document.getElementById('out-wght');
   const outO = document.getElementById('out-opsz');
-  const outS = document.getElementById('out-soft');
 
-  const DEFAULTS = { wght: 340, opsz: 120, soft: 0, wonk: false, ital: false };
+  const DEFAULTS = { wght: 340, opsz: 120 };
 
   function apply() {
-    specimen.style.setProperty(
-      'font-variation-settings',
-      `'wght' ${wght.value}, 'opsz' ${opsz.value}, 'SOFT' ${soft.value}, 'WONK' ${wonk.checked ? 1 : 0}`
-    );
+    specimen.style.setProperty('font-variation-settings', `'wght' ${wght.value}, 'opsz' ${opsz.value}`);
     specimen.style.fontStyle = ital.checked ? 'italic' : 'normal';
     outW.textContent = wght.value;
     outO.textContent = opsz.value;
-    outS.textContent = soft.value;
   }
 
-  [wght, opsz, soft].forEach((el) => el.addEventListener('input', apply));
-  [wonk, ital].forEach((el) => el.addEventListener('change', apply));
+  [wght, opsz].forEach((el) => el.addEventListener('input', apply));
+  ital.addEventListener('change', apply);
+
+  document.querySelectorAll('.preset').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      wght.value = btn.dataset.w;
+      opsz.value = btn.dataset.o;
+      apply();
+    });
+  });
 
   reset.addEventListener('click', () => {
-    wght.value = DEFAULTS.wght; opsz.value = DEFAULTS.opsz; soft.value = DEFAULTS.soft;
-    wonk.checked = DEFAULTS.wonk; ital.checked = DEFAULTS.ital;
+    wght.value = DEFAULTS.wght; opsz.value = DEFAULTS.opsz; ital.checked = false;
     apply();
   });
 
