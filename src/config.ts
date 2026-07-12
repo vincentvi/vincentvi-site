@@ -18,7 +18,7 @@ export const SOCIALS = [
   { label: 'Behance', url: '#' },
   { label: 'Dribbble', url: '#' },
   { label: 'Instagram', url: '#' },
-  { label: 'Fiverr', url: '#' },
+  { label: 'Fiverr', url: 'https://www.fiverr.com/sinsin' },
   { label: 'GitHub', url: '#' },
 ];
 
