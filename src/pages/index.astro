@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import WorkCard from '../components/WorkCard.astro';
 import { getCollection } from 'astro:content';
 import { SITE } from '../config';
 
@@ -28,13 +29,16 @@ const posts = (await getCollection('blog', ({ data }) => !data.draft))
     <p class="folio">Selected work</p>
     <div class="grid">
       {work.map((item) => (
-        <a class="card" href={`/portfolio/${item.id}/`}>
-          <img src={item.data.cover} alt={item.data.title} loading="lazy" />
-          <h3>{item.data.title}</h3>
-          <p class="folio">{item.data.category} · {item.data.year}</p>
-        </a>
+        <WorkCard
+          href={`/portfolio/${item.id}/`}
+          title={item.data.title}
+          category={item.data.category}
+          year={item.data.year}
+          cover={item.data.cover}
+        />
       ))}
     </div>
+    <p class="more"><a href="/portfolio/">All projects →</a></p>
   </section>
 
   <hr />
@@ -56,13 +60,10 @@ const posts = (await getCollection('blog', ({ data }) => !data.draft))
   .hero { padding-block: 3rem 1rem; }
   .lede { font-size: var(--step-1); line-height: 1.5; color: var(--ink-muted); }
   .grid {
-    display: grid; gap: 2rem;
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    display: grid; gap: 3rem 2.25rem;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   }
-  .card { text-decoration: none; color: var(--ink); }
-  .card img { border: 1px solid var(--hairline); aspect-ratio: 4/3; object-fit: cover; }
-  .card h3 { margin: 0.75rem 0 0.25rem; }
-  .card:hover h3 { color: var(--cloth); }
+  .more { margin-top: 2rem; }
   .postlist { list-style: none; padding: 0; display: grid; gap: 0.75rem; }
   .postlist li { display: flex; gap: 1rem; align-items: baseline; justify-content: space-between; max-width: var(--measure); }
 </style>
