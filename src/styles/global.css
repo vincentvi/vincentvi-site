@@ -8,7 +8,7 @@
   --ink: #1b1b18;
   --ink-muted: #56564e;
   --cloth: #2c3e66;      /* links, accents */
-  --foil: #5780ac;       /* accent: steel blue */
+  --foil: hwb(0 9% 91%);       /* accent: steel blue */
   --hairline: #e4e3da;
 
   /* type */
