@@ -44,7 +44,7 @@ const cards = [
   title="Holographic model cards"
   description="A deck of mental models as holographic cards. Browse with the arrows, watch light cross the letterforms, click a card to flip it for the definition."
 >
-  <p class="folio"><a href="/tinkering/">Tinkering</a> · experiment 001</p>
+  <p class="folio crumb"><a href="/tinkering/">Tinkering</a> · experiment 001</p>
   <h1>Holographic model cards</h1>
   <p class="lede">
     A deck of mental models. Browse with the arrows, move your cursor for the
@@ -103,7 +103,13 @@ const cards = [
 </BaseLayout>
 
 <style>
-  .lede { font-size: var(--step-1); color: var(--ink-muted); }
+  /* one central axis for the whole page */
+  .crumb { text-align: center; max-width: none; }
+  h1 { text-align: center; }
+  .lede {
+    font-size: var(--step-1); color: var(--ink-muted);
+    text-align: center; max-width: 44ch; margin-inline: auto;
+  }
   .center { text-align: center; max-width: none; margin-inline: auto; }
   .counter { margin-top: 0.5rem; letter-spacing: 0.2em; }
 
@@ -113,7 +119,13 @@ const cards = [
     padding: 3.5rem 0;
     perspective: 1100px;
     touch-action: manipulation;
+    /* full-bleed: break out of the main column to the viewport edges */
+    width: 100vw;
+    margin-inline: calc(50% - 50vw);
   }
+  /* the breakout can add a few px of horizontal overflow from the
+     scrollbar; clip it at the page level */
+  :global(body) { overflow-x: clip; }
 
   .track {
     display: flex;
@@ -237,7 +249,8 @@ const cards = [
   }
   .motion:hover { border-color: var(--cloth); color: var(--cloth); }
 
-  .prose { margin-top: 3rem; }
+  .prose { margin-top: 3rem; margin-inline: auto; }
+  .prose h2 { text-align: center; }
 
   @media (prefers-reduced-motion: reduce) {
     .track, .flip, .flip-inner { transition: none; }
