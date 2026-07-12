@@ -161,6 +161,21 @@ const cards = [
     background: linear-gradient(90deg, transparent 8%, rgba(255,255,255,0.28) 50%, transparent 92%);
     pointer-events: none;
   }
+  /* dim ambient sheen on the front surface — the room light grazing
+     the lacquer, not the white-hot glint of the letters */
+  .front::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+      520px 520px at var(--mx) var(--my),
+      rgba(220, 228, 248, 0.085) 0%,
+      rgba(220, 228, 248, 0.035) 38%,
+      transparent 70%
+    );
+    pointer-events: none;
+  }
+
   .back { transform: rotateY(180deg); }
 
   .front { row-gap: 1.6rem; }
@@ -238,7 +253,7 @@ const cards = [
   const btn = document.getElementById('motion-btn');
   const flips = Array.from(track.querySelectorAll('.flip'));
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const MAX_TILT = 16;
+  const MAX_TILT = 12;
 
   let active = 0;
 
