@@ -126,7 +126,6 @@ const cards = [
     position: relative;
     overflow: hidden;
     padding: 3.5rem 0;
-    perspective: 1100px;
     touch-action: manipulation;
     /* full-bleed: break out of the main column to the viewport edges */
     width: 100vw;
@@ -148,9 +147,10 @@ const cards = [
     flex: 0 0 auto;
     width: min(400px, 78vw);
     aspect-ratio: 5 / 7;
-    transform: rotateX(var(--rx)) rotateY(var(--ry));
+    transform: perspective(900px) rotateX(var(--rx)) rotateY(var(--ry));
+    perspective: 1100px;
     scale: 0.82;
-    transition: transform 0.12s ease-out, scale 0.45s ease, opacity 0.45s ease, filter 0.45s ease;
+    transition: transform 0.09s ease-out, scale 0.45s ease, opacity 0.45s ease, filter 0.45s ease;
     opacity: 0.3;
     filter: saturate(0.6);
     cursor: pointer;
