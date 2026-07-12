@@ -1,33 +1,68 @@
 ---
-import BaseLayout from '../../layouts/BaseLayout.astro';
-import WorkCard from '../../components/WorkCard.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
 import { getCollection } from 'astro:content';
+import { SITE } from '../config';
 
 const work = (await getCollection('portfolio'))
-  .sort((a, b) => a.data.order - b.data.order);
+  .sort((a, b) => a.data.order - b.data.order)
+  .slice(0, 4);
+const posts = (await getCollection('blog', ({ data }) => !data.draft))
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+  .slice(0, 3);
 ---
-<BaseLayout title="Portfolio" description="Selected typography, lettering, and book design work by Vincent Vi.">
-  <p class="folio">Portfolio · {work.length} projects</p>
-  <h1>Work</h1>
-  <div class="grid">
-    {work.map((item) => (
-      <WorkCard
-        href={`/portfolio/${item.id}/`}
-        title={item.data.title}
-        category={item.data.category}
-        year={item.data.year}
-        cover={item.data.cover}
-        summary={item.data.summary}
-      />
-    ))}
-  </div>
+<BaseLayout>
+  <section class="hero">
+    <p class="folio">Designer · Letterer · Ho Chi Minh City</p>
+    <h1>Letterforms, books, and the spaces between them.</h1>
+    <p class="lede">
+      I'm {SITE.name} — a graphic designer working in typography, hand-lettering,
+      and book design. I draw letters, set pages, and occasionally write about
+      how it all gets made.
+    </p>
+    <p><a href="/portfolio/">See the work</a> · <a href="/contact/">Start a project</a></p>
+  </section>
+
+  <hr />
+
+  <section>
+    <p class="folio">Selected work</p>
+    <div class="grid">
+      {work.map((item) => (
+        <a class="card" href={`/portfolio/${item.id}/`}>
+          <img src={item.data.cover} alt={item.data.title} loading="lazy" />
+          <h3>{item.data.title}</h3>
+          <p class="folio">{item.data.category} · {item.data.year}</p>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <hr />
+
+  <section>
+    <p class="folio">From the blog</p>
+    <ul class="postlist">
+      {posts.map((post) => (
+        <li>
+          <a href={`/blog/${post.id}/`}>{post.data.title}</a>
+          <span class="folio">{post.data.pubDate.toLocaleDateString('en-GB', { year: 'numeric', month: 'short', day: 'numeric' })}</span>
+        </li>
+      ))}
+    </ul>
+  </section>
 </BaseLayout>
 
 <style>
+  .hero { padding-block: 3rem 1rem; }
+  .lede { font-size: var(--step-1); line-height: 1.5; color: var(--ink-muted); }
   .grid {
-    display: grid;
-    gap: 3rem 2.25rem;
-    margin-top: 2.5rem;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    display: grid; gap: 2rem;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   }
+  .card { text-decoration: none; color: var(--ink); }
+  .card img { border: 1px solid var(--hairline); aspect-ratio: 4/3; object-fit: cover; }
+  .card h3 { margin: 0.75rem 0 0.25rem; }
+  .card:hover h3 { color: var(--cloth); }
+  .postlist { list-style: none; padding: 0; display: grid; gap: 0.75rem; }
+  .postlist li { display: flex; gap: 1rem; align-items: baseline; justify-content: space-between; max-width: var(--measure); }
 </style>

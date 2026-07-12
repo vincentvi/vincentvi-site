@@ -1,0 +1,33 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+const work = (await getCollection('portfolio'))
+  .sort((a, b) => a.data.order - b.data.order);
+---
+<BaseLayout title="Portfolio" description="Selected typography, lettering, and book design work by Vincent Vi.">
+  <p class="folio">Portfolio</p>
+  <h1>Work</h1>
+  <div class="grid">
+    {work.map((item) => (
+      <a class="card" href={`/portfolio/${item.id}/`}>
+        <img src={item.data.cover} alt={item.data.title} loading="lazy" />
+        <h3>{item.data.title}</h3>
+        <p class="summary">{item.data.summary}</p>
+        <p class="folio">{item.data.category} · {item.data.year}</p>
+      </a>
+    ))}
+  </div>
+</BaseLayout>
+
+<style>
+  .grid {
+    display: grid; gap: 2.5rem; margin-top: 2rem;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  }
+  .card { text-decoration: none; color: var(--ink); }
+  .card img { border: 1px solid var(--hairline); aspect-ratio: 4/3; object-fit: cover; }
+  .card h3 { margin: 0.75rem 0 0.25rem; }
+  .card:hover h3 { color: var(--cloth); }
+  .summary { color: var(--ink-muted); margin: 0 0 0.5rem; }
+</style>

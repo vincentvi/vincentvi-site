@@ -14,7 +14,7 @@ const { Content } = await render(item);
   <article>
     <p class="folio">{item.data.category} · {item.data.year}</p>
     <h1>{item.data.title}</h1>
-    <img class="cover" src={item.data.cover} alt={item.data.title} width="800" height="600" decoding="async" />
+    <img class="cover" src={item.data.cover} alt={item.data.title} />
     <div class="prose">
       <Content />
     </div>
@@ -24,5 +24,5 @@ const { Content } = await render(item);
 </BaseLayout>
 
 <style>
-  .cover { border: 1px solid var(--hairline); margin: 1.5rem 0 2rem; width: 100%; height: auto; }
+  .cover { border: 1px solid var(--hairline); margin: 1.5rem 0 2rem; }
 </style>
