@@ -2,7 +2,7 @@
 title: "Launch to a full room"
 description: "The sell-out launch you envy was not won on launch day. On the one marketing asset a solo maker can actually own — and why it gets built before the product."
 pubDate: 2026-07-13
-draft: true
+draft: false
 ---
 
 You've seen the launch. A newsletter writer announces a course on Tuesday; by Wednesday it's sold out. An indie founder ships a paid app and the first hundred customers arrive before lunch. From the outside it reads as luck, or genius, or a rigged game.
