@@ -1,41 +1,56 @@
 ---
-import '@fontsource-variable/fraunces/full.css';
+import '@fontsource-variable/recursive/full.css';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 ---
 <BaseLayout
   title="Variable font playground"
-  description="An interactive instrument: drag the sliders to morph the live weight and optical size of Fraunces across the phrase Gradatim Ferociter."
+  description="An interactive instrument: drag the sliders to morph the live axes of Recursive — weight, casual, mono, slant, and cursive — across the phrase Gradatim Ferociter."
 >
   <p class="folio"><a href="/tinkering/">Tinkering</a> · experiment 002</p>
   <h1>Variable font playground</h1>
   <p class="lede">
-    One typeface, two dials. Drag the sliders and watch the letterforms
+    One typeface, five live dials. Drag the sliders and watch the letterforms
     change shape in real time — this is what "variable font" actually means.
   </p>
 
+  <p class="center folio type-legend">✎ Click the text below and type your own</p>
+
   <div class="panel">
-    <div class="specimen" id="specimen">Gradatim<br />Ferociter</div>
+    <div class="specimen" id="specimen" contenteditable="true" role="textbox"
+         aria-label="Editable type specimen — type your own text"
+         spellcheck="false">Gradatim Ferociter</div>
   </div>
 
   <div class="controls">
     <label>
-      <span class="row"><span class="folio">Weight</span><output id="out-wght">340</output></span>
-      <input type="range" id="wght" min="100" max="900" step="1" value="340" />
-      <span class="hint folio">From hairline thin to full black — the vertical thickness of every stroke.</span>
+      <span class="row"><span class="folio">Weight</span><output id="out-wght">400</output></span>
+      <input type="range" id="wght" min="300" max="1000" step="1" value="400" />
     </label>
     <label>
-      <span class="row"><span class="folio">Optical size</span><output id="out-opsz">120</output></span>
-      <input type="range" id="opsz" min="9" max="144" step="1" value="120" />
-      <span class="hint folio">The axis Fraunces was built for: at small values, letters are plain and text-like; at large values they grow high contrast and dramatic flourishes meant for display.</span>
+      <span class="row"><span class="folio">Casual <span class="tag">the soft one</span></span><output id="out-casl">0</output></span>
+      <input type="range" id="casl" min="0" max="100" step="1" value="0" />
+      <span class="hint folio">Linear (crisp, technical) → Casual (soft, hand-drawn, rounded terminals). The most character-changing dial here.</span>
     </label>
-    <label class="ital-row folio">
-      Italic <input type="checkbox" id="ital" />
+    <label>
+      <span class="row"><span class="folio">Mono</span><output id="out-mono">0</output></span>
+      <input type="range" id="mono" min="0" max="100" step="1" value="0" />
+      <span class="hint folio">Proportional (natural spacing) → Monospace (fixed, code-like widths).</span>
     </label>
+    <label>
+      <span class="row"><span class="folio">Slant</span><output id="out-slnt">0</output></span>
+      <input type="range" id="slnt" min="-15" max="0" step="1" value="0" />
+    </label>
+    <label class="curs-row folio">
+      Cursive <input type="checkbox" id="crsv" />
+      <span class="hint folio" style="margin-left:0.5rem;">true italic letterforms at slant</span>
+    </label>
+
     <div class="presets">
       <span class="folio">Jump to:</span>
-      <button type="button" data-w="150" data-o="12" class="preset folio">Fine text</button>
-      <button type="button" data-w="500" data-o="72" class="preset folio">Subhead</button>
-      <button type="button" data-w="900" data-o="144" class="preset folio">Display</button>
+      <button type="button" data-w="300" data-c="0" data-m="0" data-s="0" class="preset folio">Clean text</button>
+      <button type="button" data-w="640" data-c="100" data-m="0" data-s="0" class="preset folio">Handwritten</button>
+      <button type="button" data-w="500" data-c="0" data-m="100" data-s="0" class="preset folio">Code</button>
+      <button type="button" data-w="900" data-c="30" data-m="0" data-s="-14" class="preset folio">Display slant</button>
     </div>
     <button id="reset" class="reset folio">Reset</button>
   </div>
@@ -43,25 +58,34 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
   <div class="prose">
     <h2>How it works</h2>
     <p>
-      Fraunces is a <em>variable font</em>: instead of shipping separate files for
-      bold, light, and italic, it ships one file containing a continuous space of
-      possibilities along named axes. Each slider writes to a CSS property —
-      <code>font-variation-settings</code> — and the browser redraws the outlines
-      instantly. No images, no separate files: the letters are re-interpolated live.
+      Recursive is a <em>variable font</em>: instead of shipping separate files
+      for bold, light, and italic, it ships one file containing a continuous
+      space of possibilities along named axes. Each control writes to
+      <code>font-variation-settings</code>, and the browser redraws the outlines
+      instantly. No images, no separate files — the letters are re-interpolated
+      live.
     </p>
     <p>
-      The two axes here are the ones that carry Fraunces' character:
-      <strong>weight</strong> and <strong>optical size</strong>. Optical size is
-      the interesting one — historically, metal type was cut differently at
-      different sizes, delicate for text and bold-featured for headlines. A
-      variable font restores that lost craft as a living dial. "Gradatim
-      ferociter" — step by step, ferociously.
+      Recursive is built for exactly this kind of play. <strong>Casual</strong>
+      morphs the whole personality from crisp and technical to soft and
+      hand-drawn — it's the "softness" axis, done dramatically. <strong>Mono</strong>
+      snaps the spacing toward code-like fixed widths, <strong>weight</strong>
+      and <strong>slant</strong> do the familiar work, and <strong>cursive</strong>
+      swaps in true flowing italic forms. "Gradatim ferociter" — step by step,
+      ferociously.
     </p>
   </div>
 </BaseLayout>
 
 <style>
   .lede { font-size: var(--step-1); color: var(--ink-muted); }
+
+  .type-legend {
+    margin: 0 auto 0.6rem;
+    color: var(--ink-muted);
+    font-size: 0.8rem;
+    letter-spacing: 0.04em;
+  }
 
   .panel {
     background: radial-gradient(120% 130% at 50% 0%, #191c25 0%, #14161d 60%, #101218 100%);
@@ -71,19 +95,34 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
     display: grid; place-items: center; min-height: 40vh;
   }
   .specimen {
-    font-family: 'Fraunces Variable', Georgia, serif;
-    font-variation-settings: 'wght' 340, 'opsz' 120;
-    font-style: normal;
-    font-size: clamp(2.8rem, 12vw, 6rem);
-    line-height: 1.02; text-align: center; color: #e9ebf2;
+    font-family: 'Recursive Variable', system-ui, sans-serif;
+    font-variation-settings: 'wght' 400, 'CASL' 0, 'MONO' 0, 'slnt' 0, 'CRSV' 0;
+    font-size: clamp(2.6rem, 11vw, 5.5rem);
+    line-height: 1.08; text-align: center; color: #e9ebf2;
     letter-spacing: -0.01em;
     will-change: font-variation-settings;
+    outline: none;
+    caret-color: var(--foil);
+    max-width: 100%;
+    word-break: break-word;
+    cursor: text;
   }
+  .specimen:empty::before {
+    content: 'Type here…';
+    color: #4a4f5e;
+  }
+  .specimen:focus { outline: none; }
+  .panel:focus-within { box-shadow: inset 0 0 0 1px rgba(87,128,172,0.4); }
 
   .controls { display: grid; gap: 1.6rem; max-width: 34rem; }
   label { display: grid; gap: 0.5rem; }
   .row { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; }
   output { font-family: var(--font-utility); font-size: 0.8rem; color: var(--ink); }
+  .tag {
+    font-family: var(--font-utility); font-size: 0.6rem; text-transform: none;
+    letter-spacing: 0.02em; color: var(--foil); border: 1px solid var(--foil);
+    border-radius: 3px; padding: 0.05rem 0.35rem; margin-left: 0.4rem;
+  }
 
   input[type='range'] {
     -webkit-appearance: none; appearance: none;
@@ -98,7 +137,8 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
     width: 18px; height: 18px; border-radius: 50%; background: var(--foil); border: 2px solid var(--paper);
   }
 
-  .ital-row { display: inline-flex; align-items: center; gap: 0.5rem; }
+  .curs-row, .curs-row.folio { display: inline-flex; align-items: center; gap: 0.5rem; }
+  .curs-row { text-transform: none; }
   input[type='checkbox'] { width: 1rem; height: 1rem; accent-color: var(--foil); cursor: pointer; }
 
   .presets { display: flex; flex-wrap: wrap; gap: 0.6rem; align-items: center; padding-top: 0.25rem; }
@@ -123,34 +163,48 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 <script>
   const specimen = document.getElementById('specimen');
   const wght = document.getElementById('wght');
-  const opsz = document.getElementById('opsz');
-  const ital = document.getElementById('ital');
+  const casl = document.getElementById('casl');
+  const mono = document.getElementById('mono');
+  const slnt = document.getElementById('slnt');
+  const crsv = document.getElementById('crsv');
   const reset = document.getElementById('reset');
   const outW = document.getElementById('out-wght');
-  const outO = document.getElementById('out-opsz');
+  const outC = document.getElementById('out-casl');
+  const outM = document.getElementById('out-mono');
+  const outS = document.getElementById('out-slnt');
 
-  const DEFAULTS = { wght: 340, opsz: 120 };
+  const DEFAULTS = { wght: 400, casl: 0, mono: 0, slnt: 0 };
 
   function apply() {
-    specimen.style.setProperty('font-variation-settings', `'wght' ${wght.value}, 'opsz' ${opsz.value}`);
-    specimen.style.fontStyle = ital.checked ? 'italic' : 'normal';
+    // CASL and MONO axes run 0..1 in the font; sliders show 0..100 for feel
+    const casl01 = (casl.value / 100).toFixed(3);
+    const mono01 = (mono.value / 100).toFixed(3);
+    specimen.style.setProperty(
+      'font-variation-settings',
+      `'wght' ${wght.value}, 'CASL' ${casl01}, 'MONO' ${mono01}, 'slnt' ${slnt.value}, 'CRSV' ${crsv.checked ? 1 : 0}`
+    );
     outW.textContent = wght.value;
-    outO.textContent = opsz.value;
+    outC.textContent = casl.value;
+    outM.textContent = mono.value;
+    outS.textContent = slnt.value;
   }
 
-  [wght, opsz].forEach((el) => el.addEventListener('input', apply));
-  ital.addEventListener('change', apply);
+  [wght, casl, mono, slnt].forEach((el) => el.addEventListener('input', apply));
+  crsv.addEventListener('change', apply);
 
   document.querySelectorAll('.preset').forEach((btn) => {
     btn.addEventListener('click', () => {
       wght.value = btn.dataset.w;
-      opsz.value = btn.dataset.o;
+      casl.value = btn.dataset.c;
+      mono.value = btn.dataset.m;
+      slnt.value = btn.dataset.s;
       apply();
     });
   });
 
   reset.addEventListener('click', () => {
-    wght.value = DEFAULTS.wght; opsz.value = DEFAULTS.opsz; ital.checked = false;
+    wght.value = DEFAULTS.wght; casl.value = DEFAULTS.casl;
+    mono.value = DEFAULTS.mono; slnt.value = DEFAULTS.slnt; crsv.checked = false;
     apply();
   });
 
