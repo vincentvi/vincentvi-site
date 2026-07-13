@@ -178,7 +178,8 @@ const cards = [
     transform-style: preserve-3d;
     transition: transform 0.7s cubic-bezier(0.2, 0.7, 0.2, 1);
   }
-  .flip.flipped .flip-inner { transform: rotateY(180deg); }
+  .flip.flipped-up .flip-inner { transform: rotateX(180deg); }
+  .flip.flipped-down .flip-inner { transform: rotateX(-180deg); }
 
   .face {
     position: absolute; inset: 0;
@@ -208,13 +209,13 @@ const cards = [
     pointer-events: none;
   }
 
-  .back { transform: rotateY(180deg); }
+  .back { transform: rotateX(180deg); }
   .back::after {
     content: '';
     position: absolute;
     inset: 0;
     background: radial-gradient(
-      520px 520px at calc(100% - var(--mx)) var(--my),
+      520px 520px at var(--mx) calc(100% - var(--my)),
       rgba(220, 228, 248, 0.085) 0%,
       rgba(220, 228, 248, 0.035) 38%,
       transparent 70%
@@ -287,9 +288,9 @@ const cards = [
   .back .tl {
     background-image:
       linear-gradient(105deg,
-        transparent calc((100% - var(--mx)) - 18%),
-        rgba(255, 255, 255, 0.9) calc(100% - var(--mx)),
-        transparent calc((100% - var(--mx)) + 18%)),
+        transparent calc(var(--mx) - 18%),
+        rgba(255, 255, 255, 0.9) var(--mx),
+        transparent calc(var(--mx) + 18%)),
       linear-gradient(rgba(205, 210, 225, 0.38), rgba(205, 210, 225, 0.38));
     background-clip: text;
     -webkit-background-clip: text;
@@ -383,7 +384,7 @@ const cards = [
     active = Math.max(0, Math.min(flips.length - 1, index));
     flips.forEach((f, i) => {
       f.classList.toggle('active', i === active);
-      f.classList.remove('flipped'); // arrive at fronts, always
+      unflip(f); // arrive at fronts, always
       resetTilt(f);
     });
     prev.disabled = active === 0;
@@ -401,10 +402,8 @@ const cards = [
     if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT' || t.tagName === 'BUTTON')) return;
     if (e.key === 'ArrowLeft') { e.preventDefault(); go(active - 1); }
     if (e.key === 'ArrowRight') { e.preventDefault(); go(active + 1); }
-    if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
-      e.preventDefault();
-      flips[active].classList.toggle('flipped');
-    }
+    if (e.key === 'ArrowUp') { e.preventDefault(); flipDir(flips[active], 'up'); }
+    if (e.key === 'ArrowDown') { e.preventDefault(); flipDir(flips[active], 'down'); }
   });
 
   // side cards navigate on click (they're pointer-events:none, so
@@ -417,17 +416,26 @@ const cards = [
     }
   });
 
-  // ---- flip: only the active card ----
+  // ---- flip: only the active card; up/down are real directions ----
+  function isFlipped(f) {
+    return f.classList.contains('flipped-up') || f.classList.contains('flipped-down');
+  }
+  function unflip(f) { f.classList.remove('flipped-up', 'flipped-down'); }
+  function flipDir(f, dir) {
+    if (isFlipped(f)) { unflip(f); return; }
+    f.classList.add(dir === 'down' ? 'flipped-down' : 'flipped-up');
+  }
+
   flips.forEach((f) => {
     f.addEventListener('click', () => {
       if (!f.classList.contains('active')) return;
-      f.classList.toggle('flipped');
+      flipDir(f, 'up');
     });
     f.setAttribute('tabindex', '0');
     f.setAttribute('role', 'button');
     f.addEventListener('keydown', (e) => {
       if ((e.key === 'Enter' || e.key === ' ') && f.classList.contains('active')) {
-        e.preventDefault(); f.classList.toggle('flipped');
+        e.preventDefault(); flipDir(f, 'up');
       }
     });
   });
