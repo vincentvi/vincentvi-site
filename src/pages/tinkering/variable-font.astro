@@ -13,7 +13,16 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
     change shape in real time — this is what "variable font" actually means.
   </p>
 
-  <p class="center folio type-legend">✎ Click the text below and type your own</p>
+  <div class="play-head">
+    <p class="folio type-legend">✎ Click the text below and type your own</p>
+    <div class="share" aria-label="Share this playground">
+      <span class="folio share-label">Share</span>
+      <button class="share-btn folio" data-net="x" type="button">X</button>
+      <button class="share-btn folio" data-net="linkedin" type="button">LinkedIn</button>
+      <button class="share-btn folio" data-net="copy" type="button" id="copy-btn">Copy link</button>
+      <button class="share-btn folio" data-net="native" type="button" id="native-share" hidden>More…</button>
+    </div>
+  </div>
 
   <div class="panel">
     <div class="specimen" id="specimen" contenteditable="true" role="textbox"
@@ -85,11 +94,28 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
     text-align: center; max-width: 46ch; margin-inline: auto;
   }
 
+  .play-head {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 1rem; flex-wrap: wrap;
+    max-width: 100%; margin: 0 0 0.7rem;
+  }
   .type-legend {
-    margin: 0 auto 0.6rem;
+    margin: 0;
     color: var(--ink-muted);
     font-size: 0.8rem;
     letter-spacing: 0.04em;
+  }
+  .share { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; }
+  .share-label { color: var(--ink-muted); margin-right: 0.15rem; }
+  .share-btn {
+    cursor: pointer; background: none;
+    border: 1px solid var(--hairline); border-radius: 4px;
+    padding: 0.35rem 0.75rem; color: var(--ink-muted);
+    transition: border-color 0.25s ease, color 0.25s ease;
+  }
+  .share-btn:hover { border-color: var(--foil); color: var(--foil); }
+  @media (max-width: 560px) {
+    .play-head { justify-content: center; }
   }
 
   .panel {
@@ -213,6 +239,36 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
     wght.value = DEFAULTS.wght; casl.value = DEFAULTS.casl;
     mono.value = DEFAULTS.mono; slnt.value = DEFAULTS.slnt; crsv.checked = false;
     apply();
+  });
+
+  // ---- share (carries whatever the visitor typed) ----
+  const nativeBtn = document.getElementById('native-share');
+  if (navigator.share && nativeBtn) nativeBtn.hidden = false;
+
+  document.querySelectorAll('.share-btn').forEach((b) => {
+    b.addEventListener('click', async () => {
+      const typed = (specimen.textContent || '').trim().slice(0, 80);
+      const text = typed
+        ? `"${typed}" — played with variable font axes on vincentvi.me`
+        : 'A variable font playground on vincentvi.me';
+      const url = window.location.href;
+      const eu = encodeURIComponent(url);
+      const et = encodeURIComponent(text);
+      const net = b.dataset.net;
+      if (net === 'x') {
+        window.open(`https://twitter.com/intent/tweet?text=${et}&url=${eu}`, '_blank', 'noopener');
+      } else if (net === 'linkedin') {
+        window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${eu}`, '_blank', 'noopener');
+      } else if (net === 'copy') {
+        try {
+          await navigator.clipboard.writeText(url);
+          const old = b.textContent; b.textContent = 'Copied ✓';
+          setTimeout(() => { b.textContent = old; }, 1600);
+        } catch { /* blocked */ }
+      } else if (net === 'native') {
+        try { await navigator.share({ text, url, title: document.title }); } catch {}
+      }
+    });
   });
 
   apply();
