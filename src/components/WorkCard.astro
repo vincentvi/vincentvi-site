@@ -8,11 +8,10 @@ interface Props {
   href: string;
   title: string;
   category: string;
-  year: number;
   cover: string;
   summary?: string;
 }
-const { href, title, category, year, cover, summary } = Astro.props;
+const { href, title, category, cover, summary } = Astro.props;
 ---
 <a class="work-card" href={href}>
   <span class="spine folio">{category}</span>
@@ -29,7 +28,6 @@ const { href, title, category, year, cover, summary } = Astro.props;
   <div class="meta">
     <h3>{title}</h3>
     {summary && <p class="summary">{summary}</p>}
-    <p class="folio year">{year}</p>
   </div>
 </a>
 

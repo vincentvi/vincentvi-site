@@ -50,7 +50,6 @@ const headline = 'Letterforms, books, and the spaces between them.';
       {posts.map((post) => (
         <li>
           <a href={`/blog/${post.id}/`}>{post.data.title}</a>
-          <span class="folio">{post.data.pubDate.toLocaleDateString('en-GB', { year: 'numeric', month: 'short', day: 'numeric' })}</span>
         </li>
       ))}
     </ul>

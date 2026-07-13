@@ -9,12 +9,10 @@ export async function getStaticPaths() {
 
 const { post } = Astro.props;
 const { Content } = await render(post);
-const d = (date: Date) =>
-  date.toLocaleDateString('en-GB', { year: 'numeric', month: 'long', day: 'numeric' });
 ---
 <BaseLayout title={post.data.title} description={post.data.description} ogType="article" ogImage={post.data.cover}>
   <article>
-    <p class="folio">{d(post.data.pubDate)}{post.data.updatedDate && ` · updated ${d(post.data.updatedDate)}`}</p>
+    <p class="folio">Note</p>
     <h1>{post.data.title}</h1>
     <div class="prose">
       <Content />

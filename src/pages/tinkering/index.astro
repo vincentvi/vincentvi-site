@@ -7,21 +7,18 @@ const experiments = [
     title: 'One line, five voices',
     summary: 'Type your own line and watch the same words wear five typographic voices — whisper, declaration, conversation, terminal, play — plus one empty frame where hand lettering begins.',
     tags: 'CSS · JS · variable fonts',
-    date: '2026-07',
   },
   {
     href: '/tinkering/variable-font/',
     title: 'Variable font playground',
     summary: 'One typeface, five live dials. Drag sliders to morph the axes of Fraunces across "Gradatim Ferociter".',
     tags: 'CSS · JS · variable fonts',
-    date: '2026-07',
   },
   {
     href: '/tinkering/holo-card/',
     title: 'Holographic model cards',
     summary: 'A growing deck of mental models as dark cards — browse the carousel, watch light cross the letterforms, flip a card for its definition.',
     tags: 'CSS · JS · variable fonts',
-    date: '2026-07',
   },
 ];
 ---
@@ -42,7 +39,7 @@ const experiments = [
         <a href={x.href}>
           <h2>{x.title}</h2>
           <p>{x.summary}</p>
-          <p class="folio">{x.tags} · {x.date}</p>
+          <p class="folio">{x.tags}</p>
         </a>
       </li>
     ))}

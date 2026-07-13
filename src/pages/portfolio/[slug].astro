@@ -12,7 +12,7 @@ const { Content } = await render(item);
 ---
 <BaseLayout title={item.data.title} description={item.data.summary} ogType="article" ogImage={item.data.cover}>
   <article>
-    <p class="folio">{item.data.category} · {item.data.year}</p>
+    <p class="folio">{item.data.category}</p>
     <h1>{item.data.title}</h1>
     <img class="cover" src={item.data.cover} alt={item.data.title} width="800" height="600" decoding="async" />
     <div class="prose">
