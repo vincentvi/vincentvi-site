@@ -57,10 +57,19 @@ const cards = [
         <div class={`flip${i === 0 ? ' active' : ''}`} data-index={i} data-share={c.title.join(' ')}>
           <div class="flip-inner">
             <div class="face front">
-              <span class="word" aria-hidden="true">{c.title[0]}<br />{c.title[1]}</span>
-              <p class="subtitle">{c.subtitle}<br />A mental model.</p>
-              <span class="corner folio tl">Mental model</span>
-              <span class="corner folio br">{c.num}</span>
+              <div class="front-head">
+                <span class="folio">Mental model</span>
+                <span class="folio">{c.num}</span>
+              </div>
+              <!-- SLOT: sketchnote — replace the inner placeholder with your inline SVG artwork -->
+              <div class="sketch-slot" aria-hidden="true">
+                <span class="folio">sketchnote here</span>
+              </div>
+              <div class="front-main">
+                <!-- SLOT: title — replace .word with your inline SVG lettering when ready -->
+                <span class="word" aria-hidden="true">{c.title[0]}<br />{c.title[1]}</span>
+                <p class="subtitle">{c.subtitle}<br />A mental model.</p>
+              </div>
               <span class="flip-hint folio">click to flip ↻</span>
             </div>
             <div class="face back">
@@ -143,7 +152,7 @@ const cards = [
   }
 
   .flip {
-    --rx: 0deg; --ry: 0deg; --mx: 50%; --my: 42%;
+    --rx: 0deg; --ry: 0deg; --mx: -60%; --my: -60%;
     flex: 0 0 auto;
     width: min(400px, 78vw);
     aspect-ratio: 5 / 7;
@@ -199,17 +208,58 @@ const cards = [
 
   .back { transform: rotateY(180deg); }
 
-  .front { row-gap: 1.6rem; }
+  .front {
+    display: flex;
+    flex-direction: column;
+    padding: 1.4rem 1.5rem 2.5rem;
+  }
+  .front-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .front-head .folio { color: rgba(205, 210, 225, 0.38); }
+  .sketch-slot {
+    margin-top: 0.9rem;
+    height: 64px;
+    border: 1px dashed #4a4e5a;
+    border-radius: 8px;
+    display: grid;
+    place-items: center;
+  }
+  .sketch-slot .folio { color: #6d7284; font-size: 0.64rem; }
+  .front-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1.2rem;
+  }
   .word {
     font-family: 'Cinzel Variable', 'Trajan Pro', Georgia, serif;
     font-weight: 560;
     font-size: clamp(2.1rem, 10vw, 3.6rem);
     letter-spacing: 0.06em; line-height: 1.12; text-align: center;
     background-image:
+      /* foil band: sharp streak with tinted edges — the visible shine */
+      linear-gradient(105deg,
+        transparent calc(var(--mx) - 24%),
+        rgba(212, 228, 251, 0.55) calc(var(--mx) - 10%),
+        #ffffff calc(var(--mx) - 2%),
+        #ffffff calc(var(--mx) + 2%),
+        rgba(243, 221, 248, 0.55) calc(var(--mx) + 10%),
+        transparent calc(var(--mx) + 24%)),
+      /* soft glow following the full light position */
       radial-gradient(420px 420px at var(--mx) var(--my),
-        #ffffff 0%, rgba(255,255,255,0.82) 18%,
-        rgba(160,168,190,0.45) 42%, rgba(77,83,102,0.92) 70%),
-      linear-gradient(#4d5366, #424859);
+        rgba(255,255,255,0.75) 0%, rgba(255,255,255,0.35) 30%,
+        transparent 62%),
+      /* the resting metal */
+      linear-gradient(
+        180deg,
+        #f6f8fd 0%, #b8bec9 30%, #787e8b 49%,
+        #666c7a 53%, #b0b6c2 72%, #e2e6ef 100%
+      );
     background-clip: text; -webkit-background-clip: text; color: transparent;
     user-select: none;
   }
@@ -359,8 +409,8 @@ const cards = [
   function resetTilt(f) {
     f.style.setProperty('--rx', '0deg');
     f.style.setProperty('--ry', '0deg');
-    f.style.setProperty('--mx', '50%');
-    f.style.setProperty('--my', '42%');
+    f.style.setProperty('--mx', '-60%'); /* park the light off-card: */
+    f.style.setProperty('--my', '-60%'); /* pure metal at rest        */
   }
 
   if (!reduced) {
