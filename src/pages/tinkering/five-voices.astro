@@ -1,0 +1,320 @@
+---
+import '@fontsource-variable/recursive/full.css';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+---
+<BaseLayout
+  title="One line, five voices"
+  description="Type one sentence and watch it wear five typographic voices — whisper, declaration, conversation, terminal, play — and one empty frame where hand lettering begins."
+>
+  <p class="folio crumb"><a href="/tinkering/">Tinkering</a> · experiment 003</p>
+  <h1>One line, five voices</h1>
+  <p class="lede">
+    The same sentence, set six ways. Typography is tone of voice — change the
+    letterforms and the meaning shifts under the words. Scroll, and watch each
+    voice settle into itself.
+  </p>
+
+  <div class="play-head">
+    <p class="folio type-legend">✎ The line below is yours — replace it</p>
+    <div class="share" aria-label="Share this page">
+      <span class="folio share-label">Share</span>
+      <button class="share-btn folio" data-net="x" type="button">X</button>
+      <button class="share-btn folio" data-net="linkedin" type="button">LinkedIn</button>
+      <button class="share-btn folio" data-net="copy" type="button">Copy link</button>
+      <button class="share-btn folio" data-net="native" type="button" id="native-share" hidden>More…</button>
+    </div>
+  </div>
+
+  <div class="tryline">
+    <label class="folio" for="line-input">Your line</label>
+    <input id="line-input" type="text" value="Plant the tree before you're hungry."
+      autocomplete="off" spellcheck="false" maxlength="90" />
+  </div>
+
+  <section class="voice v-whisper">
+    <span class="folio voice-label">№ 01 · Whisper — Fraunces, tracked caps · reads like an epigraph</span>
+    <div class="stage"><div class="rule-row"><p class="line" data-line>Plant the tree before you're hungry.</p></div></div>
+  </section>
+
+  <section class="voice v-declaration">
+    <span class="folio voice-label">№ 02 · Declaration — Fraunces at display size · reads like a book cover</span>
+    <div class="stage"><p class="line" data-line>Plant the tree before you're hungry.</p></div>
+  </section>
+
+  <section class="voice v-conversation">
+    <span class="folio voice-label">№ 03 · Conversation — Newsreader italic · reads like a letter</span>
+    <div class="stage"><p class="line" data-line>Plant the tree before you're hungry.</p></div>
+  </section>
+
+  <section class="voice v-terminal">
+    <span class="folio voice-label">№ 04 · Terminal — Recursive, mono axis · reads like a commit message</span>
+    <div class="stage"><p class="line term-line"><span class="prompt" aria-hidden="true">❯</span><span data-line>Plant the tree before you're hungry.</span><span class="caret" aria-hidden="true">▊</span></p></div>
+  </section>
+
+  <section class="voice v-play">
+    <span class="folio voice-label">№ 05 · Play — Recursive, casual axis · reads like a doodle</span>
+    <div class="stage"><p class="line" id="play-line" aria-label="Your line, set playfully"></p></div>
+  </section>
+
+  <section class="voice v-hand">
+    <span class="folio voice-label">№ 06 · The Hand — no typeface</span>
+    <div class="stage">
+      <p class="placeholder">Machines stop here. This is where lettering begins.</p>
+      <a class="hand-cta folio" href="/contact/">Ask for the sixth voice</a>
+      <span class="folio hand-hint">a hello and your line is all it takes</span>
+    </div>
+  </section>
+
+  <div class="prose">
+    <h2>Why the same words feel different</h2>
+    <p>
+      Nothing changed above except the letterforms — yet the whisper reads like
+      a secret, the declaration like a promise, the terminal like a fact.
+      Voices 01–05 are live text: variable font axes
+      (<code>font-variation-settings</code>) re-drawn by the browser as each
+      panel enters the viewport, no images anywhere. Type is doing what a voice
+      does in speech — carrying the part of the meaning the words can't.
+    </p>
+    <p>
+      The sixth voice is the one a font file can't hold: a line drawn once, for
+      one sentence, by hand. That frame stays empty on purpose.
+    </p>
+  </div>
+</BaseLayout>
+
+<style>
+  /* Dark room for this page only — token-level, so header, footer,
+     and every .folio inherit the theme without per-element overrides.
+     Must sit on html (not body): global.css paints the background on
+     html, and custom properties only flow downward. Selector must be
+     html:root (0,1,1) to out-rank global.css's :root (0,1,0) — a bare
+     html type selector loses that fight regardless of load order. */
+  :global(html:root) {
+    --paper: #111318;
+    --ink: #e6e4dc;
+    --ink-muted: #9b9a90;
+    --hairline: #262b38;
+    --cloth: #8fb0e0;
+    --foil: #6f96c4;
+  }
+
+  .crumb { max-width: none; }
+  .lede { font-size: var(--step-1); color: var(--ink-muted); max-width: 46ch; }
+
+  .play-head {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 1rem; flex-wrap: wrap;
+    margin: 2.5rem 0 0;
+  }
+  .type-legend { margin: 0; color: var(--ink-muted); font-size: 0.8rem; letter-spacing: 0.04em; }
+  .share { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; }
+  .share-label { color: var(--ink-muted); margin-right: 0.15rem; }
+  .share-btn {
+    cursor: pointer; background: none;
+    border: 1px solid var(--hairline); border-radius: 4px;
+    padding: 0.35rem 0.75rem; color: var(--ink-muted);
+    transition: border-color 0.25s ease, color 0.25s ease;
+  }
+  .share-btn:hover { border-color: var(--foil); color: var(--foil); }
+
+  .tryline { margin: 1.25rem auto 3.5rem; max-width: 38rem; text-align: center; }
+  .tryline label { display: block; margin-bottom: 0.6rem; }
+  .tryline input { text-align: center; }
+  .tryline input {
+    width: 100%; box-sizing: border-box;
+    background: transparent; border: none;
+    border-bottom: 1px solid var(--hairline);
+    padding: 0.4rem 0.1rem;
+    font-family: var(--font-body); font-style: italic;
+    font-size: 1.35rem; color: var(--ink);
+  }
+  .tryline input:focus { outline: none; border-bottom-color: var(--foil); }
+
+  .voice { margin-bottom: 3.25rem; }
+  .voice-label { display: block; margin-bottom: 0.7rem; }
+  .stage {
+    background: radial-gradient(120% 130% at 50% 0%, #191c25 0%, #14161d 60%, #101218 100%);
+    border: 1px solid #262b38; border-radius: 12px;
+    padding: clamp(2.75rem, 7vw, 4.5rem) clamp(1.5rem, 5vw, 3.5rem);
+    overflow-x: auto;
+  }
+  .stage .line { max-width: none; }
+
+  /* № 01 — Whisper: tracking breathes open as it enters */
+  .v-whisper .stage { text-align: center; }
+  .v-whisper .rule-row { display: flex; align-items: center; gap: 1.5rem; justify-content: center; }
+  .v-whisper .rule-row::before,
+  .v-whisper .rule-row::after { content: ''; flex: 0 1 6rem; height: 1px; background: #262b38; }
+  .v-whisper .line {
+    font-family: var(--font-display);
+    font-variation-settings: 'opsz' 28, 'wght' 360;
+    text-transform: uppercase;
+    letter-spacing: 0.34em;
+    font-size: clamp(0.72rem, 1.6vw, 0.95rem);
+    color: #8d93a8; margin: 0;
+    transition: letter-spacing 0.9s ease, opacity 0.9s ease;
+  }
+  .v-whisper.raw .line { letter-spacing: 0.05em; opacity: 0.35; }
+
+  /* № 02 — Declaration: weight pours in */
+  .v-declaration .line {
+    font-family: var(--font-display);
+    font-variation-settings: 'opsz' 144, 'wght' 660;
+    font-size: clamp(2.2rem, 6.5vw, 4.4rem);
+    line-height: 1.04; letter-spacing: -0.01em;
+    color: #e9e8e2; margin: 0;
+    max-width: 18ch; text-wrap: balance;
+    transition: font-variation-settings 0.9s ease;
+  }
+  .v-declaration.raw .line { font-variation-settings: 'opsz' 144, 'wght' 300; }
+
+  /* № 03 — Conversation: arrives quietly */
+  .v-conversation .line {
+    font-family: var(--font-body); font-style: italic; font-weight: 430;
+    font-size: clamp(1.25rem, 3vw, 1.6rem); line-height: 1.55;
+    color: #c6c9d4; max-width: 30ch; margin: 0 auto;
+    transition: opacity 0.9s ease, transform 0.9s ease;
+  }
+  .v-conversation .line::before { content: '— '; color: #4d5366; }
+  .v-conversation.raw .line { opacity: 0; transform: translateY(0.4em); }
+
+  /* № 04 — Terminal: spacing snaps onto the mono grid */
+  .v-terminal .term-line {
+    font-family: 'Recursive Variable', ui-monospace, monospace;
+    font-variation-settings: 'MONO' 1, 'CASL' 0, 'wght' 420, 'slnt' 0, 'CRSV' 0;
+    font-size: clamp(0.95rem, 2.2vw, 1.15rem);
+    color: #c9cdd9; margin: 0; white-space: nowrap;
+    transition: font-variation-settings 0.9s ease;
+  }
+  .v-terminal.raw .term-line { font-variation-settings: 'MONO' 0, 'CASL' 0, 'wght' 420, 'slnt' 0, 'CRSV' 0; }
+  .v-terminal .prompt { color: var(--foil); margin-right: 0.6em; }
+  .v-terminal .caret { color: #4d5366; margin-left: 0.15em; }
+
+  /* № 05 — Play: letters loosen up, words tilt into place */
+  .v-play .stage { text-align: center; }
+  .v-play .line {
+    font-family: 'Recursive Variable', ui-monospace, sans-serif;
+    font-variation-settings: 'MONO' 0, 'CASL' 1, 'wght' 760, 'slnt' -4, 'CRSV' 0.5;
+    font-size: clamp(1.5rem, 4.5vw, 2.6rem);
+    line-height: 1.35; color: #e9e8e2; margin: 0;
+    transition: font-variation-settings 0.9s ease;
+  }
+  .v-play.raw .line { font-variation-settings: 'MONO' 0, 'CASL' 0, 'wght' 420, 'slnt' 0, 'CRSV' 0.5; }
+  .v-play .line :global(.w) { display: inline-block; transition: transform 0.7s ease; }
+  .v-play .line :global(.w:nth-child(4n+1)) { transform: rotate(-2.2deg) translateY(-0.08em); transition-delay: 0.05s; }
+  .v-play .line :global(.w:nth-child(4n+2)) { transform: rotate(1.6deg) translateY(0.06em); transition-delay: 0.12s; }
+  .v-play .line :global(.w:nth-child(4n+3)) { transform: rotate(-1.2deg); transition-delay: 0.19s; }
+  .v-play .line :global(.w:nth-child(4n))   { transform: rotate(2.4deg) translateY(-0.05em); transition-delay: 0.26s; }
+  .v-play.raw .line :global(.w) { transform: none; }
+  .v-play .line :global(.w.accent) { color: #a7f175; }
+
+  /* № 06 — The Hand: an empty frame and an open door */
+  .v-hand .stage {
+    border-style: dashed; border-color: #4d5366;
+    background: transparent; text-align: center;
+    transition: opacity 0.9s ease;
+  }
+  .v-hand.raw .stage { opacity: 0; }
+  .v-hand .placeholder {
+    font-family: var(--font-body); font-style: italic;
+    font-size: 1.2rem; color: var(--ink-muted);
+    max-width: 26ch; margin: 0 auto 1.4rem;
+  }
+  .hand-cta {
+    display: inline-block; text-decoration: none;
+    border: 1px solid var(--foil); border-radius: 4px;
+    padding: 0.6rem 1.2rem; color: var(--foil);
+    transition: background 0.25s ease, color 0.25s ease;
+  }
+  .hand-cta:hover { background: var(--foil); color: #101218; }
+  .hand-hint { display: block; margin-top: 0.8rem; color: #4d5366; text-transform: none; letter-spacing: 0.04em; }
+
+  .prose { margin-top: 4rem; }
+  .prose code {
+    font-family: var(--font-utility); font-size: 0.85em;
+    background: #1b1e28; padding: 0.1em 0.35em; border-radius: 3px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .voice .line, .voice .term-line, .v-hand .stage, .v-play .line :global(.w) {
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  const input = document.getElementById('line-input') as HTMLInputElement;
+  const plainLines = document.querySelectorAll('[data-line]');
+  const playLine = document.getElementById('play-line');
+
+  const FALLBACK = "Plant the tree before you're hungry.";
+
+  function renderPlay(text: string) {
+    if (!playLine) return;
+    playLine.textContent = '';
+    const words = text.split(/\s+/).filter(Boolean);
+    const accent = words.length > 2 ? Math.floor(words.length / 2) : -1;
+    words.forEach((w, i) => {
+      const s = document.createElement('span');
+      s.className = 'w' + (i === accent ? ' accent' : '');
+      s.textContent = w;
+      playLine.appendChild(s);
+      if (i < words.length - 1) playLine.appendChild(document.createTextNode(' '));
+    });
+  }
+
+  function update() {
+    const t = input.value.trim() || FALLBACK;
+    plainLines.forEach((el) => { el.textContent = t; });
+    renderPlay(t);
+  }
+  input.addEventListener('input', update);
+  update();
+
+  // ---- settle-on-scroll: each voice enters "unformed", then finds itself ----
+  const voices = document.querySelectorAll('.voice');
+  const motionOK = window.matchMedia('(prefers-reduced-motion: no-preference)').matches;
+
+  if (motionOK && 'IntersectionObserver' in window) {
+    voices.forEach((v) => v.classList.add('raw'));
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        if (e.isIntersecting) {
+          e.target.classList.remove('raw');
+          io.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.35 });
+    voices.forEach((v) => io.observe(v));
+  }
+
+  // ---- share (carries the visitor's line) ----
+  const nativeBtn = document.getElementById('native-share');
+  if (navigator.share && nativeBtn) nativeBtn.hidden = false;
+
+  document.querySelectorAll('.share-btn').forEach((b) => {
+    b.addEventListener('click', async () => {
+      const typed = input.value.trim().slice(0, 80);
+      const text = typed
+        ? `"${typed}" — one line, five typographic voices on vincentvi.me`
+        : 'One line, five typographic voices on vincentvi.me';
+      const url = window.location.href;
+      const eu = encodeURIComponent(url);
+      const et = encodeURIComponent(text);
+      const net = (b as HTMLElement).dataset.net;
+      if (net === 'x') {
+        window.open(`https://twitter.com/intent/tweet?text=${et}&url=${eu}`, '_blank', 'noopener');
+      } else if (net === 'linkedin') {
+        window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${eu}`, '_blank', 'noopener');
+      } else if (net === 'copy') {
+        try {
+          await navigator.clipboard.writeText(url);
+          const old = b.textContent; b.textContent = 'Copied ✓';
+          setTimeout(() => { b.textContent = old; }, 1600);
+        } catch { /* clipboard blocked */ }
+      } else if (net === 'native') {
+        try { await navigator.share({ text, url, title: document.title }); } catch {}
+      }
+    });
+  });
+</script>
