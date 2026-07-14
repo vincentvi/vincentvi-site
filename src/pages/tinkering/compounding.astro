@@ -1,0 +1,606 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+---
+<BaseLayout
+  title="Step by step, ferociously"
+  description="An explorable note on compounding: drag the numbers in the sentence and watch the curve — and a letter of type — grow with them."
+>
+  <div class="essay">
+    <p class="folio crumb"><a href="/tinkering/">Tinkering</a> · experiment 005</p>
+    <h1>Step by step, <mark>ferociously</mark></h1>
+    {/* compressHTML strips whitespace-only nodes between inline elements, so any
+        space that would fall on a line break is written explicitly as {' '} */}
+    <p class="lede">
+      An explorable note on compounding, after Bret Victor's{' '}
+      <a href="https://worrydream.com/Tangle/">reactive documents</a>.
+      The green numbers aren't illustrations — they're the model. Drag them.
+    </p>
+
+    <hr />
+
+    <p class="tangle-para">
+      Say you get{' '}
+      <span id="t-rate" class="tangle" role="slider" tabindex="0"
+            aria-label="daily improvement rate, percent"
+            aria-valuemin="0.1" aria-valuemax="3" aria-valuenow="1">1.0% better</span>{' '}
+      at something every day, and you keep it up for{' '}
+      <span id="t-days" class="tangle" role="slider" tabindex="0"
+            aria-label="number of days"
+            aria-valuemin="30" aria-valuemax="365" aria-valuenow="365">365 days</span>.
+      The effort simply added up would make you{' '}
+      <output id="o-lin" class="lin">4.7×</output> better.
+      But each day's gain stands on all the days before it, so you actually end up{' '}
+      <output id="o-comp" class="comp">37.8×</output> better.
+    </p>
+    <p class="folio hint">drag the green numbers ↔ · or focus them and use arrow keys</p>
+
+    <p class="demo-intro">Two readings of the same two numbers — the curve, and the letterform.</p>
+
+    <div class="demo">
+      <figure>
+        <div class="col-head" aria-hidden="true">
+          <span><i class="swatch comp"></i>Compounding</span>
+          <span><i class="swatch lin"></i>Linear</span>
+        </div>
+        <div class="chart-wrap" id="chart-wrap">
+          <svg id="chart" viewBox="0 0 720 380" role="img"
+               aria-label="Line chart comparing compounding growth against linear growth over the chosen number of days."></svg>
+          <div class="tooltip" id="tooltip"></div>
+        </div>
+      </figure>
+
+      <div>
+        <p class="col-head">one letter, three sizes</p>
+        <div class="stage" id="stage">
+          <span class="glyph day1" aria-hidden="true">a</span>
+          <span class="glyph lin" id="g-lin" aria-hidden="true">a</span>
+          <span class="glyph comp" id="g-comp" aria-hidden="true">a</span>
+          <div class="baserule"></div>
+          <p class="offpage folio" id="offpage">↑ past the top of the frame</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="caption-row">
+      <p class="folio">growth multiple over time — hover to read exact values</p>
+      <p class="folio spec-caption">
+        <span class="k-day1">day 1 <b>×1</b></span>
+        <span class="k-lin">linear <b id="c-lin">×4.7</b></span>
+        <span class="k-comp">compounding <b id="c-comp">×37.8</b></span>
+      </p>
+    </div>
+
+    <p id="spec-note">
+      The same lowercase <em>a</em> on one baseline: where you start, what the effort
+      adds up to, and what it compounds to.
+    </p>
+
+    <details>
+      <summary>View as table</summary>
+      <div class="table-scroll">
+        <table id="milestones">
+          <thead><tr><th scope="col">Day</th><th scope="col">Compounding</th><th scope="col">Linear</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </details>
+
+    <hr />
+
+    <div class="coda">
+      <div class="up">
+        <p class="figure">1.01<sup>365</sup> ≈ 37.8</p>
+        <p class="folio">a year of tiny gains</p>
+      </div>
+      <div>
+        <p class="figure">0.99<sup>365</sup> ≈ 0.03</p>
+        <p class="folio">a year of tiny slips</p>
+      </div>
+    </div>
+
+    <p>
+      That asymmetry is the whole argument for <em>gradatim ferociter</em>:
+      the size of the step matters far less than refusing to skip one.
+      Notice what the chart does when you drag the rate down to 0.3% —
+      the curve doesn't flatten into the linear line, it just takes longer to leave it.
+    </p>
+  </div>
+</BaseLayout>
+
+<style>
+  /* Dark room for this page only — token-level, so header, footer, and every
+     .folio inherit the theme without per-element overrides. Same set as
+     five-voices / neon-breath. Must sit on html:root (0,1,1) to out-rank
+     global.css's :root (0,1,0). */
+  :global(html:root) {
+    --paper: #111318;
+    --ink: #e6e4dc;
+    --ink-muted: #9b9a90;
+    --hairline: #262b38;
+    --cloth: #8fb0e0;
+    --foil: #6f96c4;
+
+    /* one green does every green job on this page: the drag pills, the
+       compounding letter, and the compounding series in the chart */
+    --highlight: #a7f175;
+    --highlight-ink: #14210c;
+    --series-comp: #a7f175;
+    --series-lin: #6284d6;
+
+    /* the centred reading column — fixed, so every text block shares a left
+       edge (a ch-based width would drift with each block's own font-size) */
+    --column: 36rem;
+  }
+
+  /* The page is as wide as the figures need; the prose stays a column wide
+     and centred under them. */
+  .essay > p, .essay > h1, .essay > .coda, .essay > details, .essay > hr {
+    max-width: var(--column);
+    margin-inline: auto;
+  }
+  .crumb { margin-bottom: 0.6rem; }
+  .lede { font-size: var(--step-1); color: var(--ink-muted); }
+  h1 mark {
+    background: var(--highlight);
+    color: var(--highlight-ink);
+    padding: 0 0.12em;
+  }
+
+  /* ---- the tangle paragraph: numbers you can drag ---- */
+  .tangle-para {
+    font-size: var(--step-1); line-height: 1.6;
+    margin-block: 2.2rem 0.4rem; margin-inline: auto;
+  }
+  .tangle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
+    vertical-align: baseline;
+    font-family: var(--font-utility);
+    font-variant-numeric: tabular-nums;
+    font-size: 0.8em;
+    background: var(--highlight);
+    color: var(--highlight-ink);
+    padding: 0.12em 0.5em 0.14em;
+    border-radius: 6px;
+    border: 1px solid color-mix(in oklab, var(--highlight), black 25%);
+    box-shadow: 0 2px 0 color-mix(in oklab, var(--highlight), black 45%);
+    cursor: ew-resize;
+    user-select: none;
+    touch-action: none;
+    white-space: nowrap;
+    transition: background 0.15s ease, box-shadow 0.12s ease, transform 0.12s ease;
+    animation: tangle-nudge 1s ease-in-out 1.2s 2;
+  }
+  .tangle::before { content: '◂'; }
+  .tangle::after { content: '▸'; }
+  .tangle::before, .tangle::after {
+    font-size: 0.8em;
+    color: color-mix(in oklab, var(--highlight-ink), var(--highlight) 40%);
+    transition: transform 0.15s ease, color 0.15s ease;
+  }
+  /* resting on the bright green, hover deepens rather than lightens — the
+     pill reads as engaged, and the chevrons spread */
+  @media (hover: hover) {
+    .tangle:hover { background: color-mix(in oklab, var(--highlight), black 15%); }
+    .tangle:hover::before { transform: translateX(-2px); color: var(--highlight-ink); }
+    .tangle:hover::after { transform: translateX(2px); color: var(--highlight-ink); }
+  }
+  .tangle:active, .tangle.dragging {
+    background: color-mix(in oklab, var(--highlight), black 15%);
+    transform: translateY(2px);
+    box-shadow: 0 0 0 color-mix(in oklab, var(--highlight), black 45%);
+  }
+  @keyframes tangle-nudge {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-3px); }
+    75% { transform: translateX(3px); }
+  }
+  output {
+    font-family: var(--font-utility);
+    font-variant-numeric: tabular-nums;
+    font-size: 0.85em;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  output.comp { color: var(--series-comp); }
+  output.lin { color: var(--series-lin); }
+  .hint { margin-bottom: 2rem; }
+
+  /* ---- the demo row: chart and specimen share one groundline ----
+     Both columns open with a head of identical height, so the SVG and the
+     stage start at the same y. The stage's baseline is then placed at the
+     chart's x-axis height, and JS keeps them locked as the chart resizes. */
+  .demo, .caption-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+    gap: 2.5rem;
+  }
+  .demo { margin-top: 1.25rem; }
+  .caption-row { margin-top: 0.6rem; }
+  .col-head {
+    display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap;
+    height: 1.3rem; margin: 0 0 0.6rem;
+    font-family: var(--font-utility); font-size: 0.75rem;
+    color: var(--ink-muted);
+  }
+  .col-head span { display: inline-flex; align-items: center; gap: 0.45em; }
+  .demo-intro { color: var(--ink-muted); margin-bottom: 0; }
+  @media (max-width: 900px) {
+    .demo, .caption-row { grid-template-columns: 1fr; }
+    .caption-row { gap: 0.4rem; }
+  }
+
+  /* ---- chart ----
+     The marks are built in JS, so they carry no scope attribute: their rules
+     have to be :global, held inside the scoped .chart-wrap. */
+  figure { margin: 0; }
+  .swatch { width: 18px; height: 0; border-top: 2px solid; display: inline-block; }
+  .swatch.comp { border-color: var(--series-comp); }
+  .swatch.lin { border-color: var(--series-lin); border-top-style: dashed; }
+  .chart-wrap { position: relative; }
+  .chart-wrap svg { display: block; width: 100%; height: auto; }
+  .chart-wrap :global(.gridline) { stroke: var(--hairline); stroke-width: 1; }
+  .chart-wrap :global(.axis-label),
+  .chart-wrap :global(.tick-label) {
+    font-family: var(--font-utility);
+    font-size: 11px;
+    fill: var(--ink-muted);
+  }
+  .chart-wrap :global(.tick-label) { font-variant-numeric: tabular-nums; }
+  .chart-wrap :global(.line-comp) { stroke: var(--series-comp); stroke-width: 2; fill: none; }
+  .chart-wrap :global(.line-lin) { stroke: var(--series-lin); stroke-width: 2; stroke-dasharray: 5 4; fill: none; }
+  .chart-wrap :global(.area-comp) { fill: var(--series-comp); opacity: 0.07; }
+  .chart-wrap :global(.end-label) { font-family: var(--font-utility); font-size: 11px; font-weight: 600; }
+  .chart-wrap :global(.end-label.comp) { fill: var(--series-comp); }
+  .chart-wrap :global(.end-label.lin) { fill: var(--series-lin); }
+  .chart-wrap :global(.crosshair) { stroke: var(--ink-muted); stroke-width: 1; stroke-dasharray: 2 3; }
+  .chart-wrap :global(.hover-dot) { stroke: var(--paper); stroke-width: 2; }
+  .chart-wrap :global(.hover-dot.comp) { fill: var(--series-comp); }
+  .chart-wrap :global(.hover-dot.lin) { fill: var(--series-lin); }
+  .tooltip {
+    position: absolute; pointer-events: none; z-index: 2;
+    background: var(--ink); color: var(--paper);
+    font-family: var(--font-utility); font-size: 0.72rem;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.5; padding: 0.4rem 0.6rem;
+    white-space: nowrap; display: none;
+  }
+
+  /* ---- the specimen ----
+     All three glyphs share one font-size and one box, so their baselines
+     coincide by construction; each is then scaled about its own baseline
+     point, which keeps their feet on the rule at any multiple. Scaling
+     rather than resizing also means a runaway multiple never reflows the
+     page — it just leaves the frame. */
+  .stage {
+    position: relative;
+    overflow: hidden;
+    /* --axis, --glyph-base and --baseline-pct are set in JS */
+  }
+  .glyph {
+    position: absolute;
+    bottom: calc(var(--axis, 40px) - 0.22em);   /* box bottom, so the baseline lands on --axis */
+    font-family: var(--font-display);
+    font-variation-settings: 'opsz' 72;         /* one optical size: literally the same letter, only scaled */
+    font-size: var(--glyph-base, 8px);
+    line-height: 1;
+    font-weight: 600;
+    transform-origin: left var(--baseline-pct, 82%);
+    transform: scale(var(--scale, 1));
+    transition: transform 0.18s ease;
+  }
+  .glyph.day1 { left: 2%;  color: var(--ink);         z-index: 2; }
+  .glyph.lin  { left: 14%; color: var(--series-lin);  z-index: 2; }
+  .glyph.comp { left: 34%; color: var(--series-comp); z-index: 1; }
+  .baserule {
+    position: absolute;
+    left: 0; right: 0;
+    bottom: var(--axis, 40px);     /* the chart's x-axis, continued */
+    border-top: 1px solid var(--hairline);
+    z-index: 3;
+  }
+  .offpage {
+    position: absolute;
+    top: 0; right: 0;
+    margin: 0;
+    padding: 0.35rem 0.5rem;
+    background: var(--paper);
+    z-index: 4;
+    display: none;
+  }
+  .offpage.show { display: block; }
+  .spec-caption { margin: 0; display: flex; gap: 1.25rem; flex-wrap: wrap; }
+  .spec-caption b { font-weight: 400; font-variant-numeric: tabular-nums; }
+  .spec-caption .k-day1 b { color: var(--ink); }
+  .spec-caption .k-lin b  { color: var(--series-lin); }
+  .spec-caption .k-comp b { color: var(--series-comp); }
+
+  /* ---- table view ---- */
+  details { margin-top: 1.2rem; }
+  summary {
+    cursor: pointer;
+    font-family: var(--font-utility); font-size: 0.72rem;
+    letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--ink-muted);
+  }
+  .table-scroll { overflow-x: auto; }
+  table {
+    border-collapse: collapse; margin-top: 0.8rem;
+    font-family: var(--font-utility); font-size: 0.8rem;
+    font-variant-numeric: tabular-nums;
+  }
+  .table-scroll :global(th),
+  .table-scroll :global(td) {
+    text-align: right; padding: 0.35rem 1.1rem 0.35rem 0;
+    border-bottom: 1px solid var(--hairline);
+  }
+  .table-scroll :global(th) { color: var(--ink-muted); font-weight: 400; }
+
+  /* ---- coda ---- */
+  .coda { display: flex; gap: 2.5rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
+  .coda div { flex: 1 1 12rem; }
+  .coda .figure {
+    font-family: var(--font-display);
+    font-variant-numeric: tabular-nums;
+    font-size: var(--step-2); font-weight: 600; line-height: 1.15;
+    margin-bottom: 0.2rem;
+  }
+  .coda .up .figure { color: var(--series-comp); }
+</style>
+
+<script>
+  const state = { rate: 1.0, days: 365 };
+  const LIMITS = {
+    rate: { min: 0.1, max: 3, step: 0.1 },
+    days: { min: 30, max: 365, step: 5 },
+  } as const;
+
+  const fmtMult = (v: number) => {
+    if (v >= 1000) return new Intl.NumberFormat('en', { notation: 'compact', maximumSignificantDigits: 3 }).format(v);
+    if (v >= 100) return v.toFixed(0);
+    return v.toFixed(1);
+  };
+  const compoundAt = (d: number) => Math.pow(1 + state.rate / 100, d);
+  const linearAt = (d: number) => 1 + (state.rate / 100) * d;
+
+  /* ---- the draggable numbers ---- */
+  function makeTangle(el: HTMLElement, key: 'rate' | 'days', render: () => void) {
+    const lim = LIMITS[key];
+    const clamp = (v: number) => Math.min(lim.max, Math.max(lim.min, v));
+    const snap = (v: number) => clamp(Math.round(v / lim.step) * lim.step);
+
+    el.addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      el.setPointerCapture(e.pointerId);
+      el.classList.add('dragging');
+      const startX = e.clientX;
+      const startVal = state[key];
+      const onMove = (ev: PointerEvent) => {
+        state[key] = snap(startVal + ((ev.clientX - startX) / 8) * lim.step);
+        render();
+      };
+      const onUp = () => {
+        el.classList.remove('dragging');
+        el.removeEventListener('pointermove', onMove);
+        el.removeEventListener('pointerup', onUp);
+      };
+      el.addEventListener('pointermove', onMove);
+      el.addEventListener('pointerup', onUp);
+    });
+
+    el.addEventListener('keydown', (e) => {
+      const mult = e.shiftKey ? 10 : 1;
+      if (e.key === 'ArrowRight' || e.key === 'ArrowUp') state[key] = snap(state[key] + lim.step * mult);
+      else if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') state[key] = snap(state[key] - lim.step * mult);
+      else return;
+      e.preventDefault();
+      render();
+    });
+  }
+
+  /* ---- chart ---- */
+  const svg = document.getElementById('chart') as unknown as SVGSVGElement;
+  const wrap = document.getElementById('chart-wrap') as HTMLElement;
+  const tooltip = document.getElementById('tooltip') as HTMLElement;
+  const W = 720, H = 380, M = { top: 16, right: 108, bottom: 42, left: 58 };
+  const PW = W - M.left - M.right, PH = H - M.top - M.bottom;
+  const NS = 'http://www.w3.org/2000/svg';
+
+  let scaleX = (d: number) => d;
+  let scaleY = (v: number) => v;
+
+  const mk = (tag: string, attrs: Record<string, string | number>) => {
+    const n = document.createElementNS(NS, tag);
+    for (const [k, v] of Object.entries(attrs)) n.setAttribute(k, String(v));
+    return n;
+  };
+
+  function niceTicks(max: number, count: number) {
+    const raw = max / count;
+    const mag = Math.pow(10, Math.floor(Math.log10(raw)));
+    const step = [1, 2, 2.5, 5, 10].map((m) => m * mag).find((s) => max / s <= count) || 10 * mag;
+    const ticks: number[] = [];
+    for (let v = 0; v <= max * 1.0001; v += step) ticks.push(v);
+    return ticks;
+  }
+
+  function drawChart() {
+    svg.textContent = '';
+    const D = state.days;
+    const yMax = compoundAt(D) * 1.05;
+    scaleX = (d) => M.left + (d / D) * PW;
+    scaleY = (v) => M.top + PH - (v / yMax) * PH;
+
+    for (const v of niceTicks(yMax, 5)) {
+      const y = scaleY(v);
+      svg.appendChild(mk('line', { x1: M.left, x2: M.left + PW, y1: y, y2: y, class: 'gridline' }));
+      const t = mk('text', { x: M.left - 8, y: y + 4, 'text-anchor': 'end', class: 'tick-label' });
+      t.textContent = '×' + fmtMult(Math.max(v, 0));
+      svg.appendChild(t);
+    }
+    const xStep = D <= 90 ? 15 : D <= 180 ? 30 : 60;
+    for (let d = 0; d <= D; d += xStep) {
+      const t = mk('text', { x: scaleX(d), y: M.top + PH + 22, 'text-anchor': 'middle', class: 'tick-label' });
+      t.textContent = String(d);
+      svg.appendChild(t);
+    }
+    const xTitle = mk('text', { x: M.left + PW / 2, y: H - 4, 'text-anchor': 'middle', class: 'axis-label' });
+    xTitle.textContent = 'days';
+    svg.appendChild(xTitle);
+
+    let pComp = '', pLin = '', pArea = 'M' + scaleX(0) + ',' + scaleY(0).toFixed(1) + ' ';
+    const N = 140;
+    for (let i = 0; i <= N; i++) {
+      const d = (i / N) * D;
+      const cmd = (i === 0 ? 'M' : 'L') + scaleX(d).toFixed(1) + ',';
+      pComp += cmd + scaleY(compoundAt(d)).toFixed(1) + ' ';
+      pLin += cmd + scaleY(linearAt(d)).toFixed(1) + ' ';
+      pArea += 'L' + scaleX(d).toFixed(1) + ',' + scaleY(compoundAt(d)).toFixed(1) + ' ';
+    }
+    pArea += 'L' + scaleX(D).toFixed(1) + ',' + scaleY(0).toFixed(1) + ' Z';
+    svg.appendChild(mk('path', { d: pArea, class: 'area-comp' }));
+    svg.appendChild(mk('path', { d: pLin, class: 'line-lin' }));
+    svg.appendChild(mk('path', { d: pComp, class: 'line-comp' }));
+
+    const lblComp = mk('text', { x: M.left + PW + 7, y: scaleY(compoundAt(D)) + 4, class: 'end-label comp' });
+    lblComp.textContent = '×' + fmtMult(compoundAt(D)) + ' compound';
+    const yLin = Math.min(scaleY(linearAt(D)), scaleY(compoundAt(D)) + 18);
+    const lblLin = mk('text', { x: M.left + PW + 7, y: yLin + 4, class: 'end-label lin' });
+    lblLin.textContent = '×' + fmtMult(linearAt(D)) + ' linear';
+    svg.appendChild(lblComp);
+    svg.appendChild(lblLin);
+
+    const hover = mk('g', { class: 'hover-layer', visibility: 'hidden' });
+    hover.appendChild(mk('line', { class: 'crosshair', y1: M.top, y2: M.top + PH, x1: 0, x2: 0 }));
+    hover.appendChild(mk('circle', { class: 'hover-dot comp', r: 4.5, cx: 0, cy: 0 }));
+    hover.appendChild(mk('circle', { class: 'hover-dot lin', r: 4.5, cx: 0, cy: 0 }));
+    svg.appendChild(hover);
+    const catcher = mk('rect', { x: M.left, y: M.top, width: PW, height: PH, fill: 'transparent' });
+    svg.appendChild(catcher);
+
+    catcher.addEventListener('pointermove', (e) => {
+      const ev = e as PointerEvent;
+      const box = svg.getBoundingClientRect();
+      const px = ((ev.clientX - box.left) / box.width) * W;
+      const d = Math.round(Math.min(D, Math.max(0, ((px - M.left) / PW) * D)));
+      const x = scaleX(d);
+      const [line, dotC, dotL] = Array.from(hover.children);
+      line.setAttribute('x1', String(x)); line.setAttribute('x2', String(x));
+      dotC.setAttribute('cx', String(x)); dotC.setAttribute('cy', String(scaleY(compoundAt(d))));
+      dotL.setAttribute('cx', String(x)); dotL.setAttribute('cy', String(scaleY(linearAt(d))));
+      hover.setAttribute('visibility', 'visible');
+      tooltip.innerHTML = 'day ' + d + '<br>compound ×' + fmtMult(compoundAt(d)) + '<br>linear ×' + fmtMult(linearAt(d));
+      tooltip.style.display = 'block';
+      const wb = wrap.getBoundingClientRect();
+      const tx = ev.clientX - wb.left;
+      const flip = tx > wb.width * 0.65;
+      tooltip.style.left = (flip ? tx - tooltip.offsetWidth - 14 : tx + 14) + 'px';
+      tooltip.style.top = Math.max(0, ev.clientY - wb.top - tooltip.offsetHeight - 10) + 'px';
+    });
+    catcher.addEventListener('pointerleave', () => {
+      hover.setAttribute('visibility', 'hidden');
+      tooltip.style.display = 'none';
+    });
+  }
+
+  /* ---- the specimen ----
+     The day-1 letter is sized so the reference run (1% a day for a year) fills
+     part of the frame, leaving room for a harder run to climb out of it. */
+  const REF_MULT = Math.pow(1.01, 365);
+  const FILL = 0.45;
+  const stage = document.getElementById('stage') as HTMLElement;
+  const gLin = document.getElementById('g-lin') as HTMLElement;
+  const gComp = document.getElementById('g-comp') as HTMLElement;
+  const offpage = document.getElementById('offpage') as HTMLElement;
+  const cLin = document.getElementById('c-lin') as HTMLElement;
+  const cComp = document.getElementById('c-comp') as HTMLElement;
+  const specNote = document.getElementById('spec-note') as HTMLElement;
+
+  /* Ask the font itself rather than hard-coding ratios that would be wrong for
+     whichever face actually loads:
+       xRatio   — height of a lowercase 'a', which is what the eye reads
+       baseline — where the baseline falls inside a line-height:1 box, which is
+                  the point every glyph must be scaled about */
+  let xRatio = 0.48;
+  function measureFont() {
+    const ctx = document.createElement('canvas').getContext('2d');
+    if (!ctx) return;
+    ctx.font = '100px ' + getComputedStyle(gComp).fontFamily;
+    const m = ctx.measureText('a');
+    if (m.actualBoundingBoxAscent > 0) xRatio = m.actualBoundingBoxAscent / 100;
+    const asc = m.fontBoundingBoxAscent / 100;
+    const desc = m.fontBoundingBoxDescent / 100;
+    if (asc > 0 && desc > 0) {
+      const baseline = (1 - (asc + desc)) / 2 + asc;   // half-leading, then up to the baseline
+      stage.style.setProperty('--baseline-pct', (baseline * 100).toFixed(2) + '%');
+    }
+  }
+
+  function drawSpecimen() {
+    // lock the stage to the chart's box, and its baseline to the chart's x-axis
+    const svgH = svg.getBoundingClientRect().height;
+    if (!svgH) return;
+    const axis = svgH * (M.bottom / H);
+    const room = svgH - axis;
+    const base = (FILL * room) / (REF_MULT * xRatio);
+    stage.style.height = svgH + 'px';
+    stage.style.setProperty('--axis', axis.toFixed(1) + 'px');
+    stage.style.setProperty('--glyph-base', base.toFixed(2) + 'px');
+
+    const mComp = compoundAt(state.days);
+    const mLin = linearAt(state.days);
+    gLin.style.setProperty('--scale', String(mLin));
+    gComp.style.setProperty('--scale', String(mComp));
+    cLin.textContent = '×' + fmtMult(mLin);
+    cComp.textContent = '×' + fmtMult(mComp);
+
+    const ratio = (base * xRatio * mComp) / room;
+    const over = ratio > 1;
+    offpage.classList.toggle('show', over);
+    specNote.innerHTML = over
+      ? 'The compounding <em>a</em> has left the frame — it now stands ' + (ratio >= 1.5
+          ? fmtMult(ratio) + '× taller than the chart beside it. What is left on screen is the inside of one stroke.'
+          : 'just past the top of the chart beside it.')
+      : 'The same lowercase <em>a</em> on one baseline: where you start, what the effort ' +
+        'adds up to, and what it compounds to.';
+  }
+
+  /* ---- render ---- */
+  const tRate = document.getElementById('t-rate') as HTMLElement;
+  const tDays = document.getElementById('t-days') as HTMLElement;
+  const oLin = document.getElementById('o-lin') as HTMLElement;
+  const oComp = document.getElementById('o-comp') as HTMLElement;
+  const tbody = document.querySelector('#milestones tbody') as HTMLElement;
+
+  function render() {
+    tRate.textContent = state.rate.toFixed(1) + '% better';
+    tRate.setAttribute('aria-valuenow', state.rate.toFixed(1));
+    tRate.setAttribute('aria-valuetext', state.rate.toFixed(1) + ' percent per day');
+    tDays.textContent = state.days + ' days';
+    tDays.setAttribute('aria-valuenow', String(state.days));
+    oLin.textContent = fmtMult(linearAt(state.days)) + '×';
+    oComp.textContent = fmtMult(compoundAt(state.days)) + '×';
+    drawChart();
+    drawSpecimen();
+
+    tbody.textContent = '';
+    for (const f of [0, 0.25, 0.5, 0.75, 1]) {
+      const d = Math.round(state.days * f);
+      const tr = document.createElement('tr');
+      tr.innerHTML =
+        '<td>' + d + '</td>' +
+        '<td>×' + fmtMult(compoundAt(d)) + '</td>' +
+        '<td>×' + fmtMult(linearAt(d)) + '</td>';
+      tbody.appendChild(tr);
+    }
+  }
+
+  makeTangle(tRate, 'rate', render);
+  makeTangle(tDays, 'days', render);
+  measureFont();
+  render();
+  addEventListener('resize', render);
+  // the fallback face measures differently from the real one — remeasure once it lands
+  document.fonts?.ready.then(() => { measureFont(); render(); });
+</script>
