@@ -140,10 +140,11 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
   }
   .crumb { margin-bottom: 0.6rem; }
   .lede { font-size: var(--step-1); color: var(--ink-muted); }
+  /* the emphasis is carried by the green itself, not a highlighter block —
+     mark ships with a UA background that has to be cleared */
   h1 mark {
-    background: var(--highlight);
-    color: var(--highlight-ink);
-    padding: 0 0.12em;
+    background: none;
+    color: var(--highlight);
   }
 
   /* ---- the tangle paragraph: numbers you can drag ---- */
