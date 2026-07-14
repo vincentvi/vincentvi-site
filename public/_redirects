@@ -1,0 +1,3 @@
+# Cloudflare Pages redirects
+/tinkering/signs/ /tinkering/neon-breath/ 301
+/tinkering/signs /tinkering/neon-breath/ 301
