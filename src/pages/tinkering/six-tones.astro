@@ -1,0 +1,1020 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+/* Cinzel is the evidence in the stress test, not part of the UI. It is the
+   only face here without a Vietnamese subset — that is the whole point of it. */
+import '@fontsource-variable/cinzel/wght.css';
+
+type Kind = 'tone' | 'qual';
+
+/* Every letter on this page is composed at build time by appending a combining
+   mark and normalising, so what ships is what Unicode actually produces —
+   nothing is typed in as a literal. */
+const MARKS: Record<string, { name: string; ccc: number; kind: Kind }> = {
+  '̀': { name: 'COMBINING GRAVE ACCENT', ccc: 230, kind: 'tone' },
+  '́': { name: 'COMBINING ACUTE ACCENT', ccc: 230, kind: 'tone' },
+  '̂': { name: 'COMBINING CIRCUMFLEX ACCENT', ccc: 230, kind: 'qual' },
+  '̃': { name: 'COMBINING TILDE', ccc: 230, kind: 'tone' },
+  '̆': { name: 'COMBINING BREVE', ccc: 230, kind: 'qual' },
+  '̉': { name: 'COMBINING HOOK ABOVE', ccc: 230, kind: 'tone' },
+  '̛': { name: 'COMBINING HORN', ccc: 216, kind: 'qual' },
+  '̣': { name: 'COMBINING DOT BELOW', ccc: 220, kind: 'tone' },
+};
+
+const BREVE = '̆', CIRC = '̂', HORN = '̛';
+
+const LETTERS = [
+  { base: 'a', qual: null }, { base: 'a', qual: BREVE }, { base: 'a', qual: CIRC },
+  { base: 'e', qual: null }, { base: 'e', qual: CIRC },
+  { base: 'i', qual: null },
+  { base: 'o', qual: null }, { base: 'o', qual: CIRC }, { base: 'o', qual: HORN },
+  { base: 'u', qual: null }, { base: 'u', qual: HORN },
+  { base: 'y', qual: null },
+].map((l) => ({ ...l, ch: (l.base + (l.qual ?? '')).normalize('NFC') }));
+
+const TONES = [
+  { id: 'ngang', mark: '',        vi: 'ngang', en: 'level',   say: 'mid, flat, unmarked' },
+  { id: 'huyen', mark: '̀',  vi: 'huyền', en: 'falling', say: 'starts low, falls' },
+  { id: 'sac',   mark: '́',  vi: 'sắc',   en: 'rising',  say: 'climbs sharply' },
+  { id: 'hoi',   mark: '̉',  vi: 'hỏi',   en: 'dipping', say: 'dips, then lifts' },
+  { id: 'nga',   mark: '̃',  vi: 'ngã',   en: 'broken',  say: 'rises through a catch in the throat' },
+  { id: 'nang',  mark: '̣',  vi: 'nặng',  en: 'heavy',   say: 'drops and stops short' },
+];
+
+const compose = (ch: string, mark: string) => (ch + mark).normalize('NFC');
+
+const BASES = ['a', 'e', 'i', 'o', 'u', 'y'];
+const QUALS = [
+  { q: '',      label: 'plain' },
+  { q: BREVE,   label: 'breve' },
+  { q: CIRC,    label: 'circumflex' },
+  { q: HORN,    label: 'horn' },
+];
+const letterFor = (base: string, q: string) =>
+  LETTERS.find((l) => l.base === base && (l.qual ?? '') === q);
+
+/* the page opens on ệ — the hardest letter in the language */
+const START = { base: 'e', qual: CIRC, tone: TONES[5] };
+const startLetter = letterFor(START.base, START.qual)!;
+
+/* ma / mà / má / mả / mã / mạ — six words, one letter */
+const GLOSS = ['ghost', 'but, yet', 'mother', 'a grave', 'horse', 'rice seedling'];
+const A = LETTERS[0];
+
+/* hòa or hoà: split a word so only the toned vowel is coloured */
+function split(word: string) {
+  return [...word].map((ch) => {
+    const nfd = [...ch.normalize('NFD')];
+    const toned = nfd.slice(1).some((m) => MARKS[m]?.kind === 'tone');
+    if (!toned) return { ch, toned: false, bare: ch };
+    const bare = nfd.filter((m) => MARKS[m]?.kind !== 'tone').join('').normalize('NFC');
+    return { ch, toned: true, bare };
+  });
+}
+const PLACEMENT = [
+  { old: 'hòa', neu: 'hoà', gloss: 'peace' },
+  { old: 'thúy', neu: 'thuý', gloss: 'jade green' },
+  { old: 'họa', neu: 'hoạ', gloss: 'to draw' },
+].map((p) => ({ ...p, oldParts: split(p.old), newParts: split(p.neu) }));
+
+const FACES = [
+  { name: 'Fraunces',   cls: 'f-fraunces',   family: "'Fraunces Variable'",   note: 'Vietnamese subset, marks drawn for stacking', caps: false },
+  { name: 'Newsreader', cls: 'f-newsreader', family: "'Newsreader Variable'", note: 'Vietnamese subset', caps: false },
+  { name: 'Cinzel',     cls: 'f-cinzel',     family: "'Cinzel Variable'",     note: 'no Vietnamese subset — 2 of the 90 glyphs in U+1EA0–1EF9', caps: true },
+];
+const PHRASE = 'Tiếng Việt';
+
+const DATA = JSON.stringify({ LETTERS, TONES, MARKS });
+---
+<BaseLayout
+  title="Six tones, one letter"
+  description="An explorable infographic of the Vietnamese tone system: build a syllable, watch the tone and vowel marks stack, and see what a careless font does to them."
+>
+  <div class="essay">
+    <p class="folio crumb"><a href="/tinkering/">Tinkering</a> · experiment 006</p>
+    <h1>Six tones, <mark>one letter</mark></h1>
+    <p class="lede">
+      <span class="viet">Sáu thanh, một chữ.</span> Vietnamese writes with the Latin alphabet
+      and then asks it to do something Latin was never designed for: stack two marks on one
+      vowel, and let the top one carry the meaning of the word. Build a letter and watch the
+      stack assemble.
+    </p>
+
+    <hr />
+
+    <h2>One letter, six words</h2>
+    <p>
+      Every word below is the same three strokes — <em>m</em>, <em>a</em> — plus one mark.
+      The mark is not an accent in the French sense, decorating a vowel you'd still recognise
+      without it. It <em>is</em> the word. Drop it and you have said something else.
+    </p>
+
+    <ul class="pairs">
+      {TONES.map((t, i) => (
+        <li>
+          <span class="word">m<span class="stack"
+            ><span class="l l-tone">{compose(A.ch, t.mark)}</span
+            ><span class="l l-qual">{A.ch}</span
+            ><span class="l l-base">{A.base}</span
+          ></span></span>
+          <span class="gloss"><span class="tname">{t.vi}</span>{GLOSS[i]}</span>
+        </li>
+      ))}
+    </ul>
+
+    <hr />
+
+    <h2>Build a syllable</h2>
+    <p>
+      A Vietnamese vowel is assembled from up to three parts, and this page colours them
+      apart: the <b class="c-base">base letter</b> you'd find in any Latin font, the
+      <b class="c-qual">quality mark</b> that turns it into a different vowel
+      (<span class="viet">ă, â, ê, ô, ơ, ư</span> — these are separate letters of the alphabet,
+      not variants), and on top of that the <b class="c-tone">tone mark</b> that picks one of
+      six pitches.
+    </p>
+    <p>
+      The two marks are drawn by different people for different reasons and they land in the
+      same place. That collision is the entire craft problem.
+    </p>
+
+    <div class="legend">
+      <span class="k-base"><i></i>base letter</span>
+      <span class="k-qual"><i></i>vowel quality</span>
+      <span class="k-tone"><i></i>tone</span>
+    </div>
+
+    <div class="builder">
+      <div>
+        <div class="rack rack-base">
+          <p class="folio">1 · base vowel</p>
+          <div class="chips" role="group" aria-label="base vowel">
+            {BASES.map((b) => (
+              <button type="button" class="chip" data-base={b} aria-label={`base vowel ${b}`}
+                      aria-pressed={b === START.base}><span>{b}</span></button>
+            ))}
+          </div>
+        </div>
+
+        <div class="rack rack-qual">
+          <p class="folio">2 · vowel quality</p>
+          <div class="chips" role="group" aria-label="vowel quality mark">
+            {QUALS.map(({ q, label }) => {
+              const l = letterFor(START.base, q);
+              return (
+                <button type="button" class="chip" data-qual={q}
+                        disabled={!l} aria-pressed={!!l && q === START.qual}>
+                  <span class="g">{l ? l.ch : '·'}</span><small>{label}</small>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        <div class="rack rack-tone">
+          <p class="folio">3 · tone</p>
+          <div class="chips" role="group" aria-label="tone mark">
+            {TONES.map((t) => (
+              <button type="button" class="chip" data-tone={t.id} aria-pressed={t.id === START.tone.id}>
+                <span class="g">{compose(startLetter.ch, t.mark)}</span><small>{t.vi}</small>
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="stage" id="stage">
+          <div class="rule r-tone" data-label="tone ceiling" id="rule-tone"></div>
+          <div class="rule r-x show" data-label="top of e" id="rule-x"></div>
+          <div class="rule r-base show" data-label="baseline" id="rule-baseline"></div>
+          <div class="rule r-below" data-label="below" id="rule-below"></div>
+          <span class="stack animate" id="specimen" aria-hidden="true"
+            ><span class="l l-tone">{compose(startLetter.ch, START.tone.mark)}</span
+            ><span class="l l-qual">{startLetter.ch}</span
+            ><span class="l l-base">{startLetter.base}</span
+          ></span>
+        </div>
+
+        <div class="readout">
+          <dl>
+            <dt>letter</dt>
+            <dd><span class="cp" id="r-cp"></span> · <span id="r-name"></span></dd>
+            <dt>tone</dt>
+            <dd id="r-tone"></dd>
+            <dt>decomposed</dt>
+            <dd><div class="seq" id="r-seq"></div></dd>
+            <dt>ink height</dt>
+            <dd id="r-metrics"></dd>
+          </dl>
+          <p class="ccc-note" id="r-ccc"></p>
+        </div>
+      </div>
+    </div>
+
+    <hr />
+
+    <h2>All seventy-two</h2>
+    <p>
+      Twelve vowels, six tones. This is the whole vowel inventory of written Vietnamese —
+      the complete set a font has to draw before it can claim support. Read down a column and
+      you watch one tone mark ride over every possible thing underneath it. Read across a row
+      and you watch one vowel take all six. Click any cell.
+    </p>
+
+    <div class="matrix-scroll">
+      <table class="matrix" id="matrix">
+        <caption class="folio">the twelve vowel letters × the six tones</caption>
+        <thead>
+          <tr>
+            <th></th>
+            {TONES.map((t) => (
+              <th scope="col" data-tone={t.id} class={t.id === START.tone.id ? 'on' : undefined}>
+                {t.vi}<span class="en">{t.en}</span>
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {LETTERS.map((l) => (
+            <tr>
+              <th scope="row" data-letter={l.ch} class={l.ch === startLetter.ch ? 'on' : undefined}>{l.ch}</th>
+              {TONES.map((t) => (
+                <td>
+                  <button type="button" class="cell" data-letter={l.ch} data-tone={t.id}
+                          aria-pressed={l.ch === startLetter.ch && t.id === START.tone.id}
+                          aria-label={`${compose(l.ch, t.mark)} — ${l.ch}, tone ${t.vi}`}>
+                    <span class="stack"
+                      ><span class="l l-tone">{compose(l.ch, t.mark)}</span
+                      ><span class="l l-qual">{l.ch}</span
+                      ><span class="l l-base">{l.base}</span
+                    ></span>
+                  </button>
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+    <hr />
+
+    <h2>Where the mark <mark>goes</mark></h2>
+    <p>
+      Marks want the same airspace. The circumflex of <span class="viet">ê</span> sits directly
+      over the letter; so does the hook of <span class="viet">ả</span>. Put them together and one
+      has to move — the tone climbs, or shifts off-centre, or the whole stack gets shallower.
+      Watch the blue mark in the specimen above as you change the tone: in a well-cut face it
+      holds still and the green mark finds room around it. In a careless one, it flinches.
+    </p>
+    <p>
+      Below the baseline there is only ever one tenant: <span class="viet">nặng</span>, the heavy
+      tone, is the sole mark Vietnamese puts under a vowel. It never collides with another mark —
+      it collides with the line of text beneath it, and with every underline a designer has ever
+      drawn.
+    </p>
+
+    <h3>hòa, or hoà?</h3>
+    <p>
+      When a syllable has two vowels, which one carries the tone? Vietnamese has never fully
+      settled this. The older convention puts the mark near the middle of the word, which looks
+      balanced. The newer one puts it on the vowel that actually carries the sound, which is
+      linguistically tidier. Both are in print today; publishers pick a house style and defend it.
+    </p>
+
+    <div class="switch">
+      <button type="button" class="chip flat" data-style="old" aria-pressed="true">kiểu cũ · old style</button>
+      <button type="button" class="chip flat" data-style="new" aria-pressed="false">kiểu mới · new style</button>
+    </div>
+
+    <div class="placement" id="placement">
+      {PLACEMENT.map((p) => (
+        <div>
+          <span class="word">
+            <span class="v-old">
+              {p.oldParts.map((c) => (c.toned
+                ? <span class="stack"
+                    ><span class="l l-tone">{c.ch}</span
+                    ><span class="l l-qual">{c.bare}</span
+                    ><span class="l l-base">{c.bare}</span
+                  ></span>
+                : <span>{c.ch}</span>))}
+            </span>
+            <span class="v-new" hidden>
+              {p.newParts.map((c) => (c.toned
+                ? <span class="stack"
+                    ><span class="l l-tone">{c.ch}</span
+                    ><span class="l l-qual">{c.bare}</span
+                    ><span class="l l-base">{c.bare}</span
+                  ></span>
+                : <span>{c.ch}</span>))}
+            </span>
+          </span>
+          <span class="gloss">{p.gloss}</span>
+        </div>
+      ))}
+    </div>
+    <p class="folio wide centre">watch the green mark jump</p>
+
+    <p class="after-placement">
+      This is not only an aesthetic quarrel. The two spellings are different sequences of
+      codepoints, so a search box that doesn't normalise both will fail to find half the
+      documents it was asked for.
+    </p>
+
+    <hr />
+
+    <h2>What a careless font does</h2>
+    <p>
+      Here is the phrase <span class="viet">Tiếng Việt</span> — the name of the language — set in
+      three faces. Two of them were drawn with Vietnamese in mind. The third is
+      <b>Cinzel</b>, a beautiful inscriptional Roman face used all over the web, including
+      elsewhere on this site.
+    </p>
+    <p>
+      Cinzel gets partway. It has <span class="viet">ă</span> and <span class="viet">đ</span>. It
+      does not have <span class="viet">ơ</span>, it does not have <span class="viet">ư</span>, and
+      of the ninety codepoints in U+1EA0–1EF9 — the block where almost every <em>toned</em>
+      Vietnamese vowel lives — it contains two: <span class="viet">Ỳ</span> and
+      <span class="viet">ỳ</span>, which are only there because Welsh needs them. Its Vietnamese
+      coverage is an accident.
+    </p>
+    <p>
+      So the moment a tone lands on a marked vowel, the glyph isn't there, and the browser quietly
+      reaches for another font mid-word. Nothing errors. No console warning. The word just stops
+      being set in the typeface you chose, and only a reader of Vietnamese will notice.
+    </p>
+
+    <div class="specimens">
+      {FACES.map((f) => (
+        <div class="spec">
+          <div class={`word ${f.cls}`}>{f.caps ? PHRASE.toUpperCase() : PHRASE}</div>
+          <div class="meta">
+            <div class="fname">{f.name}</div>
+            <span class="badge" data-family={f.family}>checking…</span>
+            <div class="fname note">{f.note}</div>
+          </div>
+        </div>
+      ))}
+    </div>
+    <p class="folio wide">
+      coverage measured live in your browser — a face is marked broken when the glyph it draws
+      for <span class="lc">ế</span> is identical to the one your fallback font draws
+    </p>
+
+    <h3>And what a careless <mark>setting</mark> does</h3>
+    <p>
+      Even a font with every glyph can be ruined by the leading. A tone stacked on a quality mark
+      reaches far higher than any ascender an English typesetter budgets for, and
+      <span class="viet">nặng</span> hangs below. Squeeze the lines and Vietnamese is the first
+      script to break.
+    </p>
+
+    <div class="leading-demo" id="leading-demo">
+      <p class="tight">Chữ Quốc ngữ dùng sáu thanh điệu; mỗi thanh đổi hẳn nghĩa của một tiếng. Người vẽ chữ phải đặt dấu sao cho chúng không chạm nhau, không chạm dòng bên trên, và vẫn đọc được ở cỡ nhỏ nhất.</p>
+      <div class="controls">
+        <label for="lh">line-height</label>
+        <input type="range" id="lh" min="0.85" max="1.9" step="0.01" value="1.55" />
+        <output id="lh-val">1.55</output>
+      </div>
+      <p class="verdict clear" id="verdict"></p>
+      <p class="gloss-en">
+        “The Vietnamese script uses six tones; each one changes the meaning of a syllable outright.
+        Whoever draws the letters must set the marks so they don't touch each other, don't touch the
+        line above, and still read at the smallest size.”
+      </p>
+    </div>
+
+    <hr />
+
+    <h2>The count</h2>
+    <p>
+      An English font is done at fifty-two letterforms. A font that can set Vietnamese is not done
+      until it has drawn — and, harder, correctly <em>positioned</em> — a hundred and seventy-eight.
+    </p>
+
+    <table class="count">
+      <tbody>
+        <tr><th scope="row">12 vowels × 6 tones × 2 cases</th><td>144</td></tr>
+        <tr><th scope="row">17 consonants × 2 cases</th><td>34</td></tr>
+        <tr class="total"><th scope="row">Vietnamese letterforms</th><td class="sum">178</td></tr>
+      </tbody>
+    </table>
+
+    <div class="coda">
+      <div>
+        <p class="figure">52</p>
+        <p class="folio">letterforms to set English</p>
+      </div>
+      <div class="up">
+        <p class="figure">178</p>
+        <p class="folio">letterforms to set Vietnamese</p>
+      </div>
+    </div>
+
+    <p>
+      They are not a hundred and seventy-eight original drawings — the marks repeat, the bases
+      repeat. That is exactly what makes the work invisible, and exactly why it gets skipped. The
+      labour is not in drawing the hook; it is in deciding, one hundred and forty-four times, how
+      high the hook sits and how far left it leans when there is already a circumflex under it.
+    </p>
+    <p>
+      Every Vietnamese person can see, instantly, whether a typeface was finished or merely
+      shipped. We have been reading badly-set diacritics our whole lives. The tell is never the
+      letter — it's the space above it.
+    </p>
+  </div>
+
+  <script type="application/json" id="tone-data" set:html={DATA}></script>
+</BaseLayout>
+
+<style>
+  /* Dark room for this page only — token-level, so header, footer and every
+     .folio inherit it. Must sit on html:root (0,1,1) to out-rank global.css's
+     :root (0,1,0). Same set as compounding / five-voices / neon-breath. */
+  :global(html:root) {
+    --paper: #111318;
+    --ink: #e6e4dc;
+    --ink-muted: #9b9a90;
+    --hairline: #262b38;
+    --cloth: #8fb0e0;
+    --foil: #6f96c4;
+
+    --highlight: var(--highlight-fill);
+
+    /* the three colours that carry the whole argument: the only colour on this
+       page is the marks themselves */
+    --c-base: var(--ink);   /* the letter you'd find in the Latin alphabet */
+    --c-qual: #7fa8dd;      /* the mark that changes the vowel   */
+    --c-tone: var(--highlight-fill);  /* the mark that changes the meaning */
+    --c-fail: #e8795a;      /* failure — the stress test only, never decoration */
+
+    --column: 36rem;
+  }
+
+  /* the prose keeps to a column and centres under the wider figures */
+  .essay > p, .essay > h1, .essay > h2, .essay > h3, .essay > hr, .essay > .coda {
+    max-width: var(--column);
+    margin-inline: auto;
+  }
+  .essay > h3 { margin-top: 2.5rem; }
+  .essay > .wide { max-width: none; }
+  .crumb { margin-bottom: 0.6rem; }
+  .lede { font-size: var(--step-1); color: var(--ink-muted); }
+  .viet { font-style: italic; }
+  .centre { text-align: center; }
+  .lc { text-transform: none; }
+  /* the emphasis is carried by the green itself, not a highlighter block —
+     mark ships with a UA background that has to be cleared */
+  mark { background: none; color: var(--c-tone); }
+  .c-base { color: var(--c-base); }
+  .c-qual { color: var(--c-qual); }
+  .c-tone { color: var(--c-tone); }
+  .after-placement { margin-top: 1.5rem; }
+
+  /* ----------------------------------------------------------------
+     THE STACK — the one idea the page is built on.
+
+     A composed Vietnamese letter is a single glyph: you cannot colour its
+     circumflex separately from its bowl. So paint it three times, in the same
+     face at the same origin, and let each layer cover the one beneath:
+
+         ệ (green, full) ← ê (blue, base+quality) ← e (ink, base)
+
+     The marks are strict supersets, so what survives is exactly the tone mark
+     in green and the quality mark in blue. Nothing is hand-positioned — the
+     font places every mark itself. If a face shifts its circumflex when a tone
+     lands on top, this shows it rather than hiding it.
+     ---------------------------------------------------------------- */
+  .stack {
+    position: relative;
+    display: inline-block;
+    font-family: var(--font-display);
+    font-variation-settings: 'opsz' 72;
+    font-weight: 500;
+    line-height: 1;
+  }
+  .stack .l {
+    display: block;
+    white-space: nowrap;
+    /* the AA edges of two identical outlines blend; a hairline stroke in the
+       covering layer's own colour removes the fringe without altering weight */
+    -webkit-text-stroke: 0.005em currentColor;
+  }
+  /* the full glyph stays in flow and defines the box; the two covering layers
+     hang off its top-left corner, so all three share one origin */
+  .stack .l-tone { color: var(--c-tone); }
+  .stack .l-qual,
+  .stack .l-base { position: absolute; top: 0; left: 0; }
+  .stack .l-qual { color: var(--c-qual); }
+  .stack .l-base { color: var(--c-base); }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .stack.animate .l-tone,
+    .stack.animate .l-qual { animation: drop 0.32s cubic-bezier(0.2, 0.9, 0.3, 1.2) both; }
+    .stack.animate .l-qual { animation-delay: 0.04s; }
+    .stack.animate .l-tone { animation-delay: 0.12s; }
+  }
+  @keyframes drop {
+    from { transform: translateY(-0.09em); opacity: 0; }
+    to   { transform: none; opacity: 1; }
+  }
+
+  .legend { display: flex; flex-wrap: wrap; gap: 0.4rem 1.5rem; margin: 0 auto 2rem; max-width: var(--column); }
+  .legend span { display: inline-flex; align-items: center; gap: 0.5em; }
+  .legend i { width: 0.7rem; height: 0.7rem; border-radius: 50%; background: currentColor; flex: none; }
+  .legend .k-base { color: var(--c-base); }
+  .legend .k-qual { color: var(--c-qual); }
+  .legend .k-tone { color: var(--c-tone); }
+
+  /* ---- minimal pairs ---- */
+  .pairs {
+    display: grid; grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 0.5rem; margin: 2rem 0 0.75rem; list-style: none; padding: 0;
+  }
+  .pairs li { border-top: 1px solid var(--hairline); padding-top: 0.7rem; text-align: center; }
+  .pairs .word { font-size: clamp(1.6rem, 4.5vw, 2.4rem); font-family: var(--font-display); }
+  .pairs .gloss {
+    display: block; font-family: var(--font-utility); font-size: 0.68rem;
+    letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-muted);
+    margin-top: 0.5rem; line-height: 1.4;
+  }
+  .pairs .tname { display: block; font-size: 0.68rem; color: var(--c-tone); }
+  @media (max-width: 640px) { .pairs { grid-template-columns: repeat(3, 1fr); gap: 1rem 0.5rem; } }
+
+  /* ---- builder ---- */
+  .builder {
+    display: grid; grid-template-columns: minmax(0, 20rem) minmax(0, 1fr);
+    gap: 3rem; align-items: start; margin-top: 2rem;
+  }
+  @media (max-width: 860px) { .builder { grid-template-columns: 1fr; gap: 2rem; } }
+
+  .rack { margin-bottom: 1.6rem; }
+  .rack > .folio { margin-bottom: 0.6rem; }
+  .chips { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+
+  .chip {
+    font-family: var(--font-display);
+    font-variation-settings: 'opsz' 48;
+    font-size: 1.5rem; line-height: 1; min-width: 2.9rem;
+    padding: 0.55rem 0.4rem 0.45rem;
+    background: transparent; color: var(--ink-muted);
+    border: 1px solid var(--hairline); border-radius: 2px; cursor: pointer;
+    transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+    display: flex; flex-direction: column; align-items: center; gap: 0.25rem;
+  }
+  .chip small {
+    font-family: var(--font-utility); font-size: 0.55rem;
+    letter-spacing: 0.1em; text-transform: uppercase; line-height: 1;
+  }
+  .chip:hover { color: var(--ink); border-color: var(--foil); }
+  .chip[aria-pressed='true'] { color: var(--ink); border-color: var(--ink); background: #191d25; }
+  .chip[disabled] { opacity: 0.25; cursor: not-allowed; }
+  .chip[disabled]:hover { color: var(--ink-muted); border-color: var(--hairline); }
+  /* the rack whose mark the chip contributes takes that mark's colour when live */
+  .rack-tone .chip[aria-pressed='true'] { border-color: var(--c-tone); color: var(--c-tone); }
+  .rack-qual .chip[aria-pressed='true'] { border-color: var(--c-qual); color: var(--c-qual); }
+  .chip.flat {
+    font-family: var(--font-utility); font-size: 0.68rem;
+    min-width: 0; padding: 0.5rem 0.9rem;
+  }
+
+  /* ---- the specimen stage ---- */
+  .stage {
+    position: relative; padding: 4.5rem 0 3.5rem; min-height: 20rem;
+    display: flex; justify-content: center;
+    align-items: flex-start;   /* never stretch the stack: its box IS the glyph's box */
+  }
+  .stage .stack { font-size: clamp(8rem, 20vw, 14rem); }
+
+  .rule {
+    position: absolute; left: 0; right: 0;
+    border-top: 1px dashed var(--hairline); pointer-events: none;
+    opacity: 0; transition: opacity 0.25s ease, top 0.25s ease;
+  }
+  .rule.show { opacity: 1; }
+  .rule::after {
+    content: attr(data-label);
+    position: absolute; right: 0; top: -1.35rem;
+    font-family: var(--font-utility); font-size: 0.62rem;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--ink-muted); background: var(--paper); padding-left: 0.6rem;
+  }
+  .rule.r-base { border-top-style: solid; border-top-color: var(--foil); opacity: 1; }
+  .rule.r-base::after { color: var(--foil); }
+  .rule.r-tone { border-top-color: var(--c-tone); }
+  .rule.r-tone::after { color: var(--c-tone); }
+  .rule.r-below { border-top-color: var(--c-tone); }
+  .rule.r-below::after { color: var(--c-tone); top: 0.15rem; }
+  .rule.r-x::after { top: 0.15rem; }
+
+  /* ---- readout ---- */
+  .readout {
+    margin-top: 1rem; font-family: var(--font-utility); font-size: 0.78rem;
+    line-height: 1.7; border-top: 1px solid var(--hairline); padding-top: 1rem;
+  }
+  .readout dl { display: grid; grid-template-columns: 7.5rem minmax(0, 1fr); gap: 0.15rem 1rem; margin: 0; }
+  .readout dt {
+    color: var(--ink-muted); text-transform: uppercase; letter-spacing: 0.1em;
+    font-size: 0.62rem; padding-top: 0.28rem;
+  }
+  .readout dd { margin: 0; overflow-wrap: anywhere; }
+  .readout .cp { color: var(--c-tone); }
+  .seq { display: flex; flex-wrap: wrap; gap: 0.3rem 0.5rem; }
+  /* the decomposition chips are built in JS, so they carry no scope attribute */
+  .seq :global(span) {
+    border: 1px solid var(--hairline); padding: 0.1rem 0.45rem;
+    border-radius: 2px; white-space: nowrap; font-size: 0.72rem;
+  }
+  .seq :global(.m-tone) { border-color: color-mix(in oklab, var(--c-tone), transparent 55%); color: var(--c-tone); }
+  .seq :global(.m-qual) { border-color: color-mix(in oklab, var(--c-qual), transparent 55%); color: var(--c-qual); }
+  .ccc-note { color: var(--ink-muted); font-size: 0.72rem; margin-top: 0.5rem; display: none; }
+  .ccc-note.on { display: block; }
+  .ccc-note :global(b) { color: var(--ink); font-weight: 400; }
+
+  /* ---- the matrix ---- */
+  .matrix-scroll { overflow-x: auto; margin-top: 1.5rem; }
+  table.matrix { border-collapse: collapse; margin-inline: auto; }
+  table.matrix caption { caption-side: bottom; padding-top: 1rem; text-align: left; }
+  table.matrix th {
+    font-weight: 400; font-family: var(--font-utility); font-size: 0.62rem;
+    letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-muted);
+    padding: 0.5rem; transition: color 0.15s ease;
+  }
+  table.matrix th.on { color: var(--c-tone); }
+  table.matrix th[scope='row'] {
+    font-family: var(--font-display); font-size: 1.1rem;
+    text-transform: none; letter-spacing: 0;
+    text-align: right; padding-right: 0.9rem; color: var(--ink-muted);
+  }
+  table.matrix th[scope='row'].on { color: var(--ink); }
+  table.matrix th .en { display: block; font-size: 0.55rem; letter-spacing: 0.08em; opacity: 0.7; margin-top: 0.2rem; }
+  table.matrix td { padding: 0; }
+  .cell {
+    display: block; width: 100%; background: none;
+    border: 1px solid transparent; border-radius: 2px;
+    padding: 0.45rem 0.6rem; cursor: pointer;
+    transition: background 0.12s ease, border-color 0.12s ease;
+  }
+  .cell .stack { font-size: 1.75rem; }
+  .cell:hover { background: #191d25; }
+  .cell[aria-pressed='true'] { border-color: var(--ink); background: #191d25; }
+
+  /* ---- tone placement ---- */
+  .switch { display: flex; gap: 0.5rem; justify-content: center; margin-bottom: 0.5rem; }
+  .placement {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem; margin: 2rem 0 1rem; text-align: center;
+  }
+  .placement .word { font-size: clamp(2rem, 6vw, 3.4rem); font-family: var(--font-display); }
+  .placement .gloss {
+    font-family: var(--font-utility); font-size: 0.65rem;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--ink-muted); display: block; margin-top: 0.6rem;
+  }
+  .placement [hidden] { display: none; }
+
+  /* ---- stress test ---- */
+  .specimens {
+    display: grid; gap: 1px; background: var(--hairline);
+    border: 1px solid var(--hairline); margin-top: 1.5rem;
+  }
+  .spec {
+    background: var(--paper); padding: 1.5rem;
+    display: grid; grid-template-columns: minmax(0, 1fr) auto;
+    gap: 1rem; align-items: center;
+  }
+  .spec .word { font-size: clamp(2rem, 7vw, 3.6rem); line-height: 1.15; white-space: nowrap; }
+  .spec .word.f-fraunces { font-family: var(--font-display); font-variation-settings: 'opsz' 72; }
+  .spec .word.f-newsreader { font-family: var(--font-body); }
+  .spec .word.f-cinzel { font-family: 'Cinzel Variable', Georgia, serif; }
+  .spec .meta { text-align: right; }
+  .spec .fname {
+    font-family: var(--font-utility); font-size: 0.7rem;
+    letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-muted);
+  }
+  .spec .fname.note { letter-spacing: 0; text-transform: none; margin-top: 0.4rem; opacity: 0.75; }
+  .badge {
+    display: inline-block; margin: 0.5rem 0;
+    font-family: var(--font-utility); font-size: 0.62rem;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    padding: 0.2rem 0.5rem; border-radius: 2px;
+    border: 1px solid var(--hairline); color: var(--ink-muted);
+    white-space: nowrap;
+  }
+  .badge.ok { color: var(--c-tone); border-color: color-mix(in oklab, var(--c-tone), transparent 60%); }
+  .badge.bad { color: var(--c-fail); border-color: color-mix(in oklab, var(--c-fail), transparent 50%); }
+  @media (max-width: 640px) {
+    .spec { grid-template-columns: 1fr; }
+    .spec .meta { text-align: left; }
+    .spec .word { white-space: normal; }
+  }
+
+  /* ---- leading ---- */
+  .leading-demo { margin-top: 1.5rem; border: 1px solid var(--hairline); padding: 1.75rem; overflow: hidden; }
+  /* only the specimen paragraph takes the big type and the live leading — scoped
+     to .tight so it does not out-rank .verdict and .gloss-en below it */
+  .leading-demo p.tight {
+    font-size: clamp(1.05rem, 2.6vw, 1.45rem);
+    line-height: var(--lh, 1.55);
+    margin: 0; max-width: none; color: var(--ink);
+    transition: line-height 0.12s ease;
+  }
+  .controls { display: flex; align-items: center; gap: 1rem; margin-top: 1.25rem; flex-wrap: wrap; }
+  .controls label {
+    font-family: var(--font-utility); font-size: 0.68rem;
+    letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-muted);
+  }
+  .controls output {
+    font-family: var(--font-utility); font-variant-numeric: tabular-nums;
+    font-size: 0.8rem; color: var(--c-tone);
+  }
+  input[type='range'] { flex: 1 1 12rem; accent-color: var(--c-tone); min-width: 8rem; }
+  .verdict {
+    font-family: var(--font-utility); font-size: 0.72rem;
+    color: var(--c-fail); min-height: 1.4em; margin-top: 0.6rem; max-width: none;
+  }
+  .verdict.clear { color: var(--ink-muted); }
+  .gloss-en { color: var(--ink-muted); font-size: 0.9rem; margin-top: 1rem; max-width: none; }
+
+  /* ---- the count ---- */
+  table.count {
+    border-collapse: collapse; font-family: var(--font-utility); font-size: 0.78rem;
+    margin: 1.5rem auto 0; max-width: var(--column); width: 100%;
+    font-variant-numeric: tabular-nums;
+  }
+  table.count th, table.count td {
+    text-align: right; padding: 0.35rem 0; border-bottom: 1px solid var(--hairline);
+  }
+  table.count th { color: var(--ink-muted); font-weight: 400; text-align: left; }
+  table.count td.sum { color: var(--c-tone); }
+  table.count tr.total th, table.count tr.total td {
+    border-bottom: none; border-top: 1px solid var(--foil); padding-top: 0.5rem;
+  }
+
+  .coda { display: flex; gap: 3rem; flex-wrap: wrap; margin: 2rem auto 1.5rem; }
+  .coda div { flex: 1 1 12rem; }
+  .coda .figure {
+    font-family: var(--font-display); font-variation-settings: 'opsz' 72;
+    font-variant-numeric: tabular-nums;
+    font-size: var(--step-3); font-weight: 600; line-height: 1.1; margin-bottom: 0.2rem;
+  }
+  .coda .up .figure { color: var(--c-tone); }
+</style>
+
+<script>
+  type Kind = 'tone' | 'qual';
+  interface Letter { base: string; qual: string | null; ch: string }
+  interface Tone { id: string; mark: string; vi: string; en: string; say: string }
+  interface Mark { name: string; ccc: number; kind: Kind }
+
+  const data = JSON.parse(document.getElementById('tone-data')!.textContent!) as {
+    LETTERS: Letter[]; TONES: Tone[]; MARKS: Record<string, Mark>;
+  };
+  const { LETTERS, TONES, MARKS } = data;
+
+  const compose = (ch: string, mark: string) => (ch + mark).normalize('NFC');
+  const hex = (ch: string) => 'U+' + ch.codePointAt(0)!.toString(16).toUpperCase().padStart(4, '0');
+
+  const QUAL_UC: Record<string, string> = { '̆': 'BREVE', '̂': 'CIRCUMFLEX', '̛': 'HORN' };
+  const TONE_UC: Record<string, string> = {
+    '̀': 'GRAVE', '́': 'ACUTE', '̃': 'TILDE',
+    '̉': 'HOOK ABOVE', '̣': 'DOT BELOW',
+  };
+
+  /* The Unicode name of a Vietnamese vowel is itself compositional —
+     LATIN SMALL LETTER E WITH CIRCUMFLEX AND DOT BELOW — so build it the same
+     way the glyph is built. */
+  function unicodeName(letter: Letter, tone: Tone) {
+    const parts: string[] = [];
+    if (letter.qual) parts.push(QUAL_UC[letter.qual]);
+    if (tone.mark) parts.push(TONE_UC[tone.mark]);
+    const stem = 'LATIN SMALL LETTER ' + letter.base.toUpperCase();
+    return parts.length ? stem + ' WITH ' + parts.join(' AND ') : stem;
+  }
+
+  const state = { base: 'e', qual: '̂', tone: TONES[5] };
+  const letterFor = (base: string, qual: string | null) =>
+    LETTERS.find((l) => l.base === base && (l.qual ?? '') === (qual ?? ''))!;
+  const current = () => letterFor(state.base, state.qual);
+  const qualsFor = (base: string) => LETTERS.filter((l) => l.base === base).map((l) => l.qual ?? '');
+
+  const $ = <T extends Element>(s: string) => document.querySelector(s) as T;
+  const specimen = $<HTMLElement>('#specimen');
+  const stage = $<HTMLElement>('#stage');
+  const rules = {
+    tone: $<HTMLElement>('#rule-tone'),
+    x: $<HTMLElement>('#rule-x'),
+    base: $<HTMLElement>('#rule-baseline'),
+    below: $<HTMLElement>('#rule-below'),
+  };
+
+  /* ---- font metrics, measured from the face that actually loaded ---- */
+  const ctx = document.createElement('canvas').getContext('2d')!;
+  const FS = 200;
+  const DISPLAY = "'Fraunces Variable', Georgia, serif";
+  function ink(ch: string, family: string) {
+    ctx.font = '500 ' + FS + 'px ' + family;
+    const m = ctx.measureText(ch);
+    return {
+      asc: m.actualBoundingBoxAscent / FS,      // ink above the baseline, in em
+      desc: m.actualBoundingBoxDescent / FS,    // ink below it
+      fbAsc: m.fontBoundingBoxAscent / FS,
+      fbDesc: m.fontBoundingBoxDescent / FS,
+      width: m.width / FS,
+    };
+  }
+
+  function paint(el: HTMLElement, letter: Letter, tone: Tone) {
+    (el.querySelector('.l-tone') as HTMLElement).textContent = compose(letter.ch, tone.mark);
+    (el.querySelector('.l-qual') as HTMLElement).textContent = letter.ch;
+    (el.querySelector('.l-base') as HTMLElement).textContent = letter.base;
+  }
+
+  function render(animate: boolean) {
+    const letter = current();
+    const tone = state.tone;
+    const ch = compose(letter.ch, tone.mark);
+
+    if (animate) {
+      specimen.classList.remove('animate');
+      void specimen.offsetWidth;   // restart the animation
+      specimen.classList.add('animate');
+    }
+    paint(specimen, letter, tone);
+
+    /* racks */
+    document.querySelectorAll<HTMLButtonElement>('.rack-base .chip').forEach((b) =>
+      b.setAttribute('aria-pressed', String(b.dataset.base === state.base)));
+
+    const valid = qualsFor(state.base);
+    document.querySelectorAll<HTMLButtonElement>('.rack-qual .chip').forEach((b) => {
+      const q = b.dataset.qual ?? '';
+      const ok = valid.includes(q);
+      b.disabled = !ok;
+      b.setAttribute('aria-pressed', String(ok && q === (state.qual ?? '')));
+      (b.querySelector('.g') as HTMLElement).textContent = ok ? letterFor(state.base, q).ch : '·';
+    });
+
+    document.querySelectorAll<HTMLButtonElement>('.rack-tone .chip').forEach((b) => {
+      const t = TONES.find((x) => x.id === b.dataset.tone)!;
+      b.setAttribute('aria-pressed', String(t.id === tone.id));
+      (b.querySelector('.g') as HTMLElement).textContent = compose(letter.ch, t.mark);
+    });
+
+    /* matrix */
+    document.querySelectorAll<HTMLButtonElement>('.cell').forEach((b) =>
+      b.setAttribute('aria-pressed', String(b.dataset.letter === letter.ch && b.dataset.tone === tone.id)));
+    document.querySelectorAll<HTMLElement>('#matrix th[data-tone]').forEach((th) =>
+      th.classList.toggle('on', th.dataset.tone === tone.id));
+    document.querySelectorAll<HTMLElement>('#matrix th[data-letter]').forEach((th) =>
+      th.classList.toggle('on', th.dataset.letter === letter.ch));
+
+    /* readout */
+    $<HTMLElement>('#r-cp').textContent = hex(ch);
+    $<HTMLElement>('#r-name').textContent = unicodeName(letter, tone);
+    $<HTMLElement>('#r-tone').textContent = tone.vi + ' — ' + tone.en + ', ' + tone.say;
+
+    const nfd = [...ch.normalize('NFD')];
+    const seq = $<HTMLElement>('#r-seq');
+    seq.textContent = '';
+    nfd.forEach((c) => {
+      const m = MARKS[c];
+      const s = document.createElement('span');
+      if (m) s.className = 'm-' + m.kind;
+      s.textContent = hex(c) + ' ' + (m ? m.name.replace('COMBINING ', '') : 'LETTER ' + c.toUpperCase());
+      seq.appendChild(s);
+    });
+
+    /* The quiet surprise: Unicode stores combining marks sorted by combining
+       class, not in the order a hand would draw them. For the heavy tone on a
+       circumflex vowel (ậ ệ ộ) that inverts the stack — the tone, added last,
+       is written before the quality mark it sits under. */
+    const marks = nfd.slice(1).map((c) => MARKS[c]).filter(Boolean);
+    const ccc = $<HTMLElement>('#r-ccc');
+    const inverted = marks.length > 1 && marks[0].kind === 'tone' && marks[1].kind === 'qual';
+    ccc.classList.toggle('on', inverted);
+    if (inverted) {
+      const low = (m: Mark) => m.name.replace('COMBINING ', '').toLowerCase();
+      ccc.innerHTML = 'Look at the order. The <b>tone</b> — ' + low(marks[0]) + ', class ' + marks[0].ccc +
+        ' — is stored <em>before</em> the <b>quality mark</b> — ' + low(marks[1]) + ', class ' + marks[1].ccc +
+        '. Unicode sorts combining marks by class, not by the order a hand would draw them, so the ' +
+        'mark you add last comes first in the string.';
+    }
+
+    /* metrics — measured from the loaded face, not asserted */
+    const full = ink(ch, DISPLAY);
+    const bare = ink(letter.base, DISPLAY);
+    const hFull = full.asc + full.desc;
+    const hBare = bare.asc + bare.desc;
+    $<HTMLElement>('#r-metrics').textContent = (hBare > 0 && hFull > 0)
+      ? (hFull / hBare).toFixed(2) + '× the bare ' + letter.base +
+        '  ·  reaches ' + (full.asc - bare.asc).toFixed(3) + 'em above it'
+      : '—';
+
+    /* the rules, placed on the real baseline of the real glyph */
+    const sBox = specimen.getBoundingClientRect();
+    const gBox = stage.getBoundingClientRect();
+    const fs = parseFloat(getComputedStyle(specimen).fontSize);
+    if (fs && full.fbAsc) {
+      // with line-height 1 the content box is 1em; the baseline sits at
+      // half-leading + the font's ascent
+      const halfLeading = (1 - (full.fbAsc + full.fbDesc)) / 2;
+      const baselineY = (sBox.top - gBox.top) + fs * (halfLeading + full.fbAsc);
+      const put = (el: HTMLElement, y: number, show: boolean) => {
+        el.style.top = y.toFixed(1) + 'px';
+        el.classList.toggle('show', show);
+      };
+      put(rules.base, baselineY, true);
+      put(rules.x, baselineY - bare.asc * fs, true);
+      put(rules.tone, baselineY - full.asc * fs, full.asc - bare.asc > 0.01);
+      put(rules.below, baselineY + full.desc * fs, full.desc - bare.desc > 0.01);
+      rules.x.dataset.label = 'top of ' + letter.base;
+    }
+  }
+
+  /* ---- controls ---- */
+  document.querySelectorAll<HTMLButtonElement>('.rack-base .chip').forEach((b) =>
+    b.addEventListener('click', () => {
+      state.base = b.dataset.base!;
+      if (!qualsFor(state.base).includes(state.qual ?? '')) state.qual = '';
+      render(true);
+    }));
+  document.querySelectorAll<HTMLButtonElement>('.rack-qual .chip').forEach((b) =>
+    b.addEventListener('click', () => { state.qual = b.dataset.qual ?? ''; render(true); }));
+  document.querySelectorAll<HTMLButtonElement>('.rack-tone .chip').forEach((b) =>
+    b.addEventListener('click', () => {
+      state.tone = TONES.find((t) => t.id === b.dataset.tone)!;
+      render(true);
+    }));
+  document.querySelectorAll<HTMLButtonElement>('.cell').forEach((b) =>
+    b.addEventListener('click', () => {
+      const l = LETTERS.find((x) => x.ch === b.dataset.letter)!;
+      state.base = l.base;
+      state.qual = l.qual ?? '';
+      state.tone = TONES.find((t) => t.id === b.dataset.tone)!;
+      render(true);
+      stage.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }));
+
+  /* ---- hòa / hoà ---- */
+  document.querySelectorAll<HTMLButtonElement>('.switch .chip').forEach((b) =>
+    b.addEventListener('click', () => {
+      const old = b.dataset.style === 'old';
+      document.querySelectorAll<HTMLElement>('.placement .v-old').forEach((e) => { e.hidden = !old; });
+      document.querySelectorAll<HTMLElement>('.placement .v-new').forEach((e) => { e.hidden = old; });
+      document.querySelectorAll<HTMLButtonElement>('.switch .chip').forEach((o) =>
+        o.setAttribute('aria-pressed', String((o.dataset.style === 'old') === old)));
+    }));
+
+  /* ---- stress test: does the face actually have the glyph? ----
+     A font that lacks a glyph falls back silently. Detect it by measuring: if
+     the face draws 'ế' exactly as the generic fallback does, it isn't drawing
+     it at all. The control letter proves the face itself loaded. */
+  const TEST = 'ế';      // U+1EBF — inside the block Cinzel lacks
+  const CONTROL = 'ă';   // U+0103 — Latin Extended, which Cinzel does have
+  function hasGlyph(family: string, ch: string) {
+    const a = ink(ch, family + ', serif');
+    const b = ink(ch, 'serif');
+    return !(Math.abs(a.width - b.width) < 0.001 &&
+             Math.abs(a.asc - b.asc) < 0.001 &&
+             Math.abs(a.desc - b.desc) < 0.001);
+  }
+  function checkFaces() {
+    document.querySelectorAll<HTMLElement>('.badge').forEach((el) => {
+      const family = el.dataset.family!;
+      if (!hasGlyph(family, CONTROL)) { el.hidden = true; return; }   // face never loaded
+      const covers = hasGlyph(family, TEST);
+      el.hidden = false;
+      el.className = 'badge ' + (covers ? 'ok' : 'bad');
+      el.textContent = covers ? 'has ' + TEST : 'no ' + TEST + ' — substituted';
+    });
+  }
+
+  /* ---- leading ---- */
+  const lh = $<HTMLInputElement>('#lh');
+  const demo = $<HTMLElement>('#leading-demo');
+  const verdict = $<HTMLElement>('#verdict');
+  function renderLeading() {
+    const v = parseFloat(lh.value);
+    demo.style.setProperty('--lh', String(v));
+    $<HTMLElement>('#lh-val').textContent = v.toFixed(2);
+    let msg: string, clear = false;
+    if (v < 1.05) msg = 'The marks have crashed into the line above. This is not a tight setting any more — it is broken text.';
+    else if (v < 1.25) msg = 'The tone marks have climbed into the line above. This is what a “tight, editorial” line-height does to Vietnamese.';
+    else if (v < 1.4) msg = 'Marks are grazing the descenders overhead. It reads, but it is crowded, and at small sizes it will smear.';
+    else if (v < 1.65) { msg = 'Comfortable. Note this is looser than an English page would need — that is the tax.'; clear = true; }
+    else { msg = 'Generous. Vietnamese sets happily here; English would look airy.'; clear = true; }
+    verdict.textContent = msg;
+    verdict.classList.toggle('clear', clear);
+  }
+  lh.addEventListener('input', renderLeading);
+
+  render(true);
+  checkFaces();
+  renderLeading();
+  // the fallback face measures differently from the real one — once Fraunces
+  // and friends have landed, every measured number and rule is redrawn
+  document.fonts?.ready.then(() => { render(false); checkFaces(); });
+  addEventListener('resize', () => render(false));
+</script>
