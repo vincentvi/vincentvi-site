@@ -38,6 +38,76 @@ const cards = [
     ],
     attrib: 'after Nassim Taleb & classical theology',
   },
+  {
+    num: '№ 004',
+    title: ['REFLEX', 'IVITY'],
+    subtitle: 'Belief bends the thing it is a belief about.',
+    back: [
+      'In some systems, perceiving the thing changes the thing. Belief moves the fundamentals, the moved fundamentals confirm the belief, and cause and effect run in a loop instead of a line — the two spiralling together until the loop snaps.',
+      'A company seen as the leader draws cheaper money, better hires and more trusting customers, and so becomes the leader. Past a threshold, the story is not noise; it is load-bearing. The same loop runs just as fast in reverse.',
+    ],
+    attrib: 'after George Soros, The Alchemy of Finance (1987)',
+  },
+  {
+    num: '№ 005',
+    title: ['CIRCLE OF', 'COMPETENCE'],
+    subtitle: 'Act inside earned knowledge; know exactly where its edge is.',
+    back: [
+      'Everyone has a domain where their judgment is genuinely reliable, and a larger one where it merely feels reliable. The circle is the border between them, and the skill is not widening it — it is knowing precisely where it ends.',
+      'The expensive mistakes never come from what you know you do not know. They come from the ground where you think you know and do not. So ask of any belief: did I earn this, or absorb it?',
+    ],
+    attrib: 'after Charlie Munger & Warren Buffett',
+  },
+  {
+    num: '№ 006',
+    title: ['THE', 'INCENTIVE'],
+    subtitle: "Show me the incentive and I'll show you the outcome.",
+    back: [
+      'Behaviour follows incentives, not intentions. To understand why a person, a company or a system does what it does, stop reading the stated goals and read the reward structure. The output matches the incentive almost every time.',
+      'The uncomfortable half of the model is turning it inward. What do your own rewards actually pay you to do — and is it the thing you say you want?',
+    ],
+    attrib: 'after Charlie Munger, on reward superresponse',
+  },
+  {
+    num: '№ 007',
+    title: ['OPPORTUNITY', 'COST'],
+    subtitle: 'The real price is the best alternative you gave up.',
+    back: [
+      'The cost of a choice is never what you spent. It is the best thing you did not do instead. Time and attention are finite, so every yes is a silent no to something else.',
+      'Munger measures comparatively: do not weigh an opportunity against doing nothing, weigh it against the best option already on your table. If it cannot beat that, it is not an opportunity.',
+    ],
+    attrib: 'after Charlie Munger & Warren Buffett',
+  },
+  {
+    num: '№ 008',
+    title: ['MARGIN OF', 'SAFETY'],
+    subtitle: 'Insurance for being wrong — not a prediction of being right.',
+    back: [
+      'An engineer expecting ten-thousand-pound trucks rates the bridge for thirty thousand. Not pessimism about the trucks — honesty about her own measurements. Leave that same gap between what you pay and what you believe it is worth.',
+      'The margin is sized to how wrong your estimate could be, never to how confident you feel. Confidence is precisely the thing it is insuring against.',
+    ],
+    attrib: 'after Benjamin Graham; kept by Munger & Buffett',
+  },
+  {
+    num: '№ 009',
+    title: ['LOLLA', 'PALOOZA'],
+    subtitle: 'When several forces push one way, outcomes multiply.',
+    back: [
+      'When two, three, four forces all push in the same direction, you do not get a bigger result — you get a non-linear one. The effects multiply instead of adding. Unbreakable moats, sudden crashes and unshakeable habits are all built this way.',
+      'Read it both ways. As a warning: how many biases are pushing me toward this at once? As a design: stop over-tuning one factor and stack several that point the same way.',
+    ],
+    attrib: 'after Charlie Munger, Elementary Worldly Wisdom (1994)',
+  },
+  {
+    num: '№ 010',
+    title: ['FIRST', 'PRINCIPLES'],
+    subtitle: 'Reason up from bedrock, not across from precedent.',
+    back: [
+      'Most thinking is reasoning by analogy: it worked for them, so a modified version should work for me. Fast, cheap, and right most of the time — but it can only ever produce variations on what already exists.',
+      'The alternative is to break the problem down to the few things you know are true, the facts that cannot be reduced further, and rebuild upward from there. It is expensive, so spend it where the stakes are high and the standard answer is old.',
+    ],
+    attrib: 'after Aristotle; sharpened by Elon Musk',
+  },
 ];
 ---
 <BaseLayout
@@ -60,7 +130,12 @@ const cards = [
   <div class="stage" id="stage">
     <div class="track" id="track">
       {cards.map((c, i) => (
-        <div class={`flip${i === 0 ? ' active' : ''}`} data-index={i} data-share={c.title.join(' ')}>
+        <div
+          class={`flip${i === 0 ? ' active' : ''}`}
+          data-index={i}
+          data-share={c.title.join(' ')}
+          style={`--len:${Math.max(...c.title.map((line) => line.length))}`}
+        >
           <div class="flip-inner">
             <div class="face front">
               <div class="front-head">
@@ -231,6 +306,8 @@ const cards = [
     display: flex;
     flex-direction: column;
     padding: 1.4rem 1.5rem 2.5rem;
+    /* the title sizes itself against the card, not the viewport */
+    container-type: inline-size;
   }
   .front-head {
     display: flex;
@@ -258,7 +335,9 @@ const cards = [
   .word {
     font-family: 'Cinzel Variable', 'Trajan Pro', Georgia, serif;
     font-weight: 560;
-    font-size: clamp(2.1rem, 10vw, 3.6rem);
+    /* --len is the longest line's character count; 112cqi/len keeps every
+       title the same optical width, so long words shrink instead of spilling */
+    font-size: clamp(1.6rem, calc(112cqi / var(--len, 8)), 3.6rem);
     letter-spacing: 0.06em; line-height: 1.12; text-align: center;
     background-image:
       /* foil band: sharp streak with tinted edges — the visible shine */
