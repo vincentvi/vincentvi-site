@@ -3,7 +3,7 @@ import '@fontsource-variable/fraunces/opsz.css';
 import '@fontsource-variable/newsreader/opsz.css';
 import '@fontsource-variable/newsreader/opsz-italic.css';
 import '../styles/global.css';
-import { SITE } from '../config';
+import { SITE, SOCIALS } from '../config';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 
@@ -20,12 +20,27 @@ const {
   title,
   description = SITE.description,
   ogType = 'website',
-  ogImage,
+  ogImage = SITE.defaultOgImage,
 } = Astro.props;
 
 const pageTitle = title ? `${title} — ${SITE.name}` : SITE.title;
 const canonical = new URL(Astro.url.pathname, SITE.url).href;
 const ogImageAbs = ogImage ? new URL(ogImage, SITE.url).href : undefined;
+
+// Structured data: a Person entity for the site, so search engines can
+// connect the name, role, and your verified profiles. sameAs drops any
+// placeholder ("#") links.
+const sameAs = SOCIALS.map((s) => s.url).filter((u) => u && u !== '#');
+const personLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: SITE.author,
+  url: SITE.url,
+  jobTitle: SITE.jobTitle,
+  description: SITE.description,
+  image: ogImageAbs,
+  ...(sameAs.length ? { sameAs } : {}),
+};
 ---
 <!doctype html>
 <html lang={SITE.locale}>
@@ -38,6 +53,9 @@ const ogImageAbs = ogImage ? new URL(ogImage, SITE.url).href : undefined;
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="sitemap" href="/sitemap-index.xml" />
     <meta name="generator" content={Astro.generator} />
+    {SITE.googleSiteVerification && (
+      <meta name="google-site-verification" content={SITE.googleSiteVerification} />
+    )}
 
     <!-- Open Graph / social sharing -->
     <meta property="og:site_name" content={SITE.name} />
@@ -47,6 +65,10 @@ const ogImageAbs = ogImage ? new URL(ogImage, SITE.url).href : undefined;
     <meta property="og:url" content={canonical} />
     {ogImageAbs && <meta property="og:image" content={ogImageAbs} />}
     <meta name="twitter:card" content={ogImageAbs ? 'summary_large_image' : 'summary'} />
+    {ogImageAbs && <meta name="twitter:image" content={ogImageAbs} />}
+
+    <!-- Structured data -->
+    <script type="application/ld+json" set:html={JSON.stringify(personLd)} />
   </head>
   <body>
     <Header />

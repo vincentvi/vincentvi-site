@@ -10,6 +10,19 @@ export const SITE = {
   url: 'https://vincentvi.me',
   locale: 'en',
   author: 'Vincent Vi',
+
+  // Used in the Person structured-data block (helps Google understand
+  // who you are — a step toward a name knowledge panel).
+  jobTitle: 'Graphic Designer & Letterer',
+
+  // Default social-share image (1200×630). Any page can override via the
+  // `ogImage` prop; this is the fallback so no share ever renders bare.
+  defaultOgImage: '/og-default.png',
+
+  // Google Search Console "HTML tag" verification: paste ONLY the content
+  // token here (the value inside content="..."). Leave '' if you verify
+  // via DNS instead.
+  googleSiteVerification: '',
 };
 
 // Shown in the footer and on /contact. Replace # with real URLs,
