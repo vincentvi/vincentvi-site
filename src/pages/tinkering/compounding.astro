@@ -120,11 +120,12 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
     --cloth: #8fb0e0;
     --foil: #6f96c4;
 
-    /* one green does every green job on this page: the drag pills, the
-       compounding letter, and the compounding series in the chart */
-    --highlight: #a7f175;
-    --highlight-ink: #14210c;
-    --series-comp: #a7f175;
+    /* This is a dark page, so --highlight points at the spring green rather
+       than the darker sibling paper uses (see global.css). One green then
+       does every green job here: the drag pills, the compounding letter,
+       and the compounding series in the chart. */
+    --highlight: var(--highlight-fill);
+    --series-comp: var(--highlight-fill);
     --series-lin: #6284d6;
 
     /* the centred reading column — fixed, so every text block shares a left

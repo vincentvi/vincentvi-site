@@ -302,13 +302,14 @@ const SIGNS_JS = signs.map((s) => ({ lat: s.lat, lng: s.lng, tags: s.tags, title
      Accent = spring green #A7F175; hairlines are the same green at
      low alpha so every border reads green without shouting. */
   :global(html:root) {
-    --neon: #a7f175;
+    --neon: var(--highlight-fill);   /* the same spring green the rest of the site uses */
     --paper: #111318;
     --ink: #e6e4dc;
     --ink-muted: #9b9a90;
     --hairline: rgba(167, 241, 117, 0.28);
     --cloth: var(--neon);
     --foil: var(--neon);
+    --highlight: var(--neon);        /* the dark ground takes the spring green */
   }
 
   .crumb { max-width: none; }
