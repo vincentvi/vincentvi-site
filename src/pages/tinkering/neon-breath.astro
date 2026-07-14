@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import { WEB3FORMS_ACCESS_KEY } from '../../config';
 
 // ------------------------------------------------------------------
 // THE ARCHIVE. One entry per sign — add a sign by adding an object
@@ -8,6 +9,9 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 // image path. Coordinates come from Google Maps: right-click the
 // storefront, first menu item copies "lat, lng".
 //
+// Optional: `spottedBy: 'Mai N.'` credits a visitor who nominated the
+// sign through the form at the bottom of the page.
+//
 // ⚠ SAMPLE DATA — names/addresses/coords are stand-ins for review.
 // ------------------------------------------------------------------
 const STYLE_TAGS = [
@@ -15,7 +19,20 @@ const STYLE_TAGS = [
   'monoline', 'rounded', 'sans', 'script', 'serif', 'slab',
 ];
 
-const signs = [
+interface Sign {
+  num: string;
+  title: string;
+  photo: string;
+  address: string;
+  lat: number;
+  lng: number;
+  tags: string[];
+  note: string;
+  /** credit for a visitor who nominated this sign */
+  spottedBy?: string;
+}
+
+const signs: Sign[] = [
   {
     num: '№ 001',
     title: 'Phở Hòa',
@@ -73,8 +90,11 @@ const signs = [
 ];
 
 const tagCount = (t: string) => signs.filter((s) => s.tags.includes(t)).length;
-const mapsUrl = (s: (typeof signs)[number]) =>
+const mapsUrl = (s: Sign) =>
   `https://www.google.com/maps/search/?api=1&query=${s.lat},${s.lng}`;
+
+// styles with no specimen yet — the archive asks for these by name
+const missing = STYLE_TAGS.filter((t) => tagCount(t) === 0);
 
 // minimal payload for the client script
 const SIGNS_JS = signs.map((s) => ({ lat: s.lat, lng: s.lng, tags: s.tags, title: s.title }));
@@ -125,6 +145,7 @@ const SIGNS_JS = signs.map((s) => ({ lat: s.lat, lng: s.lng, tags: s.tags, title
               {s.address} ↗
             </a>
           </p>
+          {s.spottedBy && <p class="folio spotted">Spotted by {s.spottedBy}</p>}
         </div>
       ))}
       <div id="minimap" aria-label="Map location of the current sign"></div>
@@ -142,6 +163,69 @@ const SIGNS_JS = signs.map((s) => ({ lat: s.lat, lng: s.lng, tags: s.tags, title
 
     <p class="folio map-hint">pin = this sign · link opens Google Maps</p>
   </div>
+
+  <section class="nominate">
+    <p class="folio">Nominate a sign</p>
+    <h2>Know a sign worth collecting?</h2>
+    <p class="nom-lede">
+      Don't send a photo — send a <em>place</em>. Tell me the store and where it
+      stands, and I'll go photograph it myself. If it makes the archive, your
+      name goes on the specimen.
+    </p>
+
+    {missing.length > 0 && (
+      <p class="wanted">
+        <span class="folio wanted-label">Still missing</span>
+        {missing.map((t) => <span class="tag wanted-tag">{t}</span>)}
+        <span class="wanted-tail">
+          — no specimen in the archive yet. Know one? That's the sign I most want.
+        </span>
+      </p>
+    )}
+
+    <form action="https://api.web3forms.com/submit" method="POST">
+      <input type="hidden" name="access_key" value={WEB3FORMS_ACCESS_KEY} />
+      <input type="hidden" name="subject" value="Neon Breath — sign nomination" />
+      <input type="checkbox" name="botcheck" class="hidden" tabindex="-1" autocomplete="off" />
+
+      <label>
+        The store or place
+        <input type="text" name="store" required placeholder="Phở Hòa" />
+      </label>
+
+      <label>
+        Where it stands
+        <input
+          type="text"
+          name="location"
+          required
+          placeholder="Street address, or paste a Google Maps link"
+        />
+      </label>
+
+      <label>
+        What makes the lettering worth the trip <span class="opt">(optional)</span>
+        <textarea
+          name="why"
+          rows="4"
+          placeholder="Hand-painted script, glowing since the 60s, still repainted every Tết…"
+        ></textarea>
+      </label>
+
+      <div class="row">
+        <label>
+          Your name <span class="opt">(for the credit line)</span>
+          <input type="text" name="name" autocomplete="name" placeholder="Mai N." />
+        </label>
+        <label>
+          Email <span class="opt">(optional — only to tell you it's up)</span>
+          <input type="email" name="email" autocomplete="email" />
+        </label>
+      </div>
+
+      <button type="submit">Send the nomination</button>
+    </form>
+  </section>
 </BaseLayout>
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -341,12 +425,66 @@ const SIGNS_JS = signs.map((s) => ({ lat: s.lat, lng: s.lng, tags: s.tags, title
   .address { margin: 0 0 1.25rem; font-family: var(--font-utility); font-size: 0.8rem; }
   .address a { text-decoration-style: dotted; }
 
+  .spotted { margin: 0.75rem 0 0; }
+
   #minimap {
     height: 340px; margin-top: auto; /* pin to the aligned bottom edge */
     border: 1px solid var(--hairline);
     background: #05070c;
   }
   .map-hint { margin: 0; }
+
+  /* ---- nominate a sign ---- */
+  .nominate {
+    margin-top: 4.5rem; padding-top: 2.5rem;
+    border-top: 1px solid var(--hairline);
+  }
+  .nominate h2 { margin: 0.4rem 0 0.75rem; }
+  .nom-lede { color: var(--ink-muted); font-size: var(--step-1); max-width: 46ch; }
+
+  /* the archive names the gaps in itself — generated from tag counts */
+  .wanted {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem;
+    max-width: 52ch; margin: 1.75rem 0 0;
+    padding: 1rem 1.25rem;
+    border: 1px solid var(--hairline); border-radius: 4px;
+    background: rgba(167, 241, 117, 0.05);
+  }
+  .wanted-label { margin-right: 0.15rem; }
+  .wanted-tag { color: var(--neon); }
+  .wanted-tail { color: var(--ink-muted); font-style: italic; }
+
+  .nominate form { display: grid; gap: 1.25rem; max-width: 40rem; margin-top: 2rem; }
+  .nominate label {
+    display: grid; gap: 0.4rem;
+    font-family: var(--font-utility); font-size: 0.74rem; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--ink-muted);
+  }
+  .opt { text-transform: none; letter-spacing: 0.02em; opacity: 0.6; }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+  @media (max-width: 620px) { .row { grid-template-columns: 1fr; } }
+
+  .nominate input[type='text'],
+  .nominate input[type='email'],
+  .nominate textarea {
+    font-family: var(--font-body); font-size: var(--step-0); color: var(--ink);
+    padding: 0.7rem 0.85rem; border-radius: 4px;
+    border: 1px solid var(--hairline); background: rgba(5, 7, 12, 0.6);
+  }
+  .nominate ::placeholder { color: var(--ink-muted); opacity: 0.55; }
+  .nominate input:focus, .nominate textarea:focus {
+    border-color: var(--neon); outline: none;
+  }
+  .nominate button {
+    justify-self: start; cursor: pointer;
+    font-family: var(--font-utility); font-size: 0.82rem; letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #0d120c; background: var(--neon);
+    border: 0; border-radius: 4px; padding: 0.85rem 1.6rem;
+    transition: filter 0.25s ease;
+  }
+  .nominate button:hover { filter: brightness(1.12); }
+  .hidden { display: none; }
 
   /* leaflet lives outside Astro's scope */
   :global(#minimap .leaflet-container) { background: #05070c; }
