@@ -7,5 +7,4 @@
   <text x="400" y="360" text-anchor="middle" font-family="Helvetica, sans-serif" font-size="30" letter-spacing="22" fill="#7fa8dd">VOICE</text>
   <text x="400" y="450" text-anchor="middle" font-family="cursive" font-style="italic" font-size="52" fill="#e6e4dc">voice</text>
   <rect x="230" y="485" width="340" height="60" fill="none" stroke="#9b9a90" stroke-width="2" stroke-dasharray="8 8"/>
-  <text x="50%" y="95%" text-anchor="middle" font-family="monospace" font-size="18" letter-spacing="6" fill="#7a7a70">PLACEHOLDER · TO BE DRAWN</text>
 </svg>

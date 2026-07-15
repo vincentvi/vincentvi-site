@@ -14,5 +14,4 @@
   <rect x="250" y="115" width="300" height="390" rx="18" fill="#1a1f2b" stroke="#262b38" stroke-width="2"/>
   <text x="400" y="390" text-anchor="middle" font-family="Georgia, serif" font-size="220" fill="#e6e4dc" clip-path="url(#card)">A</text>
   <rect x="250" y="115" width="300" height="390" rx="18" fill="url(#sheen)"/>
-  <text x="50%" y="95%" text-anchor="middle" font-family="monospace" font-size="18" letter-spacing="6" fill="#7a7a70">PLACEHOLDER · TO BE DRAWN</text>
 </svg>
