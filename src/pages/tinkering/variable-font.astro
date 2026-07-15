@@ -1,18 +1,13 @@
 ---
 import '@fontsource-variable/recursive/full.css';
+import '@fontsource-variable/roboto-serif/full.css';
+import '@fontsource-variable/playfair/standard.css';
 import '@fontsource-variable/grenze-gotisch/wght.css';
 import BaseLayout from '../../layouts/BaseLayout.astro';
-// Fraunces: self-declared under a UNIQUE family name. The site-wide layout
-// imports fraunces/opsz.css, whose 'Fraunces Variable' woff2 has SOFT & WONK
-// flattened out — reusing that name here made those two axes silently no-op.
-// A private family name sidesteps the @font-face collision entirely.
-import frauncesLatin from '@fontsource-variable/fraunces/files/fraunces-latin-full-normal.woff2?url';
-import frauncesLatinExt from '@fontsource-variable/fraunces/files/fraunces-latin-ext-full-normal.woff2?url';
-import frauncesVietnamese from '@fontsource-variable/fraunces/files/fraunces-vietnamese-full-normal.woff2?url';
 ---
 <BaseLayout
   title="Variable font playground"
-  description="An interactive instrument: pick a typeface, then drag the sliders to morph its live axes in real time — Recursive's five dials, Fraunces' editorial serif, or Grenze Gotisch's blackletter weight."
+  description="An interactive instrument: pick a typeface, then drag the sliders to morph its live axes in real time — Recursive's five dials, Roboto Serif's flexible width, or Grenze Gotisch's blackletter weight."
 >
   <p class="folio crumb"><a href="/tinkering/">Tinkering</a> · experiment 002</p>
   <h1>Variable font playground</h1>
@@ -27,7 +22,8 @@ import frauncesVietnamese from '@fontsource-variable/fraunces/files/fraunces-vie
       <span class="folio">Typeface</span>
       <select id="font-select" class="folio" aria-label="Choose a typeface">
         <option value="recursive">Recursive — 5 axes</option>
-        <option value="fraunces">Fraunces — editorial serif, 4 axes</option>
+        <option value="roboto">Roboto Serif — flexible serif, 4 axes</option>
+        <option value="playfair">Playfair — high-contrast serif, 3 axes</option>
         <option value="grenze">Grenze Gotisch — blackletter, weight</option>
       </select>
     </label>
@@ -74,20 +70,33 @@ import frauncesVietnamese from '@fontsource-variable/fraunces/files/fraunces-vie
       <span class="hint folio" style="margin-left:0.5rem;">true italic letterforms at slant</span>
     </label>
 
-    <!-- Fraunces-only axes -->
-    <label data-for="fraunces">
-      <span class="row"><span class="folio">Optical size <span class="tag">text ↔ display</span></span><output id="out-opsz">144</output></span>
-      <input type="range" id="opsz" min="9" max="144" step="1" value="144" />
-      <span class="hint folio">Text (9, sturdy for small sizes) → Display (144, dramatic contrast, fine hairlines). The serif equivalent of Recursive's Casual.</span>
+    <!-- Roboto Serif axes -->
+    <label data-for="roboto">
+      <span class="row"><span class="folio">Width <span class="tag">the dramatic one</span></span><output id="out-wdth">100</output></span>
+      <input type="range" id="wdth" min="50" max="150" step="1" value="100" />
+      <span class="hint folio">Condensed (50, tall & narrow) → Expanded (150, wide & open). The serif's version of Recursive's Casual — the big personality dial.</span>
     </label>
-    <label data-for="fraunces">
-      <span class="row"><span class="folio">Softness</span><output id="out-soft">0</output></span>
-      <input type="range" id="soft" min="0" max="100" step="1" value="0" />
-      <span class="hint folio">Sharp, cut terminals → rounded, softened corners.</span>
+    <label data-for="roboto">
+      <span class="row"><span class="folio">Optical size</span><output id="out-opsz">20</output></span>
+      <input type="range" id="opsz" min="8" max="144" step="1" value="20" />
+      <span class="hint folio">Text (8, sturdy hairlines) → Display (144, high contrast, delicate serifs).</span>
     </label>
-    <label class="curs-row folio" data-for="fraunces">
-      Wonk <input type="checkbox" id="wonk" />
-      <span class="hint folio" style="margin-left:0.5rem;">swaps in the quirky, off-kilter letterforms</span>
+    <label data-for="roboto">
+      <span class="row"><span class="folio">Grade</span><output id="out-grad">0</output></span>
+      <input type="range" id="grad" min="-50" max="100" step="1" value="0" />
+      <span class="hint folio">Darkens or lightens the strokes without changing the letters' width — the spacing stays put. Useful for dark mode.</span>
+    </label>
+
+    <!-- Playfair axes -->
+    <label data-for="playfair">
+      <span class="row"><span class="folio">Optical size <span class="tag">the dramatic one</span></span><output id="out-pf-opsz">72</output></span>
+      <input type="range" id="pf-opsz" min="5" max="1200" step="1" value="72" />
+      <span class="hint folio">Playfair's signature dial. Low (text, gentle contrast) → high (display, razor-thin hairlines against heavy stems). Its 5–1200 range is enormous.</span>
+    </label>
+    <label data-for="playfair">
+      <span class="row"><span class="folio">Width</span><output id="out-pf-wdth">100</output></span>
+      <input type="range" id="pf-wdth" min="87.5" max="112.5" step="0.5" value="100" />
+      <span class="hint folio">A subtle trim, from a touch condensed to a touch expanded.</span>
     </label>
 
     <div class="presets" data-for="recursive">
@@ -97,11 +106,17 @@ import frauncesVietnamese from '@fontsource-variable/fraunces/files/fraunces-vie
       <button type="button" data-w="500" data-c="0" data-m="100" data-s="0" class="preset folio">Code</button>
       <button type="button" data-w="900" data-c="30" data-m="0" data-s="-14" class="preset folio">Display slant</button>
     </div>
-    <div class="presets" data-for="fraunces" hidden>
+    <div class="presets" data-for="roboto" hidden>
       <span class="folio">Jump to:</span>
-      <button type="button" data-w="340" data-opsz="9" data-soft="0" data-wonk="0" class="preset folio">Reading</button>
-      <button type="button" data-w="600" data-opsz="144" data-soft="0" data-wonk="0" class="preset folio">Display serif</button>
-      <button type="button" data-w="900" data-opsz="144" data-soft="70" data-wonk="1" class="preset folio">Wonky black</button>
+      <button type="button" data-w="400" data-wdth="55" data-opsz="18" data-grad="0" class="preset folio">Condensed</button>
+      <button type="button" data-w="500" data-wdth="100" data-opsz="144" data-grad="0" class="preset folio">Editorial</button>
+      <button type="button" data-w="900" data-wdth="140" data-opsz="144" data-grad="0" class="preset folio">Poster</button>
+    </div>
+    <div class="presets" data-for="playfair" hidden>
+      <span class="folio">Jump to:</span>
+      <button type="button" data-w="400" data-pfopsz="8" data-pfwdth="100" class="preset folio">Text</button>
+      <button type="button" data-w="500" data-pfopsz="72" data-pfwdth="100" class="preset folio">Editorial</button>
+      <button type="button" data-w="900" data-pfopsz="1200" data-pfwdth="112.5" class="preset folio">Max contrast</button>
     </div>
     <div class="presets" data-for="grenze" hidden>
       <span class="folio">Jump to:</span>
@@ -126,38 +141,23 @@ import frauncesVietnamese from '@fontsource-variable/fraunces/files/fraunces-vie
       <strong>Recursive</strong> is a functional sans built for play, with five
       dials — <strong>Casual</strong> morphs it from crisp to hand-drawn,
       <strong>Mono</strong> snaps toward code-like widths, and weight, slant and
-      cursive do the familiar work. <strong>Fraunces</strong> is its editorial
-      opposite: a high-contrast serif whose <strong>Optical size</strong> axis
-      re-draws the whole face from sturdy text to dramatic display, with
-      <strong>Softness</strong> and a <strong>Wonk</strong> toggle for character.
-      <strong>Grenze Gotisch</strong> is a legible blackletter by Omnibus-Type
-      with a single continuous <strong>weight</strong> axis (100–900) — one dial,
-      but watch how much the gothic forms thicken and close up. "Gradatim
-      ferociter" — step by step, ferociously.
+      cursive do the familiar work. <strong>Roboto Serif</strong> is its editorial
+      counterpart, and its headline trick is <strong>Width</strong>: push it and
+      the whole face stretches from tall-and-narrow to wide-and-open. Add
+      <strong>Optical size</strong> (sturdy text ↔ high-contrast display) and
+      <strong>Grade</strong>, which darkens the strokes without moving anything —
+      the letters get heavier but the spacing holds. <strong>Playfair</strong> is
+      the high-contrast Didone of the group: its <strong>Optical size</strong> axis
+      spans an enormous 5–1200, sweeping from gentle text to razor-thin hairlines
+      set against heavy stems — push it with the weight up for full poster drama.
+      <strong>Grenze Gotisch</strong>
+      is a legible blackletter by Omnibus-Type with a single continuous
+      <strong>weight</strong> axis (100–900) — one dial, but watch how much the
+      gothic forms thicken and close up. "Gradatim ferociter" — step by step,
+      ferociously.
     </p>
   </div>
 </BaseLayout>
-
-<style is:inline set:html={`
-  @font-face {
-    font-family: 'Fraunces Full VF';
-    font-style: normal; font-weight: 100 900; font-display: swap;
-    src: url(${frauncesLatin}) format('woff2-variations');
-    unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;
-  }
-  @font-face {
-    font-family: 'Fraunces Full VF';
-    font-style: normal; font-weight: 100 900; font-display: swap;
-    src: url(${frauncesLatinExt}) format('woff2-variations');
-    unicode-range: U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF;
-  }
-  @font-face {
-    font-family: 'Fraunces Full VF';
-    font-style: normal; font-weight: 100 900; font-display: swap;
-    src: url(${frauncesVietnamese}) format('woff2-variations');
-    unicode-range: U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB;
-  }
-`}></style>
 
 <style>
   /* Dark room for this page only — token-level, so header, footer and every
@@ -303,16 +303,21 @@ import frauncesVietnamese from '@fontsource-variable/fraunces/files/fraunces-vie
   const mono = document.getElementById('mono');
   const slnt = document.getElementById('slnt');
   const crsv = document.getElementById('crsv');
+  const wdth = document.getElementById('wdth');
   const opsz = document.getElementById('opsz');
-  const soft = document.getElementById('soft');
-  const wonk = document.getElementById('wonk');
+  const grad = document.getElementById('grad');
+  const pfOpsz = document.getElementById('pf-opsz');
+  const pfWdth = document.getElementById('pf-wdth');
   const reset = document.getElementById('reset');
   const outW = document.getElementById('out-wght');
   const outC = document.getElementById('out-casl');
   const outM = document.getElementById('out-mono');
   const outS = document.getElementById('out-slnt');
+  const outWd = document.getElementById('out-wdth');
   const outO = document.getElementById('out-opsz');
-  const outSoft = document.getElementById('out-soft');
+  const outG = document.getElementById('out-grad');
+  const outPfO = document.getElementById('out-pf-opsz');
+  const outPfWd = document.getElementById('out-pf-wdth');
 
   // Each typeface only exposes the axes its designer actually drew. The panel
   // adapts: `build` writes the font-variation-settings string from just this
@@ -331,15 +336,25 @@ import frauncesVietnamese from '@fontsource-variable/fraunces/files/fraunces-vie
       },
       onReset() { casl.value = 0; mono.value = 0; slnt.value = 0; crsv.checked = false; },
     },
-    fraunces: {
-      family: "'Fraunces Full VF', Georgia, serif",
-      tracking: '-0.005em',
+    roboto: {
+      family: "'Roboto Serif Variable', Georgia, serif",
+      tracking: '0em',
       optical: 'none', // let the slider drive opsz instead of font-size
       wght: { min: 100, max: 900, def: 400 },
       build() {
-        return `'opsz' ${opsz.value}, 'wght' ${wght.value}, 'SOFT' ${soft.value}, 'WONK' ${wonk.checked ? 1 : 0}`;
+        return `'wdth' ${wdth.value}, 'opsz' ${opsz.value}, 'wght' ${wght.value}, 'GRAD' ${grad.value}`;
       },
-      onReset() { opsz.value = 144; soft.value = 0; wonk.checked = false; },
+      onReset() { wdth.value = 100; opsz.value = 20; grad.value = 0; },
+    },
+    playfair: {
+      family: "'Playfair Variable', Georgia, serif",
+      tracking: '0em',
+      optical: 'none', // let the slider drive opsz instead of font-size
+      wght: { min: 300, max: 900, def: 400 },
+      build() {
+        return `'opsz' ${pfOpsz.value}, 'wght' ${wght.value}, 'wdth' ${pfWdth.value}`;
+      },
+      onReset() { pfOpsz.value = 72; pfWdth.value = 100; },
     },
     grenze: {
       family: "'Grenze Gotisch Variable', serif",
@@ -359,8 +374,11 @@ import frauncesVietnamese from '@fontsource-variable/fraunces/files/fraunces-vie
     outC.textContent = casl.value;
     outM.textContent = mono.value;
     outS.textContent = slnt.value;
+    outWd.textContent = wdth.value;
     outO.textContent = opsz.value;
-    outSoft.textContent = soft.value;
+    outG.textContent = grad.value;
+    outPfO.textContent = pfOpsz.value;
+    outPfWd.textContent = pfWdth.value;
   }
 
   function setFont(key) {
@@ -382,8 +400,8 @@ import frauncesVietnamese from '@fontsource-variable/fraunces/files/fraunces-vie
 
   fontSelect.addEventListener('change', () => setFont(fontSelect.value));
 
-  [wght, casl, mono, slnt, opsz, soft].forEach((el) => el.addEventListener('input', apply));
-  [crsv, wonk].forEach((el) => el.addEventListener('change', apply));
+  [wght, casl, mono, slnt, wdth, opsz, grad, pfOpsz, pfWdth].forEach((el) => el.addEventListener('input', apply));
+  crsv.addEventListener('change', apply);
 
   document.querySelectorAll('.preset').forEach((btn) => {
     btn.addEventListener('click', () => {
@@ -392,9 +410,11 @@ import frauncesVietnamese from '@fontsource-variable/fraunces/files/fraunces-vie
       if (d.c !== undefined) casl.value = d.c;
       if (d.m !== undefined) mono.value = d.m;
       if (d.s !== undefined) slnt.value = d.s;
+      if (d.wdth !== undefined) wdth.value = d.wdth;
       if (d.opsz !== undefined) opsz.value = d.opsz;
-      if (d.soft !== undefined) soft.value = d.soft;
-      if (d.wonk !== undefined) wonk.checked = d.wonk === '1';
+      if (d.grad !== undefined) grad.value = d.grad;
+      if (d.pfopsz !== undefined) pfOpsz.value = d.pfopsz;
+      if (d.pfwdth !== undefined) pfWdth.value = d.pfwdth;
       apply();
     });
   });
