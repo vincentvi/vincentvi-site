@@ -1,0 +1,94 @@
+---
+/**
+ * SandGrain — a fixed, full-viewport stipple of tiny grains rendered on a
+ * canvas at load. Reads as the tooth of sand: a sandbox to tinker in. The
+ * grains drift denser and sparser across a soft noise field so it never reads
+ * as flat static. Colour + alpha are deliberately low so it sits behind the
+ * reading column without competing.
+ *
+ * Purely decorative → aria-hidden, pointer-events: none, z-index behind
+ * content. Drop it once per page (usually just after the layout's <slot />
+ * or at the top of a page body). Colour is themeable via --grain-rgb.
+ */
+---
+<canvas id="sand-grain" aria-hidden="true"></canvas>
+
+<style>
+  #sand-grain {
+    position: fixed;
+    inset: 0;
+    z-index: -1;            /* behind normal-flow content, above the paper */
+    pointer-events: none;
+    /* no fallback fill: if canvas/JS is unavailable the page just stays paper */
+  }
+</style>
+
+<script>
+  const canvas = document.getElementById('sand-grain') as HTMLCanvasElement | null;
+  const ctx = canvas?.getContext('2d');
+
+  if (canvas && ctx) {
+    // the blue the grains are stippled in, read from the design token
+    const grainRGB = () => {
+      const v = getComputedStyle(document.documentElement)
+        .getPropertyValue('--grain-rgb')
+        .trim();
+      return (v || '44 62 102').replace(/\s+/g, ',');
+    };
+
+    // a cheap smooth field, ~0..1 — large soft drifts, like windblown sand
+    const field = (x: number, y: number) =>
+      (Math.sin(x * 0.0016 + 1.3) * Math.cos(y * 0.0021) +
+        Math.sin(x * 0.0039 - 0.7) * Math.cos(y * 0.0032 + 2.1) * 0.6 +
+        Math.sin((x + y) * 0.0025) * 0.4) *
+        0.25 +
+      0.5;
+
+    const draw = () => {
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      canvas.width = Math.round(w * dpr);
+      canvas.height = Math.round(h * dpr);
+      canvas.style.width = w + 'px';
+      canvas.style.height = h + 'px';
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.clearRect(0, 0, w, h);
+
+      const rgb = grainRGB();
+      const target = Math.min(Math.round((w * h) / 371), 18000);
+
+      for (let i = 0; i < target; i++) {
+        const x = Math.random() * w;
+        const y = Math.random() * h;
+        const d = field(x, y); // 0..1 drift
+
+        // rejection-sample against the field → soft dunes of denser grain
+        if (Math.random() > 0.55 + d * 0.45) continue;
+
+        // mostly fine grains, a scattered few coarser ones
+        const r =
+          Math.random() < 0.85
+            ? 0.55 + Math.random() * 0.4
+            : 1.0 + Math.random() * 0.7;
+
+        // base alpha; denser drifts read a touch darker
+        const a = (0.11 + Math.random() * 0.1) * (0.72 + d * 0.45);
+
+        ctx.beginPath();
+        ctx.fillStyle = `rgba(${rgb},${a.toFixed(3)})`;
+        ctx.arc(x, y, r, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    };
+
+    draw();
+
+    // redraw on resize (debounced) and when the theme flips the grain colour
+    let t: number;
+    window.addEventListener('resize', () => {
+      clearTimeout(t);
+      t = window.setTimeout(draw, 150);
+    });
+  }
+</script>
