@@ -7,36 +7,48 @@ const experiments = [
     title: 'Six tones, one letter',
     summary: 'An explorable infographic of Vietnamese diacritics — build a syllable from a vowel, a quality mark and one of six tones, watch the stack assemble, then see what a font without a Vietnamese subset does to it.',
     tags: 'JS · Unicode · type design · explorable',
+    thumb: '/images/tinkering/six-tones.svg',
+    alt: 'Placeholder sketch: the vowel a with six tone-marked variants orbiting it.',
   },
   {
     href: '/tinkering/compounding/',
     title: 'Step by step, ferociously',
     summary: 'An explorable note on compounding — drag the numbers inside the sentence and watch the curve, and a letter of type, grow with them until the letter no longer fits the page.',
     tags: 'JS · dataviz · explorable · type',
+    thumb: '/images/tinkering/compounding.svg',
+    alt: 'Placeholder sketch: an exponential curve with the letter G growing along it.',
   },
   {
     href: '/tinkering/neon-breath/',
     title: 'Neon Breath',
     summary: 'A specimen archive of storefront neon — browse the carousel, filter by letterform style (brush script, slab, monoline…), and find each sign on the map it glows on.',
     tags: 'CSS · JS · lettering · maps',
+    thumb: '/images/tinkering/neon-breath.svg',
+    alt: 'Placeholder sketch: a glowing neon script word in a storefront frame, with a map pin.',
   },
   {
     href: '/tinkering/five-voices/',
     title: 'One line, five voices',
     summary: 'Type your own line and watch the same words wear five typographic voices — whisper, declaration, conversation, terminal, play — plus one empty frame where hand lettering begins.',
     tags: 'CSS · JS · variable fonts',
+    thumb: '/images/tinkering/five-voices.svg',
+    alt: 'Placeholder sketch: the word voice set five ways, above an empty dashed frame.',
   },
   {
     href: '/tinkering/variable-font/',
     title: 'Variable font playground',
     summary: 'One typeface, five live dials. Drag sliders to morph the axes of Fraunces across "Gradatim Ferociter".',
     tags: 'CSS · JS · variable fonts',
+    thumb: '/images/tinkering/variable-font.svg',
+    alt: 'Placeholder sketch: a large letter G beside three axis sliders labelled wght, opsz, SOFT.',
   },
   {
     href: '/tinkering/holo-card/',
     title: 'Holographic model cards',
     summary: 'A growing deck of mental models as dark cards — browse the carousel, watch light cross the letterforms, flip a card for its definition.',
     tags: 'CSS · JS · variable fonts',
+    thumb: '/images/tinkering/holo-card.svg',
+    alt: 'Placeholder sketch: a dark playing card with a band of light crossing a large letter A.',
   },
 ];
 ---
@@ -47,16 +59,21 @@ const experiments = [
   <p class="folio">Tinkering · the workbench</p>
   <h1>Experiments</h1>
   <p class="lede">
-    Not client work — studies. Small tests in type, motion, and code,
-    shown mid-process. Some become techniques; some just teach me something.
+    My letter playground, come play with me or just say hi! These are not
+    from client work, just my tinkerings while I cannot find a place provide
+    these all yet. Some become techniques; some just teach me something.
   </p>
 
   <ul class="experiments">
-    {experiments.map((x) => (
+    {experiments.map((x, i) => (
       <li>
-        <a href={x.href}>
+        <a class="card" href={x.href}>
+          <figure>
+            <img src={x.thumb} alt={x.alt} width="800" height="600" loading={i < 2 ? 'eager' : 'lazy'} />
+          </figure>
+          <p class="folio no">№ {String(i + 1).padStart(2, '0')}</p>
           <h2>{x.title}</h2>
-          <p>{x.summary}</p>
+          <p class="summary">{x.summary}</p>
           <p class="folio">{x.tags}</p>
         </a>
       </li>
@@ -66,15 +83,74 @@ const experiments = [
 
 <style>
   .lede { font-size: var(--step-1); color: var(--ink-muted); }
-  .experiments { list-style: none; padding: 0; margin-top: 2.5rem; display: grid; gap: 2rem; max-width: 46rem; }
-  .experiments a {
-    display: block; text-decoration: none; color: var(--ink);
-    border: 1px solid var(--hairline); padding: 1.5rem 1.75rem;
-    transition: border-color 0.3s ease, transform 0.3s ease;
+
+  /* The pinboard: two staggered columns of index cards, each pinned at its
+     own slight angle. Playfulness lives in the geometry — the palette stays
+     paper-and-ink. */
+  .experiments {
+    list-style: none;
+    padding: 0 0 2rem;
+    margin-top: 3rem;
+    display: grid;
+    gap: 2.75rem 2.5rem;
   }
-  .experiments h2 { margin: 0 0 0.4rem; font-size: var(--step-1); }
-  .experiments p { margin: 0 0 0.5rem; color: var(--ink-muted); }
+
+  .card {
+    display: block;
+    text-decoration: none;
+    color: var(--ink);
+    background: var(--paper);
+    border: 1px solid var(--hairline);
+    padding: 1.1rem 1.1rem 1.4rem;
+    box-shadow: 0 1px 2px rgb(27 27 24 / 5%), 0 10px 28px rgb(27 27 24 / 7%);
+    transform: rotate(var(--tilt, 0deg));
+    transition: transform 0.35s ease, box-shadow 0.35s ease, border-color 0.35s ease;
+  }
+
+  /* each card gets its own lean — like things pinned by hand */
+  li:nth-child(6n + 1) { --tilt: -1.1deg; }
+  li:nth-child(6n + 2) { --tilt: 0.9deg; }
+  li:nth-child(6n + 3) { --tilt: 0.6deg; }
+  li:nth-child(6n + 4) { --tilt: -0.8deg; }
+  li:nth-child(6n + 5) { --tilt: 1.2deg; }
+  li:nth-child(6n + 6) { --tilt: -0.5deg; }
+
+  .card figure { position: relative; margin: 0 0 1.1rem; }
+  .card img {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    border: 1px solid var(--hairline);
+  }
+  /* washi tape holding the photo down */
+  .card figure::after {
+    content: '';
+    position: absolute;
+    top: -0.7rem;
+    left: 50%;
+    width: 6.5rem;
+    height: 1.5rem;
+    transform: translateX(-50%) rotate(-2.5deg);
+    background: color-mix(in srgb, var(--highlight-fill) 55%, transparent);
+    border: 1px solid rgb(27 27 24 / 6%);
+  }
+
+  .no { margin: 0 0 0.35rem; color: var(--highlight); }
+  .card h2 { margin: 0 0 0.4rem; font-size: var(--step-1); }
+  .card .summary { margin: 0 0 0.7rem; color: var(--ink-muted); }
+  .card > .folio:last-child { margin: 0; }
+
   @media (hover: hover) {
-    .experiments a:hover { border-color: var(--foil); transform: translateY(-3px); }
+    .card:hover {
+      transform: rotate(0deg) translateY(-6px);
+      border-color: var(--foil);
+      box-shadow: 0 2px 4px rgb(27 27 24 / 6%), 0 18px 40px rgb(27 27 24 / 12%);
+    }
+  }
+
+  /* two columns, right one hanging lower — a board, not a table */
+  @media (min-width: 52rem) {
+    .experiments { grid-template-columns: 1fr 1fr; }
+    li:nth-child(even) { margin-top: 3rem; }
   }
 </style>

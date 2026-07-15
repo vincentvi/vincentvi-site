@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
+  <!-- placeholder: a storefront neon word, glowing -->
+  <rect width="800" height="600" fill="#0b0d12"/>
+  <defs>
+    <filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="12"/>
+    </filter>
+  </defs>
+  <rect x="140" y="150" width="520" height="280" rx="10" fill="none" stroke="#262b38" stroke-width="3"/>
+  <text x="400" y="330" text-anchor="middle" font-family="cursive" font-size="120" font-style="italic" fill="#ff8fb8" filter="url(#glow)" opacity="0.9">neon</text>
+  <text x="400" y="330" text-anchor="middle" font-family="cursive" font-size="120" font-style="italic" fill="#ffd9e8">neon</text>
+  <circle cx="620" cy="490" r="10" fill="#a7f175"/>
+  <path d="M 620 490 L 620 460 M 606 476 A 14 14 0 1 1 634 476" fill="none" stroke="#a7f175" stroke-width="3"/>
+  <text x="50%" y="95%" text-anchor="middle" font-family="monospace" font-size="18" letter-spacing="6" fill="#7a7a70">PLACEHOLDER · TO BE DRAWN</text>
+</svg>

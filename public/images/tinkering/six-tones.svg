@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
+  <!-- placeholder: the vowel and its six-tone orbit -->
+  <rect width="800" height="600" fill="#111318"/>
+  <circle cx="400" cy="310" r="185" fill="none" stroke="#262b38" stroke-width="2" stroke-dasharray="4 10"/>
+  <text x="400" y="395" text-anchor="middle" font-family="Georgia, serif" font-size="250" fill="#e6e4dc">a</text>
+  <text x="400" y="145" text-anchor="middle" font-family="Georgia, serif" font-size="54" fill="#9b9a90">a</text>
+  <text x="562" y="240" text-anchor="middle" font-family="Georgia, serif" font-size="54" fill="#a7f175">à</text>
+  <text x="562" y="440" text-anchor="middle" font-family="Georgia, serif" font-size="54" fill="#a7f175">á</text>
+  <text x="400" y="530" text-anchor="middle" font-family="Georgia, serif" font-size="54" fill="#a7f175">ạ</text>
+  <text x="238" y="440" text-anchor="middle" font-family="Georgia, serif" font-size="54" fill="#a7f175">ã</text>
+  <text x="238" y="240" text-anchor="middle" font-family="Georgia, serif" font-size="54" fill="#a7f175">ả</text>
+  <text x="50%" y="95%" text-anchor="middle" font-family="monospace" font-size="18" letter-spacing="6" fill="#7a7a70">PLACEHOLDER · TO BE DRAWN</text>
+</svg>
