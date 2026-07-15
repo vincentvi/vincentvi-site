@@ -105,7 +105,7 @@ const experiments = [
   /* the title runs green, with a single bright-yellow, haloed "s" */
   h1 { color: var(--highlight); }
   h1 .ess {
-    color: #ffe14d;
+    color: #fff1b8;   /* brighter, less saturated — a pale creamy yellow */
     text-shadow:
       0 0 8px rgba(255, 225, 77, 0.85),
       0 0 22px rgba(255, 210, 60, 0.5),
@@ -125,7 +125,17 @@ const experiments = [
     gap: 2.75rem 2.5rem;
   }
 
+  /* the page went dark, but the cards stay on light paper — re-establish the
+     light token set locally so each card's text, borders and folio marks read
+     correctly on paper (the mirror of the page-level dark block above) */
   .card {
+    --paper: #fbfbf8;
+    --ink: #1b1b18;
+    --ink-muted: #56564e;
+    --hairline: #e4e3da;
+    --foil: hwb(0 9% 91%);
+    --highlight: #417a04;        /* dark green, legible on the light card */
+
     display: block;
     text-decoration: none;
     color: var(--ink);
