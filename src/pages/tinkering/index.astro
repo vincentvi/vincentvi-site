@@ -59,7 +59,7 @@ const experiments = [
 >
   <SandGrain />
   <p class="folio">Tinkering · the workbench</p>
-  <h1>Experiments</h1>
+  <h1>Experiment<span class="ess">s</span></h1>
   <p class="lede">
     My letter playground, come play with me or just say hi! These are not
     from client work, just my tinkerings while I cannot find a place provide
@@ -84,6 +84,34 @@ const experiments = [
 </BaseLayout>
 
 <style>
+  /* Dark room for this page only — token-level, so header, footer, and every
+     .folio inherit the theme without per-element overrides. Must sit on
+     html:root (0,1,1) to out-rank global.css's :root (0,1,0); a bare html
+     type selector loses that fight regardless of load order. Matches the
+     other Tinkering pages (five-voices, neon-breath, six-tones…). */
+  :global(html:root) {
+    --paper: #111318;
+    --ink: #e6e4dc;
+    --ink-muted: #9b9a90;
+    --hairline: #262b38;
+    --cloth: #8fb0e0;
+    --foil: #6f96c4;
+    --highlight: var(--highlight-fill);  /* the dark ground takes the spring green */
+
+    /* the sand needs to flip light to read on the dark ground */
+    --grain-rgb: 165 197 236;
+  }
+
+  /* the title runs green, with a single bright-yellow, haloed "s" */
+  h1 { color: var(--highlight); }
+  h1 .ess {
+    color: #ffe14d;
+    text-shadow:
+      0 0 8px rgba(255, 225, 77, 0.85),
+      0 0 22px rgba(255, 210, 60, 0.5),
+      0 0 44px rgba(255, 200, 40, 0.3);
+  }
+
   .lede { font-size: var(--step-1); color: var(--ink-muted); }
 
   /* The pinboard: two staggered columns of index cards, each pinned at its
