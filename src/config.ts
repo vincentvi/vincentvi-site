@@ -29,10 +29,8 @@ export const SITE = {
 // remove any you do not use. Order here = order on screen.
 export const SOCIALS = [
   { label: 'Behance', url: 'https://www.behance.net/vincentvi' },
-  { label: 'Dribbble', url: '#' },
-  { label: 'Instagram', url: '#' },
+  { label: 'Instagram', url: 'https://www.instagram.com/vincentvi.me/' },
   { label: 'Fiverr', url: 'https://www.fiverr.com/sinsin' },
-  { label: 'GitHub', url: '#' },
 ];
 
 // Get a free access key at https://web3forms.com (takes 1 minute,
