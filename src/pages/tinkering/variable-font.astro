@@ -1,16 +1,17 @@
 ---
 import '@fontsource-variable/recursive/full.css';
+import '@fontsource-variable/fraunces/full.css';
 import '@fontsource-variable/grenze-gotisch/wght.css';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 ---
 <BaseLayout
   title="Variable font playground"
-  description="An interactive instrument: pick a typeface, then drag the sliders to morph its live axes in real time — Recursive's five dials, or Grenze Gotisch's blackletter weight."
+  description="An interactive instrument: pick a typeface, then drag the sliders to morph its live axes in real time — Recursive's five dials, Fraunces' editorial serif, or Grenze Gotisch's blackletter weight."
 >
   <p class="folio crumb"><a href="/tinkering/">Tinkering</a> · experiment 002</p>
   <h1>Variable font playground</h1>
   <p class="lede">
-    Two typefaces, one instrument. Pick a font, then drag the sliders and watch
+    Three typefaces, one instrument. Pick a font, then drag the sliders and watch
     the letterforms change shape in real time — this is what "variable font"
     actually means. Each font exposes only the axes it was drawn with.
   </p>
@@ -20,6 +21,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
       <span class="folio">Typeface</span>
       <select id="font-select" class="folio" aria-label="Choose a typeface">
         <option value="recursive">Recursive — 5 axes</option>
+        <option value="fraunces">Fraunces — editorial serif, 4 axes</option>
         <option value="grenze">Grenze Gotisch — blackletter, weight</option>
       </select>
     </label>
@@ -40,37 +42,62 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
   </div>
 
   <div class="controls">
+    <!-- Weight: every font here has it -->
     <label>
       <span class="row"><span class="folio">Weight</span><output id="out-wght">400</output></span>
       <input type="range" id="wght" min="300" max="1000" step="1" value="400" />
     </label>
-    <label data-recursive>
+
+    <!-- Recursive-only axes -->
+    <label data-for="recursive">
       <span class="row"><span class="folio">Casual <span class="tag">the soft one</span></span><output id="out-casl">0</output></span>
       <input type="range" id="casl" min="0" max="100" step="1" value="0" />
       <span class="hint folio">Linear (crisp, technical) → Casual (soft, hand-drawn, rounded terminals). The most character-changing dial here.</span>
     </label>
-    <label data-recursive>
+    <label data-for="recursive">
       <span class="row"><span class="folio">Mono</span><output id="out-mono">0</output></span>
       <input type="range" id="mono" min="0" max="100" step="1" value="0" />
       <span class="hint folio">Proportional (natural spacing) → Monospace (fixed, code-like widths).</span>
     </label>
-    <label data-recursive>
+    <label data-for="recursive">
       <span class="row"><span class="folio">Slant</span><output id="out-slnt">0</output></span>
       <input type="range" id="slnt" min="-15" max="0" step="1" value="0" />
     </label>
-    <label class="curs-row folio" data-recursive>
+    <label class="curs-row folio" data-for="recursive">
       Cursive <input type="checkbox" id="crsv" />
       <span class="hint folio" style="margin-left:0.5rem;">true italic letterforms at slant</span>
     </label>
 
-    <div class="presets" data-recursive>
+    <!-- Fraunces-only axes -->
+    <label data-for="fraunces">
+      <span class="row"><span class="folio">Optical size <span class="tag">text ↔ display</span></span><output id="out-opsz">144</output></span>
+      <input type="range" id="opsz" min="9" max="144" step="1" value="144" />
+      <span class="hint folio">Text (9, sturdy for small sizes) → Display (144, dramatic contrast, fine hairlines). The serif equivalent of Recursive's Casual.</span>
+    </label>
+    <label data-for="fraunces">
+      <span class="row"><span class="folio">Softness</span><output id="out-soft">0</output></span>
+      <input type="range" id="soft" min="0" max="100" step="1" value="0" />
+      <span class="hint folio">Sharp, cut terminals → rounded, softened corners.</span>
+    </label>
+    <label class="curs-row folio" data-for="fraunces">
+      Wonk <input type="checkbox" id="wonk" />
+      <span class="hint folio" style="margin-left:0.5rem;">swaps in the quirky, off-kilter letterforms</span>
+    </label>
+
+    <div class="presets" data-for="recursive">
       <span class="folio">Jump to:</span>
       <button type="button" data-w="300" data-c="0" data-m="0" data-s="0" class="preset folio">Clean text</button>
       <button type="button" data-w="640" data-c="100" data-m="0" data-s="0" class="preset folio">Handwritten</button>
       <button type="button" data-w="500" data-c="0" data-m="100" data-s="0" class="preset folio">Code</button>
       <button type="button" data-w="900" data-c="30" data-m="0" data-s="-14" class="preset folio">Display slant</button>
     </div>
-    <div class="presets" data-grenze hidden>
+    <div class="presets" data-for="fraunces" hidden>
+      <span class="folio">Jump to:</span>
+      <button type="button" data-w="340" data-opsz="9" data-soft="0" data-wonk="0" class="preset folio">Reading</button>
+      <button type="button" data-w="600" data-opsz="144" data-soft="0" data-wonk="0" class="preset folio">Display serif</button>
+      <button type="button" data-w="900" data-opsz="144" data-soft="70" data-wonk="1" class="preset folio">Wonky black</button>
+    </div>
+    <div class="presets" data-for="grenze" hidden>
       <span class="folio">Jump to:</span>
       <button type="button" data-w="300" class="preset folio">Text</button>
       <button type="button" data-w="600" class="preset folio">Display</button>
@@ -90,15 +117,17 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
       can only offer the axes its designer actually drew.
     </p>
     <p>
-      <strong>Recursive</strong> is built for exactly this kind of play, with five
-      dials. <strong>Casual</strong> morphs the whole personality from crisp and
-      technical to soft and hand-drawn, <strong>Mono</strong> snaps the spacing
-      toward code-like fixed widths, and <strong>weight</strong>, <strong>slant</strong>
-      and <strong>cursive</strong> do the familiar work.
-      <strong>Grenze Gotisch</strong> is a different animal — a legible blackletter
-      by Omnibus-Type with a single continuous <strong>weight</strong> axis
-      (100–900). One dial, but watch how much the gothic letterforms thicken and
-      close up as you push it. "Gradatim ferociter" — step by step, ferociously.
+      <strong>Recursive</strong> is a functional sans built for play, with five
+      dials — <strong>Casual</strong> morphs it from crisp to hand-drawn,
+      <strong>Mono</strong> snaps toward code-like widths, and weight, slant and
+      cursive do the familiar work. <strong>Fraunces</strong> is its editorial
+      opposite: a high-contrast serif whose <strong>Optical size</strong> axis
+      re-draws the whole face from sturdy text to dramatic display, with
+      <strong>Softness</strong> and a <strong>Wonk</strong> toggle for character.
+      <strong>Grenze Gotisch</strong> is a legible blackletter by Omnibus-Type
+      with a single continuous <strong>weight</strong> axis (100–900) — one dial,
+      but watch how much the gothic forms thicken and close up. "Gradatim
+      ferociter" — step by step, ferociously.
     </p>
   </div>
 </BaseLayout>
@@ -218,13 +247,13 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
   input[type='checkbox'] { width: 1rem; height: 1rem; accent-color: var(--foil); cursor: pointer; }
 
   .presets { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.6rem; align-items: center; padding-top: 0.25rem; }
-  .presets[hidden] { display: none; }
   .preset {
     cursor: pointer; background: none; border: 1px solid var(--hairline); border-radius: 4px;
     padding: 0.4rem 0.85rem; color: var(--ink-muted);
   }
   .preset:hover { border-color: var(--foil); color: var(--foil); }
-  [data-recursive][hidden] { display: none; }
+  /* Controls/presets that don't belong to the active font collapse out. */
+  [data-for][hidden] { display: none; }
 
   .hint { display: block; color: var(--ink-muted); font-size: 0.7rem; letter-spacing: 0.02em; text-transform: none; line-height: 1.5; }
 
@@ -247,35 +276,51 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
   const mono = document.getElementById('mono');
   const slnt = document.getElementById('slnt');
   const crsv = document.getElementById('crsv');
+  const opsz = document.getElementById('opsz');
+  const soft = document.getElementById('soft');
+  const wonk = document.getElementById('wonk');
   const reset = document.getElementById('reset');
   const outW = document.getElementById('out-wght');
   const outC = document.getElementById('out-casl');
   const outM = document.getElementById('out-mono');
   const outS = document.getElementById('out-slnt');
+  const outO = document.getElementById('out-opsz');
+  const outSoft = document.getElementById('out-soft');
 
   // Each typeface only exposes the axes its designer actually drew. The panel
   // adapts: `build` writes the font-variation-settings string from just this
-  // font's axes, and `extras: false` hides the Recursive-only controls.
+  // font's axes, `onReset` restores this font's non-weight controls, and
+  // controls tagged data-for="<key>" show only for their font.
   const FONTS = {
     recursive: {
       family: "'Recursive Variable', system-ui, sans-serif",
       tracking: '-0.01em',
+      optical: 'auto',
       wght: { min: 300, max: 1000, def: 400 },
-      extras: true,
       build() {
         const casl01 = (casl.value / 100).toFixed(3);
         const mono01 = (mono.value / 100).toFixed(3);
         return `'wght' ${wght.value}, 'CASL' ${casl01}, 'MONO' ${mono01}, 'slnt' ${slnt.value}, 'CRSV' ${crsv.checked ? 1 : 0}`;
       },
+      onReset() { casl.value = 0; mono.value = 0; slnt.value = 0; crsv.checked = false; },
+    },
+    fraunces: {
+      family: "'Fraunces Variable', Georgia, serif",
+      tracking: '-0.005em',
+      optical: 'none', // let the slider drive opsz instead of font-size
+      wght: { min: 100, max: 900, def: 400 },
+      build() {
+        return `'opsz' ${opsz.value}, 'wght' ${wght.value}, 'SOFT' ${soft.value}, 'WONK' ${wonk.checked ? 1 : 0}`;
+      },
+      onReset() { opsz.value = 144; soft.value = 0; wonk.checked = false; },
     },
     grenze: {
       family: "'Grenze Gotisch Variable', serif",
       tracking: '0em',
+      optical: 'auto',
       wght: { min: 100, max: 900, def: 400 },
-      extras: false,
-      build() {
-        return `'wght' ${wght.value}`;
-      },
+      build() { return `'wght' ${wght.value}`; },
+      onReset() {},
     },
   };
 
@@ -287,6 +332,8 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
     outC.textContent = casl.value;
     outM.textContent = mono.value;
     outS.textContent = slnt.value;
+    outO.textContent = opsz.value;
+    outSoft.textContent = soft.value;
   }
 
   function setFont(key) {
@@ -294,34 +341,40 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
     const f = FONTS[key];
     specimen.style.fontFamily = f.family;
     specimen.style.letterSpacing = f.tracking;
+    specimen.style.fontOpticalSizing = f.optical;
     // Re-range the weight slider and keep the current value inside the new bounds.
     wght.min = f.wght.min;
     wght.max = f.wght.max;
     wght.value = Math.min(Math.max(Number(wght.value), f.wght.min), f.wght.max);
     // Show only the controls / presets this font supports.
-    document.querySelectorAll('[data-recursive]').forEach((el) => { el.hidden = !f.extras; });
-    document.querySelectorAll('[data-grenze]').forEach((el) => { el.hidden = f.extras; });
+    document.querySelectorAll('[data-for]').forEach((el) => {
+      el.hidden = !el.dataset.for.split(' ').includes(key);
+    });
     apply();
   }
 
   fontSelect.addEventListener('change', () => setFont(fontSelect.value));
 
-  [wght, casl, mono, slnt].forEach((el) => el.addEventListener('input', apply));
-  crsv.addEventListener('change', apply);
+  [wght, casl, mono, slnt, opsz, soft].forEach((el) => el.addEventListener('input', apply));
+  [crsv, wonk].forEach((el) => el.addEventListener('change', apply));
 
   document.querySelectorAll('.preset').forEach((btn) => {
     btn.addEventListener('click', () => {
-      if (btn.dataset.w !== undefined) wght.value = btn.dataset.w;
-      if (btn.dataset.c !== undefined) casl.value = btn.dataset.c;
-      if (btn.dataset.m !== undefined) mono.value = btn.dataset.m;
-      if (btn.dataset.s !== undefined) slnt.value = btn.dataset.s;
+      const d = btn.dataset;
+      if (d.w !== undefined) wght.value = d.w;
+      if (d.c !== undefined) casl.value = d.c;
+      if (d.m !== undefined) mono.value = d.m;
+      if (d.s !== undefined) slnt.value = d.s;
+      if (d.opsz !== undefined) opsz.value = d.opsz;
+      if (d.soft !== undefined) soft.value = d.soft;
+      if (d.wonk !== undefined) wonk.checked = d.wonk === '1';
       apply();
     });
   });
 
   reset.addEventListener('click', () => {
     wght.value = FONTS[current].wght.def;
-    casl.value = 0; mono.value = 0; slnt.value = 0; crsv.checked = false;
+    FONTS[current].onReset();
     apply();
   });
 
