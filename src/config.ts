@@ -28,6 +28,7 @@ export const SITE = {
 // Shown in the footer and on /contact. Replace # with real URLs,
 // remove any you do not use. Order here = order on screen.
 export const SOCIALS = [
+  { label: 'X', url: 'https://x.com/vincentvi86' },
   { label: 'Behance', url: 'https://www.behance.net/vincentvi' },
   { label: 'Instagram', url: 'https://www.instagram.com/vincentvi.me/' },
   { label: 'Fiverr', url: 'https://www.fiverr.com/sinsin' },
