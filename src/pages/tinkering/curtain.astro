@@ -149,7 +149,8 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   const DEFAULT_LINE = 'GRADATIM FEROCITER';
-  const COL_W = 28.8;  // air between the hanging strands (80% scale)
+  const HALO_ON = false; // the rotating 3-colour halo — flip to true to bring it back
+  const COL_W = 19;    // air between the hanging strands (tightened columns)
   const ROW_H = 15.2;  // tighter beads down each strand (80% scale)
   const FONT = '11.2px ui-monospace, "SF Mono", Menlo, Consolas, monospace';
 
@@ -256,7 +257,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
         mvy = mvy * 0.65 + (py - lastY) * 0.35;
       }
       lastX = px; lastY = py; hasLast = true;
-      stage.classList.add('lit');
+      if (HALO_ON) stage.classList.add('lit');
     });
     stage.addEventListener('pointerleave', () => {
       px = -9999; py = -9999;
@@ -275,17 +276,19 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
     window.addEventListener('resize', build);
 
     function frame(t) {
-      // halo
-      for (let i = 0; i < trail.length; i++) {
-        const b = trail[i];
-        if (px > -999) {
-          b.x += (px - b.x) * b.ease;
-          b.y += (py - b.y) * b.ease;
+      // halo (disabled — see HALO_ON)
+      if (HALO_ON) {
+        for (let i = 0; i < trail.length; i++) {
+          const b = trail[i];
+          if (px > -999) {
+            b.x += (px - b.x) * b.ease;
+            b.y += (py - b.y) * b.ease;
+          }
+          const a = t * b.speed + b.phase;
+          const el = blobs[i];
+          const half = el.offsetWidth / 2;
+          el.style.transform = `translate3d(${(b.x + Math.cos(a) * b.orbit - half).toFixed(1)}px, ${(b.y + Math.sin(a) * b.orbit - half).toFixed(1)}px, 0)`;
         }
-        const a = t * b.speed + b.phase;
-        const el = blobs[i];
-        const half = el.offsetWidth / 2;
-        el.style.transform = `translate3d(${(b.x + Math.cos(a) * b.orbit - half).toFixed(1)}px, ${(b.y + Math.sin(a) * b.orbit - half).toFixed(1)}px, 0)`;
       }
 
       // curtain
