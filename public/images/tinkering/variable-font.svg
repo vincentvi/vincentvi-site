@@ -1,15 +1,15 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
   <!-- placeholder: one big glyph, live axis sliders -->
-  <rect width="800" height="600" fill="#fbfbf8"/>
-  <text x="220" y="430" text-anchor="middle" font-family="Georgia, serif" font-size="330" fill="#1b1b18">G</text>
-  <text x="440" y="215" font-family="monospace" font-size="20" letter-spacing="3" fill="#56564e">wght</text>
-  <line x1="440" y1="250" x2="720" y2="250" stroke="#e4e3da" stroke-width="6" stroke-linecap="round"/>
-  <circle cx="640" cy="250" r="14" fill="#417a04"/>
-  <text x="440" y="315" font-family="monospace" font-size="20" letter-spacing="3" fill="#56564e">opsz</text>
-  <line x1="440" y1="350" x2="720" y2="350" stroke="#e4e3da" stroke-width="6" stroke-linecap="round"/>
-  <circle cx="500" cy="350" r="14" fill="#417a04"/>
-  <text x="440" y="415" font-family="monospace" font-size="20" letter-spacing="3" fill="#56564e">SOFT</text>
-  <line x1="440" y1="450" x2="720" y2="450" stroke="#e4e3da" stroke-width="6" stroke-linecap="round"/>
-  <circle cx="580" cy="450" r="14" fill="#417a04"/>
-  <text x="50%" y="95%" text-anchor="middle" font-family="monospace" font-size="18" letter-spacing="6" fill="#9a998e">PLACEHOLDER · TO BE DRAWN</text>
+  <rect width="800" height="600" fill="#111318"/>
+  <text x="220" y="430" text-anchor="middle" font-family="Georgia, serif" font-size="330" fill="#e6e4dc">G</text>
+  <text x="440" y="215" font-family="monospace" font-size="20" letter-spacing="3" fill="#9b9a90">wght</text>
+  <line x1="440" y1="250" x2="720" y2="250" stroke="#262b38" stroke-width="6" stroke-linecap="round"/>
+  <circle cx="640" cy="250" r="14" fill="#a7f175"/>
+  <text x="440" y="315" font-family="monospace" font-size="20" letter-spacing="3" fill="#9b9a90">opsz</text>
+  <line x1="440" y1="350" x2="720" y2="350" stroke="#262b38" stroke-width="6" stroke-linecap="round"/>
+  <circle cx="500" cy="350" r="14" fill="#a7f175"/>
+  <text x="440" y="415" font-family="monospace" font-size="20" letter-spacing="3" fill="#9b9a90">SOFT</text>
+  <line x1="440" y1="450" x2="720" y2="450" stroke="#262b38" stroke-width="6" stroke-linecap="round"/>
+  <circle cx="580" cy="450" r="14" fill="#a7f175"/>
+  <text x="50%" y="95%" text-anchor="middle" font-family="monospace" font-size="18" letter-spacing="6" fill="#7a7a70">PLACEHOLDER · TO BE DRAWN</text>
 </svg>
