@@ -1,0 +1,336 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+---
+<BaseLayout
+  title="The character curtain"
+  description="A curtain woven from strands of type — brush your cursor through it and the glyphs swing with your movement while a colorful halo drifts along behind the threads."
+>
+  <p class="folio crumb"><a href="/tinkering/">Tinkering</a> · experiment 007</p>
+  <h1>The character <span class="green">curtain</span></h1>
+
+  <div class="controls">
+    <label for="line">
+      <span class="folio">Your line</span>
+      <input
+        id="line"
+        type="text"
+        maxlength="120"
+        autocomplete="off"
+        spellcheck="false"
+        placeholder="GRADATIM FEROCITER — or weave your own words"
+      />
+    </label>
+    <label for="speed">
+      <span class="folio">Velocity · <span id="speed-val">1.0×</span></span>
+      <input id="speed" type="range" min="0.2" max="3" step="0.1" value="1" />
+    </label>
+  </div>
+
+  <div class="stage" id="stage" aria-label="Interactive curtain of characters — move the pointer across it">
+    <div class="halo" id="halo" aria-hidden="true">
+      <div class="blob b-green"></div>
+      <div class="blob b-blue"></div>
+      <div class="blob b-pink"></div>
+    </div>
+    <canvas id="curtain"></canvas>
+  </div>
+</BaseLayout>
+
+<style>
+  /* Dark room — token-level, matching the other Tinkering pages. Must sit on
+     html:root (0,1,1) to out-rank global.css's :root (0,1,0). */
+  :global(html:root) {
+    --paper: #111318;
+    --ink: #e6e4dc;
+    --ink-muted: #9b9a90;
+    --hairline: #262b38;
+    --cloth: #8fb0e0;
+    --foil: #6f96c4;
+    --highlight: var(--highlight-fill);  /* the dark ground takes the spring green */
+  }
+
+  .crumb { max-width: none; }
+  h1 .green { color: var(--highlight); }
+
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 1.25rem 2rem;
+    margin-top: 2.25rem;
+  }
+  .controls label { display: grid; gap: 0.5rem; }
+  .controls .folio { color: var(--ink-muted); margin: 0; }
+  #line {
+    font-family: var(--font-utility);
+    font-size: 0.9rem;
+    color: var(--ink);
+    background: transparent;
+    border: 1px solid var(--hairline);
+    border-radius: 4px;
+    padding: 0.6rem 0.85rem;
+    width: min(44ch, 88vw);
+  }
+  #line::placeholder { color: var(--ink-muted); opacity: 0.6; }
+  #line:focus { outline: none; border-color: var(--foil); }
+  #speed {
+    accent-color: var(--highlight);
+    width: 200px;
+    margin-bottom: 0.55rem; /* optically align with the input's baseline */
+  }
+
+  .stage {
+    position: relative;
+    height: clamp(560px, 82vh, 920px);
+    margin-top: 1.5rem;
+    overflow: hidden;
+    touch-action: none; /* let a finger drag the curtain instead of the page */
+    /* full-bleed: break out of the main column to the viewport edges */
+    width: 100vw;
+    margin-inline: calc(50% - 50vw);
+    border-block: 1px solid var(--hairline);
+  }
+  /* the breakout can add a few px of horizontal overflow; clip at page level */
+  :global(body) { overflow-x: clip; }
+
+  canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+  }
+
+  /* The halo: three blurred color fields behind the canvas. JS moves each
+     via translate3d at its own easing rate — the color mixing happens
+     optically, screen-blended over the dark ground. */
+  .halo {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    opacity: 0;
+    transition: opacity 0.6s ease;
+    pointer-events: none;
+  }
+  .stage.lit .halo { opacity: 1; }
+
+  .blob {
+    position: absolute;
+    top: 0;
+    left: 0;
+    border-radius: 50%;
+    filter: blur(64px);
+    mix-blend-mode: screen;
+    will-change: transform;
+  }
+  .b-green {
+    width: 360px; height: 360px;
+    background: radial-gradient(closest-side, rgb(140 255 60 / 90%), transparent 70%);
+  }
+  .b-blue {
+    width: 440px; height: 440px;
+    background: radial-gradient(closest-side, rgb(64 150 255 / 85%), transparent 70%);
+  }
+  .b-pink {
+    width: 320px; height: 320px;
+    background: radial-gradient(closest-side, rgb(255 45 190 / 80%), transparent 70%);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .halo { display: none; }
+  }
+</style>
+
+<script>
+  const stage = document.getElementById('stage');
+  const canvas = document.getElementById('curtain');
+  const ctx = canvas.getContext('2d');
+  const blobs = Array.from(stage.querySelectorAll('.blob'));
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const DEFAULT_LINE = 'GRADATIM FEROCITER';
+  const COL_W = 28.8;  // air between the hanging strands (80% scale)
+  const ROW_H = 15.2;  // tighter beads down each strand (80% scale)
+  const FONT = '11.2px ui-monospace, "SF Mono", Menlo, Consolas, monospace';
+
+  // physics — each glyph is a little weight on a spring back to its rest spot
+  const PUSH_R = 150;    // reach of the hand
+  const LIGHT_R = 240;   // reach of the light (leads the push)
+  const KICK = 0.14;     // how hard mouse velocity transfers to a glyph
+  const SPRING = 0.075;  // pull back to rest
+  const DAMP = 0.88;     // energy loss per frame
+  const VMAX = 26;       // per-axis glyph speed cap
+
+  // brightness ramp, dim thread → neon Matrix green, precomputed to avoid
+  // building color strings 1500× per frame
+  const STEPS = 32;
+  const dim = [0x4b, 0x50, 0x61];
+  const hot = [0x00, 0xff, 0x41];  // the famous Matrix rain green
+  const ramp = Array.from({ length: STEPS + 1 }, (_, i) => {
+    const t = i / STEPS;
+    const c = dim.map((d, k) => Math.round(d + (hot[k] - d) * t));
+    return `rgb(${c[0]} ${c[1]} ${c[2]})`;
+  });
+
+  const lineInput = document.getElementById('line');
+  const speedInput = document.getElementById('speed');
+  const speedVal = document.getElementById('speed-val');
+
+  let glyphs = [];
+  let W = 0, H = 0;
+  let energy = 1; // the velocity dial: scales how much hand speed transfers
+
+  function currentLine() {
+    const t = (lineInput.value || '').trim();
+    return (t || DEFAULT_LINE) + ' '; // one space, so the repeats weave seamlessly
+  }
+
+  function build() {
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    W = stage.clientWidth;
+    H = stage.clientHeight;
+    canvas.width = W * dpr;
+    canvas.height = H * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.font = FONT;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+
+    const line = currentLine();
+
+    glyphs = [];
+    const cols = Math.ceil(W / COL_W) + 1;
+    const rows = Math.ceil(H / ROW_H) + 1;
+    for (let c = 0; c < cols; c++) {
+      const start = (c * 7) % line.length; // each strand starts a few letters later
+      for (let r = 0; r < rows; r++) {
+        const ch = line[(start + r) % line.length];
+        if (ch === ' ') continue; // spaces are the gaps in the weave
+        glyphs.push({
+          x: c * COL_W + COL_W / 2,
+          y: r * ROW_H + ROW_H / 2,
+          ch,
+          col: c,
+          row: r,
+          ox: 0, oy: 0,
+          vx: 0, vy: 0,
+        });
+      }
+    }
+  }
+
+  function drawStatic() {
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = ramp[4];
+    for (const g of glyphs) ctx.fillText(g.ch, g.x, g.y);
+  }
+
+  build();
+
+  // reweave on the visitor's own words (the slider needs no rebuild)
+  lineInput.addEventListener('input', () => {
+    build();
+    if (reduced) drawStatic();
+  });
+  speedInput.addEventListener('input', () => {
+    energy = parseFloat(speedInput.value) || 1;
+    speedVal.textContent = `${energy.toFixed(1)}×`;
+  });
+
+  if (reduced) {
+    // the curtain hangs still: no physics, no halo, just the threads
+    drawStatic();
+    window.addEventListener('resize', () => { build(); drawStatic(); });
+  } else {
+    // pointer state: position + smoothed velocity
+    let px = -9999, py = -9999;
+    let lastX = 0, lastY = 0, hasLast = false;
+    let mvx = 0, mvy = 0;
+
+    stage.addEventListener('pointermove', (e) => {
+      const r = stage.getBoundingClientRect();
+      px = e.clientX - r.left;
+      py = e.clientY - r.top;
+      if (hasLast) {
+        mvx = mvx * 0.65 + (px - lastX) * 0.35;
+        mvy = mvy * 0.65 + (py - lastY) * 0.35;
+      }
+      lastX = px; lastY = py; hasLast = true;
+      stage.classList.add('lit');
+    });
+    stage.addEventListener('pointerleave', () => {
+      px = -9999; py = -9999;
+      hasLast = false; mvx = 0; mvy = 0;
+      stage.classList.remove('lit');
+    });
+
+    // each color field eases toward the pointer at its own rate, with a slow
+    // private orbit so the stack never sits perfectly concentric
+    const trail = [
+      { x: 0, y: 0, ease: 0.16, orbit: 70, speed: 0.0011, phase: 0 },
+      { x: 0, y: 0, ease: 0.09, orbit: 95, speed: 0.0007, phase: 2.1 },
+      { x: 0, y: 0, ease: 0.05, orbit: 80, speed: 0.0016, phase: 4.2 },
+    ];
+
+    window.addEventListener('resize', build);
+
+    function frame(t) {
+      // halo
+      for (let i = 0; i < trail.length; i++) {
+        const b = trail[i];
+        if (px > -999) {
+          b.x += (px - b.x) * b.ease;
+          b.y += (py - b.y) * b.ease;
+        }
+        const a = t * b.speed + b.phase;
+        const el = blobs[i];
+        const half = el.offsetWidth / 2;
+        el.style.transform = `translate3d(${(b.x + Math.cos(a) * b.orbit - half).toFixed(1)}px, ${(b.y + Math.sin(a) * b.orbit - half).toFixed(1)}px, 0)`;
+      }
+
+      // curtain
+      ctx.clearRect(0, 0, W, H);
+      const vmax = VMAX * energy;
+      let style = null;
+      for (const g of glyphs) {
+        const dx = g.x - px;
+        const dy = g.y - py;
+        const d = Math.hypot(dx, dy);
+
+        // the hand: velocity transfer, falling off toward the edge of reach;
+        // the dial scales how much of that speed the curtain absorbs
+        if (d < PUSH_R) {
+          const f = 1 - d / PUSH_R;
+          g.vx += mvx * KICK * energy * f * f;
+          g.vy += mvy * KICK * energy * f * f;
+        }
+
+        // the spring home
+        g.vx = (g.vx - g.ox * SPRING) * DAMP;
+        g.vy = (g.vy - g.oy * SPRING) * DAMP;
+        if (g.vx > vmax) g.vx = vmax; else if (g.vx < -vmax) g.vx = -vmax;
+        if (g.vy > vmax) g.vy = vmax; else if (g.vy < -vmax) g.vy = -vmax;
+        g.ox += g.vx;
+        g.oy += g.vy;
+
+        // idle sway — hanging strands are never perfectly still
+        const sway = Math.sin(t * 0.0008 + g.col * 0.55 + g.row * 0.12) * 1.4;
+
+        // brightness: lit by proximity, plus a flicker from being in motion
+        const lit = d < LIGHT_R ? 1 - d / LIGHT_R : 0;
+        const stir = Math.min(1, (Math.abs(g.ox) + Math.abs(g.oy)) / 48);
+        const b = Math.min(1, lit * lit * 1.15 + stir * 0.5 + 0.12);
+
+        const s = ramp[(b * STEPS) | 0];
+        if (s !== style) { ctx.fillStyle = s; style = s; }
+        ctx.fillText(g.ch, g.x + g.ox + sway, g.y + g.oy);
+      }
+
+      // decay the smoothed hand velocity when the pointer rests
+      mvx *= 0.9; mvy *= 0.9;
+
+      requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
+  }
+</script>

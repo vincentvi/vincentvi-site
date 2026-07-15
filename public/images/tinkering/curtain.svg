@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
+  <!-- placeholder: strands of characters parted around a colorful glow -->
+  <rect width="800" height="600" fill="#111318"/>
+  <defs>
+    <radialGradient id="halo" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#a7f175" stop-opacity="0.55"/>
+      <stop offset="45%" stop-color="#8fb0e0" stop-opacity="0.35"/>
+      <stop offset="75%" stop-color="#ffd24d" stop-opacity="0.15"/>
+      <stop offset="100%" stop-color="#111318" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <circle cx="470" cy="290" r="190" fill="url(#halo)"/>
+  <g font-family="monospace" font-size="26" fill="#4b5061" text-anchor="middle">
+    <text x="120" y="0" transform="rotate(0)">
+      <tspan x="120" dy="60">G</tspan><tspan x="120" dy="40">R</tspan><tspan x="120" dy="40">A</tspan><tspan x="120" dy="40">D</tspan><tspan x="120" dy="40">A</tspan><tspan x="120" dy="40">T</tspan><tspan x="120" dy="40">I</tspan><tspan x="120" dy="40">M</tspan><tspan x="120" dy="40">F</tspan><tspan x="120" dy="40">E</tspan><tspan x="120" dy="40">R</tspan><tspan x="120" dy="40">O</tspan>
+    </text>
+    <text x="220" y="0">
+      <tspan x="220" dy="80">T</tspan><tspan x="220" dy="40">I</tspan><tspan x="220" dy="40">M</tspan><tspan x="220" dy="40">F</tspan><tspan x="212" dy="40">E</tspan><tspan x="206" dy="40">R</tspan><tspan x="210" dy="40">O</tspan><tspan x="216" dy="40">C</tspan><tspan x="220" dy="40">I</tspan><tspan x="220" dy="40">T</tspan><tspan x="220" dy="40">E</tspan>
+    </text>
+    <text x="320" y="0" fill="#7d8398">
+      <tspan x="320" dy="60">E</tspan><tspan x="320" dy="40">R</tspan><tspan x="312" dy="40">O</tspan><tspan x="296" dy="40">C</tspan><tspan x="284" dy="40">I</tspan><tspan x="290" dy="40">T</tspan><tspan x="304" dy="40">E</tspan><tspan x="316" dy="40">R</tspan><tspan x="320" dy="40">G</tspan><tspan x="320" dy="40">R</tspan><tspan x="320" dy="40">A</tspan><tspan x="320" dy="40">D</tspan>
+    </text>
+    <text x="420" y="0" fill="#fff1b8">
+      <tspan x="420" dy="80">C</tspan><tspan x="428" dy="40">I</tspan><tspan x="444" dy="40">T</tspan><tspan x="452" dy="40">E</tspan><tspan x="440" dy="40">R</tspan><tspan x="424" dy="40">G</tspan><tspan x="418" dy="40">R</tspan><tspan x="420" dy="40">A</tspan><tspan x="420" dy="40">D</tspan><tspan x="420" dy="40">A</tspan><tspan x="420" dy="40">T</tspan>
+    </text>
+    <text x="520" y="0" fill="#c8cede">
+      <tspan x="520" dy="60">R</tspan><tspan x="514" dy="40">G</tspan><tspan x="500" dy="40">R</tspan><tspan x="488" dy="40">A</tspan><tspan x="496" dy="40">D</tspan><tspan x="510" dy="40">A</tspan><tspan x="518" dy="40">T</tspan><tspan x="520" dy="40">I</tspan><tspan x="520" dy="40">M</tspan><tspan x="520" dy="40">F</tspan><tspan x="520" dy="40">E</tspan><tspan x="520" dy="40">R</tspan>
+    </text>
+    <text x="620" y="0">
+      <tspan x="620" dy="80">A</tspan><tspan x="620" dy="40">D</tspan><tspan x="620" dy="40">A</tspan><tspan x="624" dy="40">T</tspan><tspan x="630" dy="40">I</tspan><tspan x="626" dy="40">M</tspan><tspan x="620" dy="40">F</tspan><tspan x="620" dy="40">E</tspan><tspan x="620" dy="40">R</tspan><tspan x="620" dy="40">O</tspan><tspan x="620" dy="40">C</tspan>
+    </text>
+    <text x="710" y="0">
+      <tspan x="710" dy="60">I</tspan><tspan x="710" dy="40">T</tspan><tspan x="710" dy="40">E</tspan><tspan x="710" dy="40">R</tspan><tspan x="710" dy="40">G</tspan><tspan x="710" dy="40">R</tspan><tspan x="710" dy="40">A</tspan><tspan x="710" dy="40">D</tspan><tspan x="710" dy="40">A</tspan><tspan x="710" dy="40">T</tspan><tspan x="710" dy="40">I</tspan><tspan x="710" dy="40">M</tspan>
+    </text>
+  </g>
+  <text x="50%" y="95%" text-anchor="middle" font-family="monospace" font-size="18" letter-spacing="6" fill="#7a7a70">PLACEHOLDER · TO BE DRAWN</text>
+</svg>
