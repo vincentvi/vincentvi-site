@@ -4,12 +4,20 @@ import SandGrain from '../../components/SandGrain.astro';
 
 const experiments = [
   {
-    href: '/tinkering/curtain/',
-    title: 'The character curtain',
-    summary: 'A bead curtain woven from strands of type — brush your cursor through it and the glyphs swing with your movement, flaring neon green in its wake before they settle back.',
-    tags: 'JS · canvas · physics · type',
-    thumb: '/images/tinkering/curtain.svg',
-    alt: 'Placeholder sketch: a dense field of monospace characters, lit neon green where a cursor ripples through.',
+    href: '/tinkering/variable-font/',
+    title: 'Variable font playground',
+    summary: 'One typeface, five live dials. Drag sliders to morph the axes of Fraunces across "Gradatim Ferociter".',
+    tags: 'CSS · JS · variable fonts',
+    thumb: '/images/tinkering/variable-font.svg',
+    alt: 'Placeholder sketch: a large letter G beside three axis sliders labelled wght, opsz, SOFT.',
+  },
+  {
+    href: '/tinkering/holo-card/',
+    title: 'Holographic model cards',
+    summary: 'A growing deck of mental models as dark cards — browse the carousel, watch light cross the letterforms, flip a card for its definition.',
+    tags: 'CSS · JS · variable fonts',
+    thumb: '/images/tinkering/holo-card.svg',
+    alt: 'Placeholder sketch: a dark playing card with a band of light crossing a large letter A.',
   },
   {
     href: '/tinkering/six-tones/',
@@ -44,20 +52,12 @@ const experiments = [
     alt: 'Placeholder sketch: the word voice set five ways, above an empty dashed frame.',
   },
   {
-    href: '/tinkering/variable-font/',
-    title: 'Variable font playground',
-    summary: 'One typeface, five live dials. Drag sliders to morph the axes of Fraunces across "Gradatim Ferociter".',
-    tags: 'CSS · JS · variable fonts',
-    thumb: '/images/tinkering/variable-font.svg',
-    alt: 'Placeholder sketch: a large letter G beside three axis sliders labelled wght, opsz, SOFT.',
-  },
-  {
-    href: '/tinkering/holo-card/',
-    title: 'Holographic model cards',
-    summary: 'A growing deck of mental models as dark cards — browse the carousel, watch light cross the letterforms, flip a card for its definition.',
-    tags: 'CSS · JS · variable fonts',
-    thumb: '/images/tinkering/holo-card.svg',
-    alt: 'Placeholder sketch: a dark playing card with a band of light crossing a large letter A.',
+    href: '/tinkering/curtain/',
+    title: 'The character curtain',
+    summary: 'A bead curtain woven from strands of type — brush your cursor through it and the glyphs swing with your movement, flaring neon green in its wake before they settle back.',
+    tags: 'JS · canvas · physics · type',
+    thumb: '/images/tinkering/curtain.svg',
+    alt: 'Placeholder sketch: a dense field of monospace characters, lit neon green where a cursor ripples through.',
   },
 ];
 ---
@@ -122,7 +122,7 @@ const experiments = [
 
   .lede { font-size: var(--step-1); color: var(--ink-muted); }
 
-  /* The pinboard: two staggered columns of index cards, each pinned at its
+  /* The pinboard: staggered columns of index cards, each pinned at its
      own slight angle. Playfulness lives in the geometry — the palette stays
      paper-and-ink. */
   .experiments {
@@ -196,9 +196,20 @@ const experiments = [
     }
   }
 
-  /* two columns, right one hanging lower — a board, not a table */
-  @media (min-width: 52rem) {
+  /* two columns on medium screens, right one hanging lower — a board, not a table */
+  @media (min-width: 48rem) and (max-width: 71.99rem) {
     .experiments { grid-template-columns: 1fr 1fr; }
     li:nth-child(even) { margin-top: 3rem; }
+  }
+
+  /* three columns on wide screens — smaller cards, each column at its own
+     hanging height so the board still reads hand-pinned, not gridded */
+  @media (min-width: 72rem) {
+    .experiments {
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 2.5rem 2rem;
+    }
+    li:nth-child(3n + 2) { margin-top: 3rem; }
+    li:nth-child(3n) { margin-top: 1.5rem; }
   }
 </style>
