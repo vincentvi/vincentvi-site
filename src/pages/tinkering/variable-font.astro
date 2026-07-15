@@ -1,20 +1,28 @@
 ---
 import '@fontsource-variable/recursive/full.css';
+import '@fontsource-variable/grenze-gotisch/wght.css';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 ---
 <BaseLayout
   title="Variable font playground"
-  description="An interactive instrument: drag the sliders to morph the live axes of Recursive — weight, casual, mono, slant, and cursive — across the phrase Gradatim Ferociter."
+  description="An interactive instrument: pick a typeface, then drag the sliders to morph its live axes in real time — Recursive's five dials, or Grenze Gotisch's blackletter weight."
 >
   <p class="folio crumb"><a href="/tinkering/">Tinkering</a> · experiment 002</p>
   <h1>Variable font playground</h1>
   <p class="lede">
-    One typeface, five live dials. Drag the sliders and watch the letterforms
-    change shape in real time — this is what "variable font" actually means.
+    Two typefaces, one instrument. Pick a font, then drag the sliders and watch
+    the letterforms change shape in real time — this is what "variable font"
+    actually means. Each font exposes only the axes it was drawn with.
   </p>
 
   <div class="play-head">
-    <p class="folio type-legend">✎ Click the text below and type your own</p>
+    <label class="font-pick">
+      <span class="folio">Typeface</span>
+      <select id="font-select" class="folio" aria-label="Choose a typeface">
+        <option value="recursive">Recursive — 5 axes</option>
+        <option value="grenze">Grenze Gotisch — blackletter, weight</option>
+      </select>
+    </label>
     <div class="share" aria-label="Share this playground">
       <span class="folio share-label">Share</span>
       <button class="share-btn folio" data-net="x" type="button">X</button>
@@ -23,6 +31,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
       <button class="share-btn folio" data-net="native" type="button" id="native-share" hidden>More…</button>
     </div>
   </div>
+  <p class="folio type-legend">✎ Click the text below and type your own</p>
 
   <div class="panel">
     <div class="specimen" id="specimen" contenteditable="true" role="textbox"
@@ -35,31 +44,37 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
       <span class="row"><span class="folio">Weight</span><output id="out-wght">400</output></span>
       <input type="range" id="wght" min="300" max="1000" step="1" value="400" />
     </label>
-    <label>
+    <label data-recursive>
       <span class="row"><span class="folio">Casual <span class="tag">the soft one</span></span><output id="out-casl">0</output></span>
       <input type="range" id="casl" min="0" max="100" step="1" value="0" />
       <span class="hint folio">Linear (crisp, technical) → Casual (soft, hand-drawn, rounded terminals). The most character-changing dial here.</span>
     </label>
-    <label>
+    <label data-recursive>
       <span class="row"><span class="folio">Mono</span><output id="out-mono">0</output></span>
       <input type="range" id="mono" min="0" max="100" step="1" value="0" />
       <span class="hint folio">Proportional (natural spacing) → Monospace (fixed, code-like widths).</span>
     </label>
-    <label>
+    <label data-recursive>
       <span class="row"><span class="folio">Slant</span><output id="out-slnt">0</output></span>
       <input type="range" id="slnt" min="-15" max="0" step="1" value="0" />
     </label>
-    <label class="curs-row folio">
+    <label class="curs-row folio" data-recursive>
       Cursive <input type="checkbox" id="crsv" />
       <span class="hint folio" style="margin-left:0.5rem;">true italic letterforms at slant</span>
     </label>
 
-    <div class="presets">
+    <div class="presets" data-recursive>
       <span class="folio">Jump to:</span>
       <button type="button" data-w="300" data-c="0" data-m="0" data-s="0" class="preset folio">Clean text</button>
       <button type="button" data-w="640" data-c="100" data-m="0" data-s="0" class="preset folio">Handwritten</button>
       <button type="button" data-w="500" data-c="0" data-m="100" data-s="0" class="preset folio">Code</button>
       <button type="button" data-w="900" data-c="30" data-m="0" data-s="-14" class="preset folio">Display slant</button>
+    </div>
+    <div class="presets" data-grenze hidden>
+      <span class="folio">Jump to:</span>
+      <button type="button" data-w="300" class="preset folio">Text</button>
+      <button type="button" data-w="600" class="preset folio">Display</button>
+      <button type="button" data-w="900" class="preset folio">Heavy</button>
     </div>
     <button id="reset" class="reset folio">Reset</button>
   </div>
@@ -67,21 +82,23 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
   <div class="prose">
     <h2>How it works</h2>
     <p>
-      Recursive is a <em>variable font</em>: instead of shipping separate files
-      for bold, light, and italic, it ships one file containing a continuous
-      space of possibilities along named axes. Each control writes to
-      <code>font-variation-settings</code>, and the browser redraws the outlines
-      instantly. No images, no separate files — the letters are re-interpolated
-      live.
+      A <em>variable font</em> ships one file containing a continuous space of
+      possibilities along named axes — instead of separate files for bold, light,
+      and italic. Each control writes to <code>font-variation-settings</code>, and
+      the browser re-interpolates the outlines instantly. No images, no separate
+      files. Switch typefaces above and the control panel changes with it: a font
+      can only offer the axes its designer actually drew.
     </p>
     <p>
-      Recursive is built for exactly this kind of play. <strong>Casual</strong>
-      morphs the whole personality from crisp and technical to soft and
-      hand-drawn — it's the "softness" axis, done dramatically. <strong>Mono</strong>
-      snaps the spacing toward code-like fixed widths, <strong>weight</strong>
-      and <strong>slant</strong> do the familiar work, and <strong>cursive</strong>
-      swaps in true flowing italic forms. "Gradatim ferociter" — step by step,
-      ferociously.
+      <strong>Recursive</strong> is built for exactly this kind of play, with five
+      dials. <strong>Casual</strong> morphs the whole personality from crisp and
+      technical to soft and hand-drawn, <strong>Mono</strong> snaps the spacing
+      toward code-like fixed widths, and <strong>weight</strong>, <strong>slant</strong>
+      and <strong>cursive</strong> do the familiar work.
+      <strong>Grenze Gotisch</strong> is a different animal — a legible blackletter
+      by Omnibus-Type with a single continuous <strong>weight</strong> axis
+      (100–900). One dial, but watch how much the gothic letterforms thicken and
+      close up as you push it. "Gradatim ferociter" — step by step, ferociously.
     </p>
   </div>
 </BaseLayout>
@@ -111,8 +128,21 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
   .play-head {
     display: flex; align-items: center; justify-content: space-between;
     gap: 1rem; flex-wrap: wrap;
-    max-width: 100%; margin: 0 0 0.7rem;
+    max-width: 100%; margin: 1.5rem 0 0.7rem;
   }
+  .font-pick { display: flex; align-items: center; gap: 0.5rem; }
+  .font-pick > .folio { color: var(--ink-muted); }
+  #font-select {
+    cursor: pointer; background: #191c25; color: var(--ink);
+    border: 1px solid var(--hairline); border-radius: 4px;
+    padding: 0.4rem 2rem 0.4rem 0.75rem;
+    font-size: 0.8rem; letter-spacing: 0.02em;
+    appearance: none; -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='7' viewBox='0 0 10 7'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%236f96c4' stroke-width='1.5'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 0.7rem center;
+    transition: border-color 0.25s ease;
+  }
+  #font-select:hover, #font-select:focus { border-color: var(--foil); outline: none; }
   .type-legend {
     margin: 0;
     color: var(--ink-muted);
@@ -136,7 +166,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
     background: radial-gradient(120% 130% at 50% 0%, #191c25 0%, #14161d 60%, #101218 100%);
     border-radius: 12px;
     padding: clamp(2.5rem, 7vw, 5rem) 1.5rem;
-    margin: 2rem 0 1.75rem;
+    margin: 0.9rem 0 1.75rem;
     display: grid; place-items: center; min-height: 40vh;
   }
   .specimen {
@@ -188,11 +218,13 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
   input[type='checkbox'] { width: 1rem; height: 1rem; accent-color: var(--foil); cursor: pointer; }
 
   .presets { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.6rem; align-items: center; padding-top: 0.25rem; }
+  .presets[hidden] { display: none; }
   .preset {
     cursor: pointer; background: none; border: 1px solid var(--hairline); border-radius: 4px;
     padding: 0.4rem 0.85rem; color: var(--ink-muted);
   }
   .preset:hover { border-color: var(--foil); color: var(--foil); }
+  [data-recursive][hidden] { display: none; }
 
   .hint { display: block; color: var(--ink-muted); font-size: 0.7rem; letter-spacing: 0.02em; text-transform: none; line-height: 1.5; }
 
@@ -209,6 +241,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 
 <script>
   const specimen = document.getElementById('specimen');
+  const fontSelect = document.getElementById('font-select');
   const wght = document.getElementById('wght');
   const casl = document.getElementById('casl');
   const mono = document.getElementById('mono');
@@ -220,38 +253,75 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
   const outM = document.getElementById('out-mono');
   const outS = document.getElementById('out-slnt');
 
-  const DEFAULTS = { wght: 400, casl: 0, mono: 0, slnt: 0 };
+  // Each typeface only exposes the axes its designer actually drew. The panel
+  // adapts: `build` writes the font-variation-settings string from just this
+  // font's axes, and `extras: false` hides the Recursive-only controls.
+  const FONTS = {
+    recursive: {
+      family: "'Recursive Variable', system-ui, sans-serif",
+      tracking: '-0.01em',
+      wght: { min: 300, max: 1000, def: 400 },
+      extras: true,
+      build() {
+        const casl01 = (casl.value / 100).toFixed(3);
+        const mono01 = (mono.value / 100).toFixed(3);
+        return `'wght' ${wght.value}, 'CASL' ${casl01}, 'MONO' ${mono01}, 'slnt' ${slnt.value}, 'CRSV' ${crsv.checked ? 1 : 0}`;
+      },
+    },
+    grenze: {
+      family: "'Grenze Gotisch Variable', serif",
+      tracking: '0em',
+      wght: { min: 100, max: 900, def: 400 },
+      extras: false,
+      build() {
+        return `'wght' ${wght.value}`;
+      },
+    },
+  };
+
+  let current = 'recursive';
 
   function apply() {
-    // CASL and MONO axes run 0..1 in the font; sliders show 0..100 for feel
-    const casl01 = (casl.value / 100).toFixed(3);
-    const mono01 = (mono.value / 100).toFixed(3);
-    specimen.style.setProperty(
-      'font-variation-settings',
-      `'wght' ${wght.value}, 'CASL' ${casl01}, 'MONO' ${mono01}, 'slnt' ${slnt.value}, 'CRSV' ${crsv.checked ? 1 : 0}`
-    );
+    specimen.style.setProperty('font-variation-settings', FONTS[current].build());
     outW.textContent = wght.value;
     outC.textContent = casl.value;
     outM.textContent = mono.value;
     outS.textContent = slnt.value;
   }
 
+  function setFont(key) {
+    current = key;
+    const f = FONTS[key];
+    specimen.style.fontFamily = f.family;
+    specimen.style.letterSpacing = f.tracking;
+    // Re-range the weight slider and keep the current value inside the new bounds.
+    wght.min = f.wght.min;
+    wght.max = f.wght.max;
+    wght.value = Math.min(Math.max(Number(wght.value), f.wght.min), f.wght.max);
+    // Show only the controls / presets this font supports.
+    document.querySelectorAll('[data-recursive]').forEach((el) => { el.hidden = !f.extras; });
+    document.querySelectorAll('[data-grenze]').forEach((el) => { el.hidden = f.extras; });
+    apply();
+  }
+
+  fontSelect.addEventListener('change', () => setFont(fontSelect.value));
+
   [wght, casl, mono, slnt].forEach((el) => el.addEventListener('input', apply));
   crsv.addEventListener('change', apply);
 
   document.querySelectorAll('.preset').forEach((btn) => {
     btn.addEventListener('click', () => {
-      wght.value = btn.dataset.w;
-      casl.value = btn.dataset.c;
-      mono.value = btn.dataset.m;
-      slnt.value = btn.dataset.s;
+      if (btn.dataset.w !== undefined) wght.value = btn.dataset.w;
+      if (btn.dataset.c !== undefined) casl.value = btn.dataset.c;
+      if (btn.dataset.m !== undefined) mono.value = btn.dataset.m;
+      if (btn.dataset.s !== undefined) slnt.value = btn.dataset.s;
       apply();
     });
   });
 
   reset.addEventListener('click', () => {
-    wght.value = DEFAULTS.wght; casl.value = DEFAULTS.casl;
-    mono.value = DEFAULTS.mono; slnt.value = DEFAULTS.slnt; crsv.checked = false;
+    wght.value = FONTS[current].wght.def;
+    casl.value = 0; mono.value = 0; slnt.value = 0; crsv.checked = false;
     apply();
   });
 
@@ -285,5 +355,5 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
     });
   });
 
-  apply();
+  setFont('recursive');
 </script>
