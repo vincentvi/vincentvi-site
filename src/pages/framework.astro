@@ -1,0 +1,495 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+// ------------------------------------------------------------------
+// /framework — unlisted studio page (direct URL only).
+//   · No nav or internal link points here.
+//   · noindex + excluded from the sitemap (astro.config.mjs).
+//   · Progress persists in localStorage per browser — one live project.
+//
+// The lettering pipeline, synthesized from:
+//   MF Martina Flor · JH Jessica Hische · KB Ken Barber ·
+//   DY Doyald Young · SK Stefan Kunz · SP studio practice
+// ------------------------------------------------------------------
+
+interface Check { id: string; src: string; text: string }
+interface Phase {
+  num: string; mode: 'pencil' | 'mixed' | 'ink';
+  title: string; sub: string; gate?: string;
+  goal?: string; checks: Check[];
+  deliver: string[]; pitfalls: string[];
+  loop?: string; effort: number;
+}
+interface Stage { label: string; phases: Phase[] }
+
+const stages: Stage[] = [
+  { label: 'Stage I — Before any drawing', phases: [
+    { num: '01', mode: 'pencil', title: 'Brief intake & scoping', sub: 'Turn a vague wish into a written, priced, bounded problem', gate: 'Gate · Contract',
+      goal: 'You and the client agree on the same picture before a single mark exists. Most failed projects fail here, invisibly.',
+      checks: [
+        { id: 'c1a', src: 'SP', text: 'Capture the exact words/phrase to be lettered — spelling, casing, punctuation, language, diacritics confirmed in writing' },
+        { id: 'c1b', src: 'JH', text: 'Usage & medium: where will it live (print, screen, packaging, mural, merch), at what sizes, color or one-color, lockup variants needed' },
+        { id: 'c1c', src: 'MF', text: 'Tone brief: 3–5 adjectives from the client + 3–5 anti-adjectives ("what it must never feel like")' },
+        { id: 'c1d', src: 'SP', text: 'Audience, brand constraints (existing palette, type system, competitors to avoid resembling)' },
+        { id: 'c1e', src: 'JH', text: 'Clarify category: one-off lettering piece vs. logotype vs. lettering system — pricing and rigor differ enormously' },
+        { id: 'c1f', src: 'JH', text: 'Contract: scope, deadline, number of concepts (2–3), revision rounds (2 included, extra billed), kill fee, usage/licensing, deposit (30–50%)' },
+      ],
+      deliver: ['Signed brief document', 'Signed contract + deposit invoice'],
+      pitfalls: ['Sketching before scope is locked — free work in disguise', '"Logo" and "lettering" used interchangeably by the client', 'Unlimited-revision ambiguity'],
+      effort: 8 },
+    { num: '02', mode: 'pencil', title: 'Research & reference', sub: 'Semantic mining + visual archaeology',
+      goal: 'Letter the meaning, not just the word. Style choices should be arguments, not accidents.',
+      checks: [
+        { id: 'c2a', src: 'MF', text: 'Semantic map: free-associate the word/phrase — imagery, era, texture, motion, temperature. Draw what it means before what it says' },
+        { id: 'c2b', src: 'KB', text: 'Historical models: collect period-accurate sources (sign painting, specimen books, packaging, ephemera) — study construction logic, not surface style' },
+        { id: 'c2c', src: 'KB', text: 'Build a 1-page moodboard: reference for structure and spirit — never trace or clone shapes; the reference informs the skeleton, your hand supplies the flesh' },
+        { id: 'c2d', src: 'SP', text: "Competitive scan: what does the client's category already look like — where is the whitespace" },
+        { id: 'c2e', src: 'DY', text: 'Letter inventory: list problem characters early (g, s, double letters, tight kerning pairs, diacritics) — they will veto weak style directions' },
+      ],
+      deliver: ['Moodboard (1 page)', 'Semantic map / word-association sheet'],
+      pitfalls: ['Pinterest sameness — referencing other letterers instead of primary sources', "Falling in love with a style the brief can't justify"],
+      effort: 10 },
+    { num: '03', mode: 'pencil', title: 'Style mapping', sub: 'Pick 2–3 defensible directions on the attribute matrix',
+      goal: 'Convert adjectives into formal decisions. Every axis below is a dial you set on purpose.',
+      checks: [
+        { id: 'c3a', src: 'MF', text: 'Construction: serif / sans / script (formal, casual, brush) / blackletter / dimensional — choose per direction' },
+        { id: 'c3b', src: 'MF', text: 'Set the dials: weight, contrast (mono ↔ high), width, slant, case, ornament level, connection (upright ↔ flowing)' },
+        { id: 'c3c', src: 'SP', text: 'Composition archetype: straight baseline, arc, stacked lockup, banner/ribbon, circular badge — pick per direction' },
+        { id: 'c3e', src: 'SK', text: 'Word hierarchy: rank every word by meaning — hero words get size, style, and flourish; connectors (the, of, and) shrink into scripts, banners, or caps fillers. In a multi-word quote, hierarchy is the design' },
+        { id: 'c3d', src: 'DY', text: 'Kill weak directions now: run each candidate against the anti-adjectives and the problem-letter inventory' },
+      ],
+      deliver: ['2–3 named directions: construction + dials + composition archetype + 1-line rationale'],
+      pitfalls: ['Exploring 6+ directions shallowly instead of 2–3 deeply', 'Choosing style by personal comfort zone, not brief'],
+      effort: 7 },
+  ]},
+  { label: 'Stage II — Graphite (where quality is decided)', phases: [
+    { num: '04', mode: 'pencil', title: 'Thumbnails', sub: 'Many, small, fast, ugly — composition only',
+      goal: 'Solve hierarchy and composition at postage-stamp size, where mistakes cost seconds. No letter detail allowed.',
+      checks: [
+        { id: 'c4a', src: 'MF', text: 'Draw 20–40 thumbnails, 2–5 cm wide, 30–90 seconds each — words as weight-blocks and gesture lines, not letters' },
+        { id: 'c4b', src: 'SP', text: 'Vary: hierarchy (which word dominates), stacking, axis, negative-space shape, flourish placement' },
+        { id: 'c4e', src: 'SK', text: 'Shape-blocking: draw container shapes first (circle, diamond, banner stack, object silhouette) and pour the words into them — the container solves composition before letters exist' },
+        { id: 'c4c', src: 'KB', text: 'Squint test the sheet: which compositions read as a single strong silhouette from across the room' },
+        { id: 'c4d', src: 'SP', text: 'Circle 3 winners — one per style direction — and note why each works in one sentence' },
+      ],
+      deliver: ['Thumbnail sheet (photo/scan archived)', '3 selected compositions'],
+      pitfalls: ['Detailing letterforms at thumbnail size — premature ink energy', 'Stopping at 8 thumbnails; the good ideas arrive after the obvious ones are exhausted'],
+      effort: 10 },
+    { num: '05', mode: 'pencil', title: 'Refined sketch', sub: 'Actual size, tracing-paper iterations, skeleton → flesh',
+      goal: 'A tight pencil drawing so resolved that digitization becomes transcription, not design.',
+      checks: [
+        { id: 'c5a', src: 'KB', text: 'Enlarge chosen thumbnails to working size; rule guidelines — baseline, x-height, cap/ascender, slant angle' },
+        { id: 'c5b', src: 'KB', text: 'Skeleton first: monoline structure and spacing before any weight or contrast is added' },
+        { id: 'c5c', src: 'MF', text: 'Iterate on tracing-paper layers (or low-opacity digital layers) — keep every generation; regressions happen' },
+        { id: 'c5g', src: 'SK', text: 'Procreate route: drop the previous pass to ~20% opacity and refine on a fresh layer above — digital tracing paper; use Drawing Guides for baselines and Symmetry for badges/ambigrams' },
+        { id: 'c5d', src: 'DY', text: 'First spacing pass: even the rhythm of counters and gaps; fix collisions with ligatures, nesting, or flourish routing' },
+        { id: 'c5e', src: 'SP', text: 'Dimensional/shaded styles: commit to one light source now and never change it' },
+        { id: 'c5f', src: 'KB', text: 'Flip test (mirror the sketch) + upside-down test to expose wobble, uneven weight, drifting slant' },
+      ],
+      deliver: ['2–3 tight B&W pencil comps, cleaned scans'],
+      pitfalls: ['Adding weight/contrast before the skeleton and spacing are right', '"I\'ll fix that curve in vector" — you won\'t; you\'ll fight it for an hour'],
+      loop: '↩ Feedback loop: if no sketch survives the flip test with dignity, return to 04 — the composition, not your hand, is usually the culprit.',
+      effort: 22 },
+    { num: '06', mode: 'pencil', title: 'Concept presentation', sub: 'Client checkpoint #1 — approval before ink', gate: 'Gate · Approval',
+      goal: 'Lock one direction in writing. Ink poured on an unapproved sketch is money set on fire.',
+      checks: [
+        { id: 'c6a', src: 'JH', text: 'Present 2–3 concepts as clean B&W sketches only — color distracts clients from evaluating form' },
+        { id: 'c6b', src: 'JH', text: 'Show each in a simple context mockup (book cover, package, screen) so the client judges it in its habitat' },
+        { id: 'c6c', src: 'MF', text: "Write 2–3 sentences of rationale per concept tying it back to the brief's adjectives — sell the thinking, not the drawing" },
+        { id: 'c6d', src: 'JH', text: 'Never include a "filler" option you\'d hate to produce — clients reliably choose it' },
+        { id: 'c6e', src: 'SP', text: 'Get direction choice + sketch-level feedback confirmed in writing; log against revision round #1' },
+      ],
+      deliver: ['Concept PDF (sketches + mockups + rationale)', 'Written approval of one direction'],
+      pitfalls: ['Presenting raw scans with no framing — invites art-direction of details too early', 'Accepting "make it pop" without translating it into a formal instruction'],
+      effort: 6 },
+  ]},
+  { label: 'Stage III — Ink & vector', phases: [
+    { num: '07', mode: 'mixed', title: 'Digitization / inking', sub: 'Vector béziers, analog ink, or iPad raster — transcribe the pencil',
+      goal: 'Translate the approved sketch into final media with fidelity. The pencil already made the decisions.',
+      checks: [
+        { id: 'c7a', src: 'SP', text: "Choose route: vector (scalable, revisable — logotypes, brand work), analog ink/paint then scan (texture, one-off art), or iPad raster — the brief's usage decides" },
+        { id: 'c7b', src: 'JH', text: 'Vector: place anchor points at curve extrema only; keep handles at ~⅓ segment length; fewer points = smoother, more editable curves' },
+        { id: 'c7c', src: 'JH', text: 'Build reusable parts: shared stems, bowls, terminals as components — consistency across repeated letters for free' },
+        { id: 'c7d', src: 'KB', text: 'Analog: ink with the tool the style implies (brush, broad nib, pointed pen, ruling pen); scan at 600+ dpi; clean levels without sterilizing texture' },
+        { id: 'c7f', src: 'SK', text: 'iPad route: canvas at final print size, 300 dpi minimum; monoline brush with StreamLine stabilization; build faux-calligraphy weight by thickening downstrokes after the skeleton is set' },
+        { id: 'c7e', src: 'DY', text: 'Work at 30–50% zoom most of the time — the artwork is judged at reading distance, not at 6400%' },
+      ],
+      deliver: ['Clean B&W digital artwork (outlined vector or hi-res bitmap)'],
+      pitfalls: ['Redesigning while vectoring — "improvements" that break the approved sketch', 'Anchor-point litter that makes every revision a surgery'],
+      effort: 15 },
+    { num: '08', mode: 'mixed', title: 'Refinement & optical correction', sub: 'Where good becomes professional — trust the eye over the ruler',
+      goal: 'Mathematically wrong, optically right. This pass separates lettering from typed text.',
+      checks: [
+        { id: 'c8a', src: 'KB', text: 'Overshoots: rounds and points cross baseline/x-height slightly, or they look short' },
+        { id: 'c8b', src: 'DY', text: 'Weight compensation: horizontals thinner than verticals; joints and dense crossings tapered to avoid clotting' },
+        { id: 'c8c', src: 'KB', text: 'Letterfit pass: space by the rhythm of white — equalize the area between letters, not the distance; test tricky pairs in isolation' },
+        { id: 'c8d', src: 'DY', text: 'Optical centering: pull visual center slightly above mathematical center in lockups and badges' },
+        { id: 'c8e', src: 'KB', text: 'Battery of tests: flip, blur/squint, upside-down, print at smallest real-world size, view at largest' },
+        { id: 'c8f', src: 'SP', text: 'Sleep on it — review with fresh eyes at least one morning before calling it done' },
+      ],
+      deliver: ['Refined master artwork, tested at real sizes'],
+      pitfalls: ['Trusting align tools and equal margins over the eye', "Endless polishing of one letter while its neighbor's spacing is broken"],
+      loop: "↩ Feedback loop: if forms collapse at final print size, the fault is usually structural — return to 05's skeleton, don't patch béziers.",
+      effort: 10 },
+    { num: '09', mode: 'ink', title: 'Color, texture & effects', sub: 'Dress the letterforms — only after the body is finished',
+      goal: 'Atmosphere that amplifies the forms. If it only looks good because of the texture, return to 08.',
+      checks: [
+        { id: 'c9a', src: 'SP', text: 'Limited palette (2–4 colors) derived from brief/brand; verify contrast at real usage sizes and on real backgrounds' },
+        { id: 'c9b', src: 'SP', text: 'Dimensional effects (shade, bevel, outline, inline) follow the light source committed in 05 — one sun, no exceptions' },
+        { id: 'c9e', src: 'SK', text: 'Layered dimension recipe: base fill → shadow layer (clipped, multiply, offset from the light) → highlight layer (thin edge catch) — each on its own layer so the effect stays adjustable' },
+        { id: 'c9c', src: 'SP', text: 'Texture last and non-destructive (masks, layers) — the clean master must survive underneath' },
+        { id: 'c9d', src: 'MF', text: 'B&W integrity check: strip everything — the piece must still hold as pure black and white' },
+      ],
+      deliver: ['Full-color artwork + preserved clean master'],
+      pitfalls: ['Texture as camouflage for weak letterforms', 'Destructive rasterizing that makes revision rounds a rebuild'],
+      effort: 6 },
+  ]},
+  { label: 'Stage IV — Delivery & compounding', phases: [
+    { num: '10', mode: 'ink', title: 'Final review & revisions', sub: "Client checkpoint #2 — converge, don't reopen", gate: 'Gate · Sign-off',
+      checks: [
+        { id: 'c10a', src: 'JH', text: 'Present near-final art in polished context mockups; frame feedback request narrowly ("color and finish", not "thoughts?")' },
+        { id: 'c10b', src: 'SP', text: 'Log revisions against contracted rounds; structural change requests at this stage = new scope, quoted separately' },
+        { id: 'c10c', src: 'SP', text: 'Obtain written final sign-off before file preparation' },
+      ],
+      deliver: ['Written final approval'],
+      pitfalls: ['Open-ended "one more tweak" spirals', 'Silently absorbing scope creep to avoid an awkward conversation'],
+      effort: 4 },
+    { num: '11', mode: 'ink', title: 'File prep & handoff', sub: 'Package like a product, not an attachment',
+      checks: [
+        { id: 'c11a', src: 'SP', text: 'Formats per usage: AI/EPS/SVG (vector, text outlined), layered source if sold, PNG (transparent) & JPG exports, print PDF; RGB and CMYK as needed' },
+        { id: 'c11b', src: 'SP', text: 'Variants promised in the brief: color/mono/reversed, lockup orientations, clear-space note if it functions as a mark' },
+        { id: 'c11c', src: 'JH', text: 'One-page usage/license summary in plain language; final invoice; tidy folder naming (client_project_asset_version)' },
+      ],
+      deliver: ['Delivery package + license note + invoice'],
+      pitfalls: ['Live fonts left unoutlined in vector files', 'Delivering the layered master when only usage rights were sold'],
+      effort: 4 },
+    { num: '12', mode: 'ink', title: 'Archive & compound', sub: 'The project pays twice: once in fee, once in assets',
+      checks: [
+        { id: 'c12a', src: 'JH', text: 'Archive everything — thumbnails to final; process photos are portfolio and marketing gold' },
+        { id: 'c12b', src: 'SP', text: 'Case study / portfolio shot / process reel; request testimonial while goodwill is warm' },
+        { id: 'c12e', src: 'SK', text: 'Export the Procreate time-lapse (or screen-record vector work) — one commission becomes a reel, a carousel, a tutorial seed, and where rights allow, a print/product candidate' },
+        { id: 'c12c', src: 'SP', text: 'Retro (10 min): what dragged, what to template, which phase estimate was off — feed it back into this framework' },
+        { id: 'c12d', src: 'SP', text: 'Harvest reusables: flourish library, ornament parts, style recipes — each project should make the next one faster' },
+      ],
+      deliver: ['Archived project folder', 'Portfolio/case-study asset', 'Updated framework + parts library'],
+      pitfalls: ['Skipping the retro — same estimate errors repeat forever'],
+      effort: 3 },
+  ]},
+];
+
+const SOURCES = [
+  { key: 'MF', name: 'Martina Flor', note: 'The Golden Secrets of Lettering' },
+  { key: 'JH', name: 'Jessica Hische', note: 'In Progress + client-work essays' },
+  { key: 'KB', name: 'Ken Barber', note: 'House Industries Lettering Manual' },
+  { key: 'DY', name: 'Doyald Young', note: 'logotype refinement craft' },
+  { key: 'SK', name: 'Stefan Kunz', note: 'iPad/Procreate workflow, word hierarchy, social-first output' },
+  { key: 'SP', name: 'Studio practice', note: 'freelance/commission conventions' },
+];
+
+const PRINCIPLES = [
+  { t: 'The cost gradient', src: 'SP', d: 'A change costs seconds in a thumbnail, minutes in a sketch, hours in vector, and a client relationship after delivery. Push every decision as far upstream as it can live.' },
+  { t: 'Draw the meaning', src: 'MF', d: "Style is an argument about what the word means. If you can't state why this construction fits this message, you're decorating, not lettering." },
+  { t: 'Skeleton before flesh', src: 'KB', d: 'Structure and spacing first; weight, contrast, and ornament are clothing on a body that must already stand.' },
+  { t: 'The eye outranks the ruler', src: 'DY', d: 'Every measurable value — alignment, spacing, weight — is a starting suggestion the eye is entitled to overrule.' },
+  { t: 'Gates protect both sides', src: 'JH', d: "Written approvals at 01, 06, 10 aren't bureaucracy; they're the rails that keep revisions from becoming redesigns." },
+  { t: 'Make it once, harvest it thrice', src: 'SK', d: 'Every commission is also a time-lapse, a teaching moment, and a possible product. Build the recording habit into the workflow, not after it.' },
+];
+---
+<BaseLayout
+  title="The Lettering Pipeline"
+  description="A hand-lettering commission framework — brief to final artwork."
+  noindex={true}
+>
+  <p class="folio crumb">Studio framework · unlisted · v1.1</p>
+  <h1><span class="w-pencil">Pencil</span> decides. <span class="w-ink">Ink</span> obeys.</h1>
+  <p class="lede">
+    A commission pipeline from client brief to final artwork, synthesized from
+    Martina Flor, Jessica Hische, Ken Barber, Doyald Young, Stefan Kunz, and
+    studio practice. Each phase spends cheap marks to avoid expensive ones —
+    never solve in bézier what you could have solved in graphite.
+  </p>
+
+  <div class="meter" role="status">
+    <div class="meter-track"><div class="meter-fill" id="fill"></div></div>
+    <span class="folio" id="meterTxt">0 / 0 · graphite</span>
+    <button class="chip reset" id="reset" title="Clear all checked steps">reset</button>
+  </div>
+  <p class="folio hint">Progress saves in this browser — one live project at a time.</p>
+
+  <div class="filter" role="group" aria-label="Highlight steps by source">
+    <span class="folio filter-label">Sources</span>
+    {SOURCES.map((s) => (
+      <button class="chip src-chip" data-src={s.key} title={`${s.name} — ${s.note}`}>
+        {s.key} <span class="count">{s.name}</span>
+      </button>
+    ))}
+  </div>
+
+  <div class="pipeline" id="pipeline">
+    {stages.map((stage) => (
+      <>
+        <p class="folio stage-label">{stage.label}</p>
+        {stage.phases.map((ph) => (
+          <details class="phase" data-mode={ph.mode} open={ph.num === '01'}>
+            <summary>
+              <span class="num">{ph.num}</span>
+              <span class="head">
+                <span class="ph-title">{ph.title}</span>
+                <span class="ph-sub">{ph.sub}</span>
+              </span>
+              {ph.gate && <span class="gate folio">{ph.gate}</span>}
+              <span class="chev" aria-hidden="true">▸</span>
+            </summary>
+            <div class="ph-body">
+              {ph.goal && <p class="goal"><strong>Goal:</strong> {ph.goal}</p>}
+              <div class="checks">
+                {ph.checks.map((c) => (
+                  <div class="check" data-src={c.src}>
+                    <input type="checkbox" id={c.id} />
+                    <label for={c.id}>{c.text} <span class="src">{c.src}</span></label>
+                  </div>
+                ))}
+              </div>
+              <div class="row">
+                <div class="card deliver">
+                  <p class="folio card-h">Deliverables</p>
+                  <ul>{ph.deliver.map((d) => <li>{d}</li>)}</ul>
+                </div>
+                <div class="card pitfall">
+                  <p class="folio card-h">⚠ Pitfalls</p>
+                  <ul>{ph.pitfalls.map((d) => <li>{d}</li>)}</ul>
+                </div>
+              </div>
+              {ph.loop && <p class="loop folio">{ph.loop}</p>}
+              <p class="folio timebar">Effort share
+                <span class="tb"><i style={`width:${ph.effort * 3.5}%`}></i></span> ~{ph.effort}%
+              </p>
+            </div>
+          </details>
+        ))}
+      </>
+    ))}
+  </div>
+
+  <section class="principles">
+    <h2>Operating principles</h2>
+    <div class="pr-grid">
+      {PRINCIPLES.map((p) => (
+        <div class="pr">
+          <strong>{p.t} <span class="src">{p.src}</span></strong>
+          <p>{p.d}</p>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <p class="folio foot">
+    Flor / Hische / Barber / Young / Kunz / studio practice ·
+    effort shares are working defaults — recalibrate them in phase 12
+  </p>
+</BaseLayout>
+
+<script is:inline>
+  const KEY = 'lettering-framework-v1';
+  const boxes = [...document.querySelectorAll('.check input')];
+  const fill = document.getElementById('fill');
+  const txt = document.getElementById('meterTxt');
+
+  // restore
+  let saved = {};
+  try { saved = JSON.parse(localStorage.getItem(KEY) || '{}'); } catch (e) {}
+  boxes.forEach((b) => { if (saved[b.id]) b.checked = true; });
+
+  function persist() {
+    const state = {};
+    boxes.forEach((b) => { if (b.checked) state[b.id] = 1; });
+    try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {}
+  }
+
+  function update() {
+    const done = boxes.filter((b) => b.checked).length;
+    const pct = boxes.length ? Math.round((done / boxes.length) * 100) : 0;
+    fill.style.width = pct + '%';
+    const state = pct === 0 ? 'graphite' : pct < 40 ? 'pencil' : pct < 80 ? 'inking' : pct < 100 ? 'refining' : 'delivered ✓';
+    txt.textContent = `${done} / ${boxes.length} · ${state}`;
+  }
+
+  boxes.forEach((b) => b.addEventListener('change', () => { persist(); update(); }));
+
+  document.getElementById('reset').addEventListener('click', () => {
+    boxes.forEach((b) => { b.checked = false; });
+    persist(); update();
+  });
+
+  // source highlighting — click a source chip to dim everything else
+  let activeSrc = null;
+  const chips = [...document.querySelectorAll('.src-chip')];
+  const checks = [...document.querySelectorAll('.check')];
+  chips.forEach((chip) => chip.addEventListener('click', () => {
+    const s = chip.dataset.src;
+    activeSrc = activeSrc === s ? null : s;
+    chips.forEach((c) => c.classList.toggle('active', c.dataset.src === activeSrc));
+    checks.forEach((c) => c.classList.toggle('dim', activeSrc !== null && c.dataset.src !== activeSrc));
+  }));
+
+  update();
+</script>
+
+<style>
+  /* Dark & green room for this page only — same token-level trick as
+     neon-breath: html:root (0,1,1) out-ranks global.css's :root. */
+  :global(html:root) {
+    --neon: var(--highlight-fill);   /* spring green #A7F175 */
+    --paper: #111318;
+    --ink: #e6e4dc;
+    --ink-muted: #9b9a90;
+    --hairline: rgba(167, 241, 117, 0.28);
+    --cloth: var(--neon);
+    --foil: var(--neon);
+    --highlight: var(--neon);
+  }
+
+  .crumb { max-width: none; }
+  h1 { margin-top: 0.5rem; }
+  .w-pencil { color: transparent; -webkit-text-stroke: 1.2px var(--ink-muted); }
+  .w-ink { color: var(--neon); }
+  .lede { font-size: var(--step-1); color: var(--ink-muted); max-width: 52ch; }
+
+  /* ---- progress meter: graphite → green ---- */
+  .meter { display: flex; align-items: center; gap: 0.9rem; margin: 2rem 0 0.35rem; max-width: 40rem; }
+  .meter-track {
+    flex: 1; height: 8px; border-radius: 999px; overflow: hidden;
+    border: 1px solid var(--hairline); background: rgba(5, 7, 12, 0.6);
+  }
+  .meter-fill {
+    height: 100%; width: 0%;
+    background: linear-gradient(90deg, var(--ink-muted), var(--neon));
+    transition: width 0.4s ease;
+  }
+  .hint { margin: 0 0 1rem; opacity: 0.7; }
+
+  /* ---- chips (shared with source filter) ---- */
+  .chip {
+    cursor: pointer; background: none;
+    font-family: var(--font-utility); font-size: 0.72rem; letter-spacing: 0.08em;
+    border: 1px solid var(--hairline); border-radius: 999px;
+    padding: 0.3rem 0.75rem; color: var(--ink-muted);
+    transition: border-color 0.25s ease, color 0.25s ease;
+  }
+  .chip:hover { border-color: var(--neon); color: var(--neon); }
+  .chip.active { border-color: var(--neon); color: var(--ink); background: rgba(167, 241, 117, 0.12); }
+  .chip .count { opacity: 0.55; text-transform: none; letter-spacing: 0.02em; }
+  .reset { flex: none; }
+
+  .filter {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem;
+    margin: 1.5rem 0 2.25rem; padding-top: 1.25rem;
+    border-top: 1px solid var(--hairline);
+  }
+  .filter-label { margin-right: 0.5rem; }
+
+  /* ---- pipeline spine ---- */
+  .pipeline { position: relative; padding-left: 1.9rem; }
+  .pipeline::before {
+    content: ''; position: absolute; left: 0.55rem; top: 0; bottom: 0; width: 1px;
+    background: linear-gradient(to bottom, var(--ink-muted) 0%, var(--neon) 100%);
+    opacity: 0.55;
+  }
+  .stage-label { position: relative; margin: 2.75rem 0 1rem; }
+  .stage-label::before {
+    content: ''; position: absolute; left: -1.62rem; top: 0.5em; width: 1rem; height: 1px;
+    background: var(--ink-muted);
+  }
+  .pipeline > .stage-label:first-child { margin-top: 0; }
+
+  /* ---- phases: pencil → ink progression ---- */
+  .phase {
+    margin-bottom: 0.9rem; border: 1px solid var(--hairline); border-radius: 6px;
+    background: rgba(5, 7, 12, 0.45); position: relative;
+  }
+  .phase::before {
+    content: ''; position: absolute; left: -1.62rem; top: 1.55rem;
+    width: 9px; height: 9px; border-radius: 50%;
+    background: var(--paper); border: 1.5px solid var(--ink-muted);
+  }
+  .phase[data-mode='pencil'] { border-style: dashed; }
+  .phase[data-mode='pencil'] .num { color: transparent; -webkit-text-stroke: 1px var(--ink-muted); }
+  .phase[data-mode='mixed'] .num { color: var(--ink-muted); }
+  .phase[data-mode='ink'] { border-color: rgba(167, 241, 117, 0.5); }
+  .phase[data-mode='ink'] .num { color: var(--neon); }
+  .phase[data-mode='ink']::before { border-color: var(--neon); background: rgba(167, 241, 117, 0.25); }
+
+  .phase summary {
+    list-style: none; cursor: pointer; display: flex; align-items: baseline; gap: 1rem;
+    padding: 1rem 1.15rem; user-select: none;
+  }
+  .phase summary::-webkit-details-marker { display: none; }
+  .phase summary:hover { background: rgba(167, 241, 117, 0.05); }
+  .num { font-family: var(--font-display); font-size: 1.7rem; line-height: 1; min-width: 2.4rem; font-weight: 560; }
+  .head { display: flex; flex-direction: column; gap: 0.1rem; }
+  .ph-title { font-family: var(--font-display); font-size: var(--step-1); font-weight: 560; letter-spacing: -0.01em; }
+  .ph-sub { font-size: 0.85rem; color: var(--ink-muted); }
+  .gate {
+    margin-left: auto; align-self: center; white-space: nowrap;
+    color: var(--neon); border: 1px solid var(--neon); border-radius: 999px; padding: 0.2rem 0.7rem;
+  }
+  .chev { margin-left: auto; align-self: center; color: var(--ink-muted); transition: transform 0.25s ease; }
+  .gate + .chev { margin-left: 0.6rem; }
+  details[open] .chev { transform: rotate(90deg); }
+
+  .ph-body { padding: 0.25rem 1.3rem 1.3rem 4.5rem; border-top: 1px solid rgba(167, 241, 117, 0.12); }
+  @media (max-width: 640px) { .ph-body { padding-left: 1.3rem; } }
+  .goal { font-size: 0.92rem; color: var(--ink-muted); margin: 0.9rem 0 0.25rem; max-width: 60ch; }
+  .goal strong { color: var(--ink); }
+
+  .checks { margin-top: 0.6rem; }
+  .check {
+    display: flex; gap: 0.7rem; align-items: flex-start; padding: 0.45rem 0;
+    border-bottom: 1px dotted rgba(167, 241, 117, 0.16);
+    font-size: 0.92rem; transition: opacity 0.25s ease;
+  }
+  .check:last-child { border-bottom: none; }
+  .check.dim { opacity: 0.28; }
+  .check input { margin-top: 0.28rem; accent-color: var(--neon); width: 1rem; height: 1rem; flex: none; cursor: pointer; }
+  .check label { cursor: pointer; flex: 1; max-width: none; }
+  .check input:checked + label { color: var(--ink-muted); text-decoration: line-through; text-decoration-color: rgba(155, 154, 144, 0.5); }
+  .src {
+    font-family: var(--font-utility); font-size: 0.62rem; letter-spacing: 0.08em;
+    color: var(--neon); border: 1px solid var(--hairline); border-radius: 4px;
+    padding: 0.05rem 0.35rem; margin-left: 0.35rem; white-space: nowrap; vertical-align: 1px;
+  }
+
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; margin-top: 1rem; }
+  @media (max-width: 640px) { .row { grid-template-columns: 1fr; } }
+  .card { border-radius: 6px; padding: 0.8rem 0.95rem; font-size: 0.86rem; border: 1px solid var(--hairline); }
+  .card-h { margin: 0 0 0.45rem; }
+  .card ul { margin: 0; padding-left: 1.1rem; }
+  .card li { margin-bottom: 0.25rem; max-width: none; }
+  .card.deliver { background: rgba(167, 241, 117, 0.06); }
+  .card.deliver .card-h { color: var(--neon); }
+  .card.pitfall { background: rgba(5, 7, 12, 0.5); }
+  .card.pitfall .card-h { color: var(--ink); }
+  .card.pitfall li { color: var(--ink-muted); }
+
+  .loop {
+    margin: 0.9rem 0 0; padding: 0.45rem 0.8rem; max-width: none;
+    border-left: 2px solid var(--neon); background: rgba(167, 241, 117, 0.05);
+    border-radius: 0 4px 4px 0; text-transform: none; letter-spacing: 0.02em;
+    color: var(--ink-muted);
+  }
+  .timebar { display: flex; align-items: center; gap: 0.6rem; margin: 0.9rem 0 0; max-width: none; }
+  .tb {
+    display: inline-block; height: 5px; border-radius: 999px; flex: 1; max-width: 200px;
+    background: rgba(155, 154, 144, 0.25); position: relative; overflow: hidden;
+  }
+  .tb i { position: absolute; inset: 0; background: var(--neon); border-radius: 999px; }
+
+  /* ---- principles ---- */
+  .principles { margin-top: 3.5rem; padding-top: 2rem; border-top: 1px solid var(--hairline); }
+  .pr-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 0.9rem; }
+  .pr { border: 1px solid var(--hairline); border-radius: 6px; padding: 1rem 1.1rem; background: rgba(5, 7, 12, 0.45); }
+  .pr strong { font-family: var(--font-display); font-weight: 560; display: block; margin-bottom: 0.35rem; }
+  .pr p { margin: 0; font-size: 0.9rem; color: var(--ink-muted); max-width: none; }
+
+  .foot { margin-top: 3rem; text-align: center; opacity: 0.7; }
+</style>
