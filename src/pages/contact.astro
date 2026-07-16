@@ -1,6 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { SOCIALS, WEB3FORMS_ACCESS_KEY } from '../config';
+import { SITE, SOCIALS, WEB3FORMS_ACCESS_KEY } from '../config';
 ---
 <BaseLayout title="Contact" description="Start a project or say hello. Typography, lettering, and book design commissions welcome.">
   <p class="folio">Contact</p>
@@ -13,6 +13,9 @@ import { SOCIALS, WEB3FORMS_ACCESS_KEY } from '../config';
   <form action="https://api.web3forms.com/submit" method="POST">
     <input type="hidden" name="access_key" value={WEB3FORMS_ACCESS_KEY} />
     <input type="hidden" name="subject" value="New project inquiry — vincentvi.me" />
+    <!-- after a successful submit, Web3Forms lands the client on the
+         working-process page; ?sent=1 triggers its confirmation banner -->
+    <input type="hidden" name="redirect" value={`${SITE.url}/process?sent=1`} />
     <!-- honeypot: invisible to humans, catches bots -->
     <input type="checkbox" name="botcheck" class="hidden" tabindex="-1" autocomplete="off" />
 

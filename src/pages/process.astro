@@ -1,0 +1,300 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+// ------------------------------------------------------------------
+// /process — client-facing sibling of /framework.
+//   · Contact-form submitters are redirected here (?sent=1 shows the
+//     confirmation banner); also reads fine as a standalone page.
+//   · Condensed on purpose: what the client experiences, not how the
+//     work is done. The checklists, sources, and effort model stay
+//     in /framework (which remains unlisted).
+//   · Indexed and in the sitemap — this page doubles as marketing.
+// ------------------------------------------------------------------
+
+interface Step {
+  num: string;
+  title: string;
+  sub: string;
+  gate?: string;
+  body: string;
+  receive: string[];
+  need: string[];
+}
+
+const steps: Step[] = [
+  {
+    num: '01',
+    title: 'Brief & agreement',
+    sub: 'Your idea becomes a written, bounded project',
+    gate: 'Checkpoint · Contract',
+    body: 'We begin by turning your idea into a written brief: the exact words to be lettered, where the artwork will live — print, packaging, screen, merchandise — the sizes it must survive, and the tone it should carry, including what it must never feel like. Scope, timeline, number of concepts, and revision rounds are fixed in a short agreement before any drawing begins, so neither side ever has to guess.',
+    receive: [
+      'A written brief for your approval',
+      'A fixed quote and agreement — concepts, revision rounds, licensing, timeline',
+    ],
+    need: [
+      'The final copy, confirmed in writing',
+      'Where and how the piece will be used',
+      'Brand constraints or references, if any',
+      'A deposit to book the production slot',
+    ],
+  },
+  {
+    num: '02',
+    title: 'Research & concepts',
+    sub: 'Two to three directions, each with an argument',
+    gate: 'Checkpoint · Direction',
+    body: 'The studio researches the meaning of your words, the visual history of your category, and the space your competitors haven’t claimed — so every style choice arrives as an argument, not an accident. That work becomes two to three distinct directions, developed as refined pencil drawings and presented in black and white, each placed in a real-world mockup with a short rationale tying it back to your brief. Black and white is deliberate: it lets you judge the letterforms themselves before color can charm or distract.',
+    receive: [
+      'A concept presentation — 2–3 directions, context mockups, written rationale',
+    ],
+    need: [
+      'One chosen direction, confirmed in writing',
+      'Feedback consolidated into a single reply per round',
+    ],
+  },
+  {
+    num: '03',
+    title: 'Final artwork',
+    sub: 'Execution, optical refinement, color & finish',
+    gate: 'Checkpoint · Sign-off',
+    body: 'The approved direction is executed in its final medium, then refined through the studio’s optical-correction pass — the stage that separates drawn lettering from typed text. Color, texture, and finish are applied only after the underlying forms stand on their own. You review near-final artwork in context, and the included revision rounds converge on details rather than reopening the concept, which is what keeps the timeline honest.',
+    receive: [
+      'Near-final artwork presented in context',
+      'Revision rounds as contracted',
+    ],
+    need: [
+      'Feedback consolidated per round',
+      'Final written approval before file preparation',
+    ],
+  },
+  {
+    num: '04',
+    title: 'Delivery & wrap',
+    sub: 'Packaged like a product, not an attachment',
+    body: 'Files arrive organized and complete: every format your usage requires — vector and raster, RGB and CMYK as needed, color and one-color variants where promised — with a plain-language summary of what you’ve licensed and how each file is meant to be used. The clean master artwork is archived at the studio, so future formats or extensions never mean starting over.',
+    receive: [
+      'The complete file package, tidily named',
+      'A one-page usage & license summary in plain language',
+      'An archived master for future needs',
+    ],
+    need: ['Nothing further — just the final invoice settled'],
+  },
+];
+
+const PRINCIPLES = [
+  {
+    t: 'Decisions live upstream',
+    d: 'A change costs seconds in a pencil sketch and hours in final artwork. The process places your decisions where changes are cheap — which is exactly why concepts arrive as drawings, not finished pieces.',
+  },
+  {
+    t: 'Checkpoints protect both sides',
+    d: 'Written approvals at the contract, direction, and sign-off stages aren’t bureaucracy. They are what keeps revisions from becoming redesigns — and your budget from becoming a negotiation.',
+  },
+  {
+    t: 'Black and white first',
+    d: 'If a piece only works because of its color or texture, it doesn’t work. Every commission must hold as pure black and white before it earns its dressing.',
+  },
+  {
+    t: 'The eye outranks the ruler',
+    d: 'Professional lettering is optically corrected — mathematically wrong, visually right. It’s invisible when done and unmistakable when skipped.',
+  },
+];
+
+const FACTS = [
+  '2–3 concepts, developed in depth',
+  '2 revision rounds included',
+  '3 written checkpoints',
+  'Replies within 1–2 working days',
+];
+---
+<BaseLayout
+  title="How We Work"
+  description="The studio's working process for lettering commissions — four steps, three written checkpoints, no surprises."
+>
+  <div class="banner" id="banner" hidden>
+    <p>
+      <span class="banner-lead">Your inquiry has landed.</span> Expect a reply
+      within 1–2 working days. In the meantime, here is how your project would run.
+    </p>
+  </div>
+
+  <h1><span class="w-hl">Studio</span> · Working Process</h1>
+  <p class="subtitle">Four steps. Three checkpoints. No surprises.</p>
+  <p class="lede">
+    Every commission runs through the same pipeline, refined across projects
+    and rooted in classical lettering practice. You will always know where
+    your project stands, what you will receive next, and where your decisions
+    are needed.
+  </p>
+
+  <div class="facts" role="list">
+    {FACTS.map((f) => <span class="fact" role="listitem">{f}</span>)}
+  </div>
+
+  <div class="pipeline">
+    {steps.map((st) => (
+      <section class="step">
+        <div class="step-head">
+          <span class="num">{st.num}</span>
+          <span class="head">
+            <span class="st-title">{st.title}</span>
+            <span class="st-sub">{st.sub}</span>
+          </span>
+          {st.gate && <span class="gate folio">{st.gate}</span>}
+        </div>
+        <div class="st-body">
+          <p class="desc">{st.body}</p>
+          <div class="row">
+            <div class="card receive">
+              <p class="folio card-h">You receive</p>
+              <ul>{st.receive.map((d) => <li>{d}</li>)}</ul>
+            </div>
+            <div class="card need">
+              <p class="folio card-h">We'll need from you</p>
+              <ul>{st.need.map((d) => <li>{d}</li>)}</ul>
+            </div>
+          </div>
+        </div>
+      </section>
+    ))}
+  </div>
+
+  <section class="principles">
+    <h2>Why it works this way</h2>
+    <div class="pr-grid">
+      {PRINCIPLES.map((p) => (
+        <div class="pr">
+          <strong>{p.t}</strong>
+          <p>{p.d}</p>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <p class="folio foot">
+    This is the shape of the process — the checklists behind it stay in the studio.
+  </p>
+</BaseLayout>
+
+<script is:inline>
+  // Arrivals from the contact form carry ?sent=1 — show the confirmation.
+  if (new URLSearchParams(location.search).has('sent')) {
+    document.getElementById('banner').hidden = false;
+  }
+</script>
+
+<style>
+  /* Same dark & green room as /framework — html:root (0,1,1) out-ranks
+     global.css's :root at the token level. */
+  :global(html:root) {
+    --neon: var(--highlight-fill);   /* spring green #A7F175 */
+    --paper: #111318;
+    --ink: #e6e4dc;
+    --ink-muted: #9b9a90;
+    --hairline: rgba(167, 241, 117, 0.28);
+    --cloth: var(--neon);
+    --foil: var(--neon);
+    --highlight: var(--neon);
+  }
+
+  .banner {
+    border: 1px solid var(--neon); border-radius: 6px;
+    background: rgba(167, 241, 117, 0.08);
+    padding: 0.9rem 1.2rem; margin-bottom: 2.5rem;
+  }
+  .banner p { margin: 0; max-width: none; }
+  .banner-lead { color: var(--neon); }
+
+  h1 { margin-bottom: 0.15em; text-align: center; }
+  .w-hl { color: var(--neon); }
+  .subtitle {
+    font-family: var(--font-display); font-size: var(--step-1); font-weight: 560;
+    color: var(--ink-muted); margin: 0 auto 2rem; max-width: none;
+    text-align: center;
+  }
+  .lede {
+    font-size: var(--step-1); color: var(--ink-muted);
+    max-width: 52ch; margin-inline: auto; text-align: center;
+  }
+
+  /* ---- quick facts ---- */
+  .facts {
+    display: flex; flex-wrap: wrap; gap: 0.5rem;
+    margin: 2rem 0 3rem; padding-top: 1.25rem;
+    border-top: 1px solid var(--hairline);
+  }
+  .fact {
+    font-family: var(--font-utility); font-size: 0.72rem; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--ink-muted);
+    border: 1px solid var(--hairline); border-radius: 999px;
+    padding: 0.3rem 0.75rem;
+  }
+
+  /* ---- pipeline spine (family trait shared with /framework) ---- */
+  .pipeline { position: relative; padding-left: 1.9rem; }
+  .pipeline::before {
+    content: ''; position: absolute; left: 0.55rem; top: 0; bottom: 0; width: 1px;
+    background: linear-gradient(to bottom, var(--ink-muted) 0%, var(--neon) 100%);
+    opacity: 0.55;
+  }
+  .step {
+    /* paper-theme island on the dark page: re-point the tokens to their
+       light-side values (green is a PAIR — spring green would vanish here) */
+    --neon: #417a04;         /* paper side of the highlight pair */
+    --ink: #1b1b18;
+    --ink-muted: #56564e;
+    --hairline: #e4e3da;
+    color: var(--ink);
+    margin-bottom: 1.2rem; border: 1px solid var(--hairline); border-radius: 8px;
+    background: #fbfbf8; position: relative;
+    box-shadow: 0 2px 14px rgba(0, 0, 0, 0.35);
+  }
+  .step::before {
+    content: ''; position: absolute; left: -1.62rem; top: 1.55rem;
+    width: 9px; height: 9px; border-radius: 50%;
+    background: var(--paper); border: 1.5px solid var(--highlight-fill);
+  }
+
+  .step-head { display: flex; align-items: baseline; gap: 1rem; padding: 1.1rem 1.25rem 0; }
+  .num {
+    font-family: var(--font-display); font-size: 1.7rem; line-height: 1;
+    min-width: 2.4rem; font-weight: 560; color: var(--neon);
+  }
+  .head { display: flex; flex-direction: column; gap: 0.1rem; }
+  .st-title { font-family: var(--font-display); font-size: var(--step-1); font-weight: 560; letter-spacing: -0.01em; }
+  .st-sub { font-size: 0.85rem; color: var(--ink-muted); }
+  .gate {
+    margin-left: auto; align-self: center; white-space: nowrap;
+    color: var(--neon); border: 1px solid var(--neon); border-radius: 999px; padding: 0.2rem 0.7rem;
+  }
+  @media (max-width: 640px) {
+    .step-head { flex-wrap: wrap; }
+    .gate { margin-left: 3.4rem; }
+  }
+
+  .st-body { padding: 0 1.25rem 1.25rem 4.65rem; }
+  @media (max-width: 640px) { .st-body { padding-left: 1.25rem; } }
+  .desc { color: var(--ink-muted); margin: 0.8rem 0 0; max-width: 62ch; }
+
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; margin-top: 1.1rem; }
+  @media (max-width: 640px) { .row { grid-template-columns: 1fr; } }
+  .card { border-radius: 6px; padding: 0.8rem 0.95rem; font-size: 0.86rem; border: 1px solid var(--hairline); }
+  .card-h { margin: 0 0 0.45rem; }
+  .card ul { margin: 0; padding-left: 1.1rem; }
+  .card li { margin-bottom: 0.25rem; max-width: none; }
+  .card.receive { background: rgba(167, 241, 117, 0.16); }
+  .card.receive .card-h { color: var(--neon); }
+  .card.need { background: rgba(27, 27, 24, 0.04); }
+  .card.need .card-h { color: var(--ink); }
+  .card.need li { color: var(--ink-muted); }
+
+  /* ---- principles ---- */
+  .principles { margin-top: 3.5rem; padding-top: 2rem; border-top: 1px solid var(--hairline); }
+  .pr-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 0.9rem; }
+  .pr { border: 1px solid var(--hairline); border-radius: 6px; padding: 1rem 1.1rem; background: rgba(5, 7, 12, 0.45); }
+  .pr strong { font-family: var(--font-display); font-weight: 560; display: block; margin-bottom: 0.35rem; }
+  .pr p { margin: 0; font-size: 0.9rem; color: var(--ink-muted); max-width: none; }
+
+  .foot { margin-top: 3rem; max-width: none; text-align: center; opacity: 0.7; }
+</style>
