@@ -14,6 +14,8 @@ interface Props {
   ogType?: 'website' | 'article';
   /** absolute or /public path to a share image */
   ogImage?: string;
+  /** unlisted pages: ask search engines not to index or follow */
+  noindex?: boolean;
 }
 
 const {
@@ -21,6 +23,7 @@ const {
   description = SITE.description,
   ogType = 'website',
   ogImage = SITE.defaultOgImage,
+  noindex = false,
 } = Astro.props;
 
 const pageTitle = title ? `${title} — ${SITE.name}` : SITE.title;
@@ -49,6 +52,7 @@ const personLd = {
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{pageTitle}</title>
     <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
     <link rel="canonical" href={canonical} />
     <link rel="icon" type="image/png" href="/favicon.png" sizes="512x512" />
     <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />

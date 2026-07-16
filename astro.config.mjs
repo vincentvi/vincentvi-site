@@ -5,5 +5,10 @@ import sitemap from '@astrojs/sitemap';
 // https://astro.build/config
 export default defineConfig({
   site: 'https://vincentvi.me',
-  integrations: [sitemap()],
+  integrations: [
+    sitemap({
+      // unlisted pages: reachable by direct URL only, never advertised
+      filter: (page) => !page.includes('/framework'),
+    }),
+  ],
 });
