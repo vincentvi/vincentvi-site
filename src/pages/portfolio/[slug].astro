@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Carousel from '../../components/Carousel.astro';
+import { SITE } from '../../config';
 import { getCollection, render } from 'astro:content';
 
 export async function getStaticPaths() {
@@ -11,12 +12,45 @@ export async function getStaticPaths() {
 
 const { item } = Astro.props;
 const { Content } = await render(item);
+
+const pageUrl = new URL(`/portfolio/${item.id}/`, SITE.url).href;
+const images = [item.data.cover, ...item.data.gallery.map((g) => g.src)].map(
+  (src) => new URL(src, SITE.url).href
+);
+
+// A CreativeWork tells a crawler what this page IS — a designed book, made by
+// a named person, in a named genre — rather than leaving it to guess from a
+// title and some pictures. It is also the part a language model can quote.
+const workLd = {
+  '@context': 'https://schema.org',
+  '@type': 'CreativeWork',
+  '@id': pageUrl,
+  name: item.data.title,
+  headline: item.data.title,
+  description: item.data.summary,
+  url: pageUrl,
+  image: images,
+  genre: item.data.category,
+  dateCreated: String(item.data.year),
+  creator: {
+    '@type': 'Person',
+    name: SITE.author,
+    url: SITE.url,
+    jobTitle: SITE.jobTitle,
+  },
+};
 ---
-<BaseLayout title={item.data.title} description={item.data.summary} ogType="article" ogImage={item.data.cover}>
+<BaseLayout
+  title={`${item.data.title} — ${item.data.category}`}
+  description={item.data.summary}
+  ogType="article"
+  ogImage={item.data.cover}
+  jsonLd={workLd}
+>
   <article>
     <p class="folio">{item.data.category}</p>
     <h1>{item.data.title}</h1>
-    <img class="cover" src={item.data.cover} alt={item.data.title} width={item.data.coverWidth} height={item.data.coverHeight} decoding="async" />
+    <img class="cover" src={item.data.cover} alt={`${item.data.title} — ${item.data.category.toLowerCase()} by ${SITE.author}`} width={item.data.coverWidth} height={item.data.coverHeight} decoding="async" />
     <div class="prose">
       <Content />
     </div>

@@ -44,7 +44,7 @@ const total = items?.length ?? 0;
             <div class="frame">
               <img
                 src={item.src}
-                alt={item.caption ?? `${title} — plate ${i + 1}`}
+                alt={item.caption ?? `${title} — book design, image ${i + 1} of ${total}`}
                 loading={i === 0 ? 'eager' : 'lazy'}
                 decoding="async"
               />

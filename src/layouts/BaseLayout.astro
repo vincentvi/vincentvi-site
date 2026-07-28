@@ -16,6 +16,8 @@ interface Props {
   ogImage?: string;
   /** unlisted pages: ask search engines not to index or follow */
   noindex?: boolean;
+  /** page-specific structured data, emitted alongside the site-wide Person */
+  jsonLd?: Record<string, unknown> | Record<string, unknown>[];
 }
 
 const {
@@ -24,6 +26,7 @@ const {
   ogType = 'website',
   ogImage = SITE.defaultOgImage,
   noindex = false,
+  jsonLd,
 } = Astro.props;
 
 const pageTitle = title ? `${title} — ${SITE.name}` : SITE.title;
@@ -75,6 +78,9 @@ const personLd = {
 
     <!-- Structured data -->
     <script type="application/ld+json" set:html={JSON.stringify(personLd)} />
+    {jsonLd && (
+      <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+    )}
   </head>
   <body>
     <Header />
