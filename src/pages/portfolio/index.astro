@@ -1,32 +1,244 @@
 ---
+/**
+ * Portfolio index — tabbed by discipline.
+ *
+ * Every panel is rendered into the HTML at build time; the tabs only decide
+ * what is *shown*. So crawlers and no-JS visitors get all the work (as a set
+ * of stacked, headed sections), while everyone else gets instant switching with
+ * no page load. The URL hash tracks the open tab, so /portfolio/#logo-design
+ * is a shareable link — a card catalogue, not a set of separate rooms.
+ *
+ * Tab list lives in src/config.ts (PORTFOLIO_TABS).
+ */
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import WorkCard from '../../components/WorkCard.astro';
+import WorkTile from '../../components/WorkTile.astro';
+import { PORTFOLIO_TABS } from '../../config';
 import { getCollection } from 'astro:content';
 
-const work = (await getCollection('portfolio'))
-  .sort((a, b) => a.data.order - b.data.order);
+const work = await getCollection('portfolio');
+
+// Group once, sort within each group by `order`.
+const groups = PORTFOLIO_TABS.map((tab) => ({
+  ...tab,
+  items: work
+    .filter((item) => item.data.tab === tab.id)
+    .sort((a, b) => a.data.order - b.data.order),
+}));
+
+const firstNonEmpty = groups.find((g) => g.items.length > 0) ?? groups[0];
 ---
-<BaseLayout title="Portfolio" description="Selected typography, lettering, and book design work by Vincent Vi.">
+<BaseLayout title="Portfolio" description="Book design, hand lettering, logo design, infographics and sketchnotes by Vincent Vi.">
   <p class="folio">Portfolio · {work.length} projects</p>
   <h1>Work</h1>
-  <div class="grid">
-    {work.map((item) => (
-      <WorkCard
-        href={`/portfolio/${item.id}/`}
-        title={item.data.title}
-        category={item.data.category}
-        cover={item.data.cover}
-        summary={item.data.summary}
-      />
+
+  <div class="tabs" data-tabs data-default={firstNonEmpty.id}>
+    <div class="tablist" role="tablist" aria-label="Portfolio disciplines">
+      {groups.map((g) => (
+        <a
+          class="tab"
+          role="tab"
+          id={`tab-${g.id}`}
+          href={`#${g.id}`}
+          aria-controls={g.id}
+          aria-selected={g.id === firstNonEmpty.id ? 'true' : 'false'}
+        >
+          <span class="tab-label">{g.label}</span>
+          <span class="tab-count folio" aria-hidden="true">{g.items.length}</span>
+        </a>
+      ))}
+    </div>
+
+    {groups.map((g) => (
+      <section
+        class="panel"
+        id={g.id}
+        role="tabpanel"
+        aria-labelledby={`tab-${g.id}`}
+        tabindex="0"
+      >
+        <h2 class="panel-heading">{g.label}</h2>
+        {g.items.length > 0 ? (
+          <div class="wall">
+            {g.items.map((item) => (
+              <WorkTile
+                href={`/portfolio/${item.id}/`}
+                title={item.data.title}
+                cover={item.data.cover}
+                width={item.data.coverWidth}
+                height={item.data.coverHeight}
+              />
+            ))}
+          </div>
+        ) : (
+          <p class="empty">
+            Nothing set in this case yet. <a href="/contact/">Commission the first piece</a>.
+          </p>
+        )}
+      </section>
     ))}
   </div>
 </BaseLayout>
 
 <style>
-  .grid {
-    display: grid;
-    gap: 3rem 2.25rem;
+  /* ---------- tab bar ---------- */
+  .tabs { --mark-weight: 4px; }
+
+  .tablist {
+    display: flex;
+    gap: clamp(1.25rem, 4vw, 2.5rem);
+    margin-top: 2rem;
+    /* The rule is drawn as a background, NOT as border-bottom. Reason:
+       overflow-x makes this a scroll container, and a scroll container clips
+       its children at the PADDING box — a border sits outside that, so any
+       mark reaching down to meet it gets guillotined. Background + a little
+       bottom padding puts the rule and the mark in the same, unclipped space. */
+    padding-bottom: calc(var(--mark-weight) / 2 + 1px);
+    background-image: linear-gradient(var(--hairline), var(--hairline));
+    background-repeat: no-repeat;
+    background-size: 100% 1px;
+    background-position: 0 calc(100% - (var(--mark-weight) / 2));
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .tablist::-webkit-scrollbar { display: none; }
+
+  .tab {
+    position: relative;
+    display: flex;
+    align-items: baseline;
+    gap: 0.4rem;
+    padding: 0 0 0.7rem;
+    white-space: nowrap;
+    text-decoration: none;
+    color: var(--ink-muted);
+    font-family: var(--font-display);
+    font-variation-settings: 'opsz' 72;
+    font-size: var(--step-1);
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    transition: color 0.3s ease;
+  }
+
+  /* The mark under the open tab — centred ON the rule, so the 1px hairline
+     runs through its middle and the two read as one rule momentarily
+     thickened, the way a nib presses harder on a stroke. The rule's midline
+     sits 0.5px below the tab's box, so the mark's bottom edge drops half its
+     own weight further again. Change --mark-weight above and the tab bar's
+     padding, the rule's position and this all follow. */
+  .tab::after {
+    content: '';
+    position: absolute;
+    inset-inline: 0;
+    bottom: calc(-0.5px - (var(--mark-weight) / 2));
+    height: var(--mark-weight);
+    background: var(--ink);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.35s ease;
+  }
+  .tab[aria-selected='true'] { color: var(--ink); }
+  .tab[aria-selected='true']::after { transform: scaleX(1); }
+
+  @media (hover: hover) {
+    .tab:hover { color: var(--ink); }
+    .tab:hover::after { transform: scaleX(1); opacity: 0.3; }
+    .tab[aria-selected='true']:hover::after { opacity: 1; }
+  }
+  .tab:focus-visible { outline: 2px solid var(--cloth); outline-offset: 4px; }
+
+  .tab-count {
+    font-size: 0.68rem;
+    letter-spacing: 0.1em;
+    /* superscript, the way a footnote marker sits */
+    align-self: flex-start;
+    padding-top: 0.15rem;
+  }
+
+  /* ---------- panels ---------- */
+  .panel { padding-top: 0.5rem; }
+  .panel:focus-visible { outline: none; }
+
+  /* ---------- the wall ----------
+     A true waterfall: CSS multi-column, so tiles of unequal height stack
+     without gaps. Column count follows the width on its own — no media
+     queries, no JS, no layout thrash. Note the fill order is column by
+     column (1 and 2 sit above each other, not side by side), which is how
+     CSS columns work; see the note in the commit if that ever matters. */
+  .wall {
+    --wall-gap: 0.75rem;
+    columns: 19rem;
+    column-gap: var(--wall-gap);
     margin-top: 2.5rem;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  }
+
+  .empty { margin-top: 2.5rem; color: var(--ink-muted); }
+
+  /* No JS: every panel stays open, each under its own heading — the page
+     degrades into a plain, complete list. JS flips this switch. */
+  .panel-heading { margin-top: 2.5rem; }
+  .tabs[data-js] .panel-heading {
+    position: absolute;
+    width: 1px; height: 1px;
+    margin: -1px; padding: 0; border: 0;
+    clip-path: inset(50%);
+    overflow: hidden; white-space: nowrap;
+  }
+  .tabs[data-js] .panel[hidden] { display: none; }
+  .tabs[data-js] .panel:not([hidden]) .wall,
+  .tabs[data-js] .panel:not([hidden]) .empty {
+    animation: rise 0.4s ease both;
+  }
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: none; }
   }
 </style>
+
+<script>
+  const root = document.querySelector<HTMLElement>('[data-tabs]');
+  if (root) {
+    const tabs = Array.from(root.querySelectorAll<HTMLAnchorElement>('[role="tab"]'));
+    const panels = Array.from(root.querySelectorAll<HTMLElement>('[role="tabpanel"]'));
+    const ids = panels.map((p) => p.id);
+
+    // Tell the CSS that JS is live — only now do panels start hiding.
+    root.dataset.js = 'on';
+
+    function activate(id: string, opts: { focus?: boolean; push?: boolean } = {}) {
+      if (!ids.includes(id)) id = root!.dataset.default!;
+
+      tabs.forEach((tab) => {
+        const on = tab.getAttribute('aria-controls') === id;
+        tab.setAttribute('aria-selected', String(on));
+        // roving tabindex: only the open tab is in the tab order
+        tab.tabIndex = on ? 0 : -1;
+        if (on && opts.focus) tab.focus();
+      });
+      panels.forEach((panel) => { panel.hidden = panel.id !== id; });
+
+      if (opts.push) history.replaceState(null, '', `#${id}`);
+    }
+
+    tabs.forEach((tab, i) => {
+      tab.addEventListener('click', (e) => {
+        e.preventDefault(); // no scroll jump to the anchor
+        activate(tab.getAttribute('aria-controls')!, { push: true });
+      });
+
+      tab.addEventListener('keydown', (e) => {
+        const step = { ArrowRight: 1, ArrowLeft: -1 }[e.key];
+        let next = -1;
+        if (step) next = (i + step + tabs.length) % tabs.length;
+        if (e.key === 'Home') next = 0;
+        if (e.key === 'End') next = tabs.length - 1;
+        if (next < 0) return;
+        e.preventDefault();
+        activate(tabs[next].getAttribute('aria-controls')!, { focus: true, push: true });
+      });
+    });
+
+    // Open whatever the URL points at; keep back/forward working.
+    activate(location.hash.slice(1) || root.dataset.default!);
+    window.addEventListener('hashchange', () => activate(location.hash.slice(1)));
+  }
+</script>

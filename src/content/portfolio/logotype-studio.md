@@ -1,6 +1,7 @@
 ---
 title: "Logotype for an architecture studio"
 summary: "Precision letterforms, engineered spacing. Replace with real work."
+tab: "logo-design"
 category: "Logotype"
 cover: "https://picsum.photos/seed/vv-logo/800/600"
 year: 2024

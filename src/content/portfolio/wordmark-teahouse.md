@@ -1,6 +1,7 @@
 ---
 title: "Wordmark for a Saigon teahouse"
 summary: "Custom lettering built from brush structure — replace with a real project."
+tab: "hand-lettering"
 category: "Lettering"
 cover: "https://picsum.photos/seed/vv-lettering/800/600"
 year: 2026

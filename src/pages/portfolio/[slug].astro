@@ -14,7 +14,7 @@ const { Content } = await render(item);
   <article>
     <p class="folio">{item.data.category}</p>
     <h1>{item.data.title}</h1>
-    <img class="cover" src={item.data.cover} alt={item.data.title} width="800" height="600" decoding="async" />
+    <img class="cover" src={item.data.cover} alt={item.data.title} width={item.data.coverWidth} height={item.data.coverHeight} decoding="async" />
     <div class="prose">
       <Content />
     </div>

@@ -34,6 +34,20 @@ export const SOCIALS = [
   { label: 'Fiverr', url: 'https://www.fiverr.com/sinsin' },
 ];
 
+// Portfolio tabs. Order here = order on screen. The `id` is the URL hash
+// (/portfolio/#hand-lettering) AND the value each project's `tab:` field
+// must match — the content schema validates against this list, so a typo
+// in a .md file breaks the build loudly instead of silently hiding work.
+// To add a tab: add a line here, then set `tab:` on the relevant projects.
+export const PORTFOLIO_TABS = [
+  { id: 'book-design', label: 'Book Design' },
+  { id: 'hand-lettering', label: 'Hand Lettering' },
+  { id: 'logo-design', label: 'Logo Design' },
+  { id: 'infographic-sketchnote', label: 'Infographic & Sketchnote' },
+] as const;
+
+export type PortfolioTabId = (typeof PORTFOLIO_TABS)[number]['id'];
+
 // Get a free access key at https://web3forms.com (takes 1 minute,
 // only needs your email). Paste it between the quotes.
 export const WEB3FORMS_ACCESS_KEY = '6f9abc9e-b523-4cd6-9f3a-9dd2fca4300e';

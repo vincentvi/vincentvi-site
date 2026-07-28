@@ -6,6 +6,9 @@
   /* palette: ink on paper, indigo book-cloth accent, bronze foil */
   --paper: #fbfbf8;
   --ink: #1b1b18;
+  /* same ink as space-separated channels, so it can be alpha'd:
+     rgb(var(--ink-rgb) / 0.7). Keep in sync with --ink above. */
+  --ink-rgb: 27 27 24;
   --ink-muted: #56564e;
   --cloth: #2c3e66;      /* links, accents */
   --foil: hwb(0 9% 91%);       /* accent: steel blue */
@@ -23,6 +26,7 @@
      at the spring green in its own :global(html:root) block. */
   --highlight: #417a04;        /* green as text on paper */
   --highlight-fill: #a7f175;   /* green as a block, behind --highlight-ink */
+  --highlight-fill-rgb: 167 241 117;  /* same green, alpha-able */
   --highlight-ink: #14210c;    /* ink on a highlight block */
 
   /* type */

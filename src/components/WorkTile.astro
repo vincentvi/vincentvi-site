@@ -1,0 +1,133 @@
+---
+/**
+ * Portfolio tile — image only, Pinterest-wall style.
+ *
+ * Deliberately mute: no spine, no summary, no year. The image carries the
+ * whole card, and the title only surfaces on hover, printed on a veil that
+ * darkens toward the bottom edge so white type stays legible over any
+ * artwork. Think of it as a contact sheet — you read the frames, not the
+ * captions, until you lean in.
+ *
+ * Height is intentionally NOT fixed: each tile keeps its cover's own
+ * proportions, which is what gives the wall its stagger. Pass real
+ * width/height so the browser can reserve the space before the image lands.
+ */
+interface Props {
+  href: string;
+  title: string;
+  cover: string;
+  width?: number;
+  height?: number;
+}
+const { href, title, cover, width = 800, height = 600 } = Astro.props;
+---
+<a class="tile" href={href}>
+  <img
+    src={cover}
+    alt=""
+    width={width}
+    height={height}
+    loading="lazy"
+    decoding="async"
+  />
+  <span class="veil">
+    <span class="veil-title">{title}</span>
+  </span>
+</a>
+
+<style>
+  .tile {
+    /* The veil's two ends. Top is your green (--highlight-fill, #a7f175);
+       bottom is its darker, bluer sibling (#244c60) — same family, hue walked
+       round toward blue and the lightness dropped, so the wash reads as one
+       colour rolling down rather than two colours meeting. --veil-alpha is
+       the single knob for how much photo survives underneath. */
+    --veil-top-rgb: var(--highlight-fill-rgb, 167 241 117);
+    --veil-bottom-rgb: 36 76 96;
+    --veil-alpha: 0.7;
+    /* just enough to take the edge off — a trimmed corner, not a rounded card */
+    --tile-radius: 6px;
+
+    position: relative;
+    display: block;
+    /* Own stacking context, so the veil and the image can never argue about
+       paint order — and so the multi-column layout repaints this tile alone. */
+    isolation: isolate;
+    /* never let a column break split a tile in half */
+    break-inside: avoid;
+    margin-bottom: var(--wall-gap, 0.75rem);
+    overflow: hidden;
+    /* No border and no ring — the photo's own edge is the edge. Worth keeping
+       it that way: a 1px border would make the padding box (and its corner
+       radius) 1px tighter than the border box, and the veil, which fills the
+       padding box on its own compositing layer, would then curve on a
+       different arc and leak a wedge of background at each corner. If a
+       hairline is ever wanted back, use box-shadow: 0 0 0 1px, not a border. */
+    border-radius: var(--tile-radius);
+    background: var(--ink);
+    text-decoration: none;
+  }
+
+  .tile img {
+    display: block;
+    width: 100%;
+    height: auto;          /* keep the cover's own aspect ratio */
+  }
+
+  /* The veil: a vertical wash, green at the head, deep petrol blue at the foot.
+     Written as rgb(<triplet> / <alpha>) — NOT color-mix(). color-mix() with a
+     var() inside cannot be resolved at build time, so the whole declaration can
+     be dropped by the CSS pipeline and you get white type on a bare photo. */
+  .veil {
+    position: absolute;
+    inset: 0;
+    /* now an exact match: no border means the padding box and the border box
+       share one radius, so the veil curves on the same arc as the photo */
+    border-radius: inherit;
+    z-index: 1;            /* always above the image, transform or not */
+    display: flex;
+    align-items: flex-end;
+    padding: 1.1rem 1.15rem;
+    background: linear-gradient(
+      to bottom,
+      rgb(var(--veil-top-rgb) / var(--veil-alpha)) 0%,
+      rgb(var(--veil-bottom-rgb) / var(--veil-alpha)) 100%
+    );
+    opacity: 0;
+    transition: opacity 0.35s ease;
+    /* Promote the veil to its own compositing layer. Without this the browser
+       re-rasterises a semi-transparent gradient over a photo on EVERY frame of
+       the fade; with it, the gradient is painted once and the GPU just blends
+       alpha. That per-frame re-rasterisation is what reads as flicker. */
+    will-change: opacity;
+  }
+
+  .veil-title {
+    color: #fff;
+    font-family: var(--font-display);
+    font-variation-settings: 'opsz' 72;
+    font-size: var(--step-1);
+    font-weight: 560;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+    transform: translateY(6px);
+    transition: transform 0.35s ease;
+  }
+
+  @media (hover: hover) {
+    .tile:hover .veil { opacity: 1; }
+    .tile:hover .veil-title { transform: translateY(0); }
+  }
+
+  /* Touch devices have no hover, so the wall would be a set of unlabelled
+     rectangles. There, the caption simply stays on. */
+  @media (hover: none) {
+    .veil { opacity: 1; }
+    .veil-title { transform: translateY(0); }
+  }
+
+  .tile:focus-visible { outline: 2px solid var(--cloth); outline-offset: 4px; }
+  .tile:focus-visible .veil { opacity: 1; }
+  .tile:focus-visible .veil-title { transform: translateY(0); }
+</style>
