@@ -45,20 +45,12 @@ const itemListLd = {
 };
 ---
 <BaseLayout
-  title="Book Design Portfolio"
-  description="Book design portfolio of Vincent Vi — covers, interior layout and typography for independent authors and publishers, from Ho Chi Minh City."
+  title="Hand Lettering & Book Design Portfolio"
+  description="Hand lettering and book design portfolio of Vincent Vi — covers, interior layout and typography for independent authors and publishers, from Ho Chi Minh City."
   jsonLd={itemListLd}
 >
   <p class="folio">Portfolio · {work.length} projects</p>
-  <h1>Book design, lettering &amp; logotypes</h1>
-
-  <p class="lede">
-    I'm a book designer working with independent authors and small publishers —
-    mostly interior layout and cover design for non-fiction: cookbooks,
-    workbooks, memoirs, health and business titles. The brief is nearly always
-    the same underneath: a manuscript that has to become something a reader will
-    stay inside for two hundred pages. Readable first, handsome second.
-  </p>
+  <h1>Hand Lettering &amp; Book Design</h1>
 
   <div class="tabs" data-tabs data-default={firstNonEmpty.id}>
     <div class="tablist" role="tablist" aria-label="Portfolio disciplines">
@@ -103,6 +95,7 @@ const itemListLd = {
             Nothing set in this case yet. <a href="/contact/">Commission the first piece</a>.
           </p>
         )}
+        {g.intro && <p class="lede">{g.intro}</p>}
       </section>
     ))}
   </div>
@@ -114,7 +107,10 @@ const itemListLd = {
     font-size: var(--step-1);
     line-height: 1.5;
     color: var(--ink-muted);
-    margin: 0 0 0.5rem;
+    /* sits under the wall, set off by a rule the width of the text */
+    margin: 3.5rem 0 0;
+    padding-top: 2rem;
+    border-top: 1px solid var(--hairline);
   }
 
   /* ---------- tab bar ---------- */
@@ -222,6 +218,7 @@ const itemListLd = {
   }
   .tabs[data-js] .panel[hidden] { display: none; }
   .tabs[data-js] .panel:not([hidden]) .wall,
+  .tabs[data-js] .panel:not([hidden]) .lede,
   .tabs[data-js] .panel:not([hidden]) .empty {
     animation: rise 0.4s ease both;
   }

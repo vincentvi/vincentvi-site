@@ -39,11 +39,19 @@ export const SOCIALS = [
 // must match — the content schema validates against this list, so a typo
 // in a .md file breaks the build loudly instead of silently hiding work.
 // To add a tab: add a line here, then set `tab:` on the relevant projects.
+//
+// `intro` prints BELOW that tab's wall. Leave it '' and nothing renders,
+// so each tab can get its own paragraph whenever you write it.
 export const PORTFOLIO_TABS = [
-  { id: 'book-design', label: 'Book Design' },
-  { id: 'hand-lettering', label: 'Hand Lettering' },
-  { id: 'logo-design', label: 'Logo Design' },
-  { id: 'infographic-sketchnote', label: 'Infographic & Sketchnote' },
+  {
+    id: 'book-design',
+    label: 'Book Design',
+    intro:
+      "I'm a book designer working with independent authors and small publishers — mostly interior layout and cover design for non-fiction: cookbooks, workbooks, memoirs, health and business titles. The brief is nearly always the same underneath: a manuscript that has to become something a reader will stay inside for two hundred pages. Readable first, handsome second.",
+  },
+  { id: 'hand-lettering', label: 'Hand Lettering', intro: '' },
+  { id: 'logo-design', label: 'Logo Design', intro: '' },
+  { id: 'infographic-sketchnote', label: 'Infographic & Sketchnote', intro: '' },
 ] as const;
 
 export type PortfolioTabId = (typeof PORTFOLIO_TABS)[number]['id'];
