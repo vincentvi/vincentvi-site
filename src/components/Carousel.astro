@@ -1,0 +1,258 @@
+---
+/**
+ * Project carousel — "plates", in the bookbinding sense: the full-page images
+ * bound in after the text.
+ *
+ * Built on native scroll-snap, so swipe, trackpad and scrollbar all work with
+ * no JavaScript at all. JS only adds the conveniences: arrows, a live counter,
+ * and the fore-edge ticks lighting up. Without it you still get a working,
+ * scrollable gallery — the ticks are plain anchor links.
+ *
+ * Each image sits contained on a paper mat with its own drop shadow, so a
+ * portrait cover and a landscape spread can share one frame without either
+ * being cropped. A print laid on a table, not a photo cropped to fit a hole.
+ */
+interface GalleryItem {
+  src: string;
+  caption?: string;
+}
+interface Props {
+  items?: GalleryItem[];
+  title: string;
+}
+const { items = [], title } = Astro.props;
+const total = items?.length ?? 0;
+---
+{total > 0 && (
+  <figure class="plates" data-carousel>
+    <div class="viewport">
+      <div
+        class="stage"
+        tabindex="0"
+        role="group"
+        aria-roledescription="carousel"
+        aria-label={`${title} — project images`}
+      >
+        {items.map((item, i) => (
+          <div
+            class="slide"
+            id={`plate-${i + 1}`}
+            role="group"
+            aria-roledescription="slide"
+            aria-label={`${i + 1} of ${total}`}
+          >
+            <div class="frame">
+              <img
+                src={item.src}
+                alt={item.caption ?? `${title} — plate ${i + 1}`}
+                loading={i === 0 ? 'eager' : 'lazy'}
+                decoding="async"
+              />
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <button class="arrow prev" type="button" aria-label="Previous plate">
+        <svg viewBox="0 0 24 24" aria-hidden="true" width="20" height="20">
+          <path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="1.6"
+                stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </button>
+      <button class="arrow next" type="button" aria-label="Next plate">
+        <svg viewBox="0 0 24 24" aria-hidden="true" width="20" height="20">
+          <path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="1.6"
+                stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </button>
+    </div>
+
+    <div class="bar">
+      {/* the fore-edge: page ticks down the side of a closed book. Purely
+          graphic — position without a word of text. */}
+      <div class="edge">
+        {items.map((_, i) => (
+          <a
+            class="tick"
+            href={`#plate-${i + 1}`}
+            aria-label={`Go to plate ${i + 1}`}
+            aria-current={i === 0 ? 'true' : 'false'}
+          ><span></span></a>
+        ))}
+      </div>
+    </div>
+  </figure>
+)}
+
+<style>
+  .plates { margin: 3.5rem 0 0; }
+
+  .viewport { position: relative; }
+
+  .stage {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+    border-radius: 6px;
+  }
+  .stage::-webkit-scrollbar { display: none; }
+  .stage:focus-visible { outline: 2px solid var(--cloth); outline-offset: 4px; }
+
+  .slide {
+    flex: 0 0 100%;
+    min-width: 0;
+    scroll-snap-align: center;
+  }
+
+  /* the mat: a shade off paper, so a white book cover still reads as an object */
+  .frame {
+    aspect-ratio: 4 / 3;
+    display: grid;
+    place-items: center;
+    padding: clamp(1rem, 3.5vw, 2.5rem);
+    background:
+      linear-gradient(
+        180deg,
+        rgb(var(--ink-rgb) / 0.03) 0%,
+        rgb(var(--ink-rgb) / 0.07) 100%
+      ),
+      var(--paper);
+    border-radius: 6px;
+  }
+
+  .frame img {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    /* drop-shadow follows the painted image, not its box — so the shadow hugs
+       the actual print whatever its proportions, with no letterbox halo */
+    filter: drop-shadow(0 8px 22px rgb(var(--ink-rgb) / 0.22));
+  }
+
+  /* ---------- arrows ---------- */
+  .arrow {
+    position: absolute;
+    top: clamp(4rem, 22%, 12rem);
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: rgb(var(--ink-rgb) / 0.55);
+    color: #fff;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.25s ease, background 0.25s ease;
+  }
+  .prev { left: 0.9rem; }
+  .next { right: 0.9rem; }
+  .arrow:hover { background: rgb(var(--ink-rgb) / 0.78); }
+  .arrow[disabled] { opacity: 0 !important; pointer-events: none; }
+
+  /* arrows are JS-only conveniences — never show them without it */
+  .plates:not([data-js]) .arrow { display: none; }
+
+  @media (hover: hover) {
+    .viewport:hover .arrow { opacity: 1; }
+  }
+  @media (hover: none) {
+    .arrow { opacity: 1; }   /* touch: swipe works, but make the tap target visible */
+  }
+  .arrow:focus-visible { opacity: 1; outline: 2px solid var(--cloth); outline-offset: 3px; }
+
+  /* ---------- fore-edge ---------- */
+  .bar {
+    display: flex;
+    justify-content: center;
+    margin-top: 1.1rem;
+  }
+
+  .edge { display: flex; gap: 1px; }
+  .tick {
+    display: grid;
+    place-items: center;
+    width: 9px;
+    height: 26px;           /* generous hit area around a hairline tick */
+    text-decoration: none;
+  }
+  .tick span {
+    display: block;
+    width: 2px;
+    height: 13px;
+    background: var(--hairline);
+    border-radius: 1px;
+    transition: height 0.25s ease, background 0.25s ease;
+  }
+  .tick:hover span { background: var(--ink-muted); }
+  .tick[aria-current='true'] span { height: 21px; background: var(--ink); }
+  .tick:focus-visible { outline: 2px solid var(--cloth); outline-offset: 2px; }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-carousel]').forEach((root) => {
+    const stage = root.querySelector<HTMLElement>('.stage');
+    const slides = Array.from(root.querySelectorAll<HTMLElement>('.slide'));
+    const ticks = Array.from(root.querySelectorAll<HTMLAnchorElement>('.tick'));
+    const prev = root.querySelector<HTMLButtonElement>('.prev');
+    const next = root.querySelector<HTMLButtonElement>('.next');
+    if (!stage || slides.length === 0) return;
+
+    root.dataset.js = 'on';
+    let index = 0;
+
+    function paint() {
+      ticks.forEach((t, i) => t.setAttribute('aria-current', String(i === index)));
+      if (prev) prev.disabled = index === 0;
+      if (next) next.disabled = index === slides.length - 1;
+    }
+
+    // Scroll the rail itself, never scrollIntoView(). scrollIntoView walks up
+    // and scrolls EVERY scrollable ancestor, the document included — so it
+    // drags the page vertically to centre the carousel as well as moving the
+    // slide sideways. Setting the stage's own scrollLeft touches nothing else.
+    function go(i: number) {
+      const target = slides[Math.max(0, Math.min(i, slides.length - 1))];
+      if (!target || !stage) return;
+      stage.scrollTo({ left: target.offsetLeft - slides[0].offsetLeft });
+    }
+
+    // Which slide is actually in view decides the index — that way scrolling,
+    // swiping and the buttons all feed the same source of truth.
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            index = slides.indexOf(entry.target as HTMLElement);
+            paint();
+          }
+        });
+      },
+      { root: stage, threshold: 0.6 }
+    );
+    slides.forEach((s) => io.observe(s));
+
+    prev?.addEventListener('click', () => go(index - 1));
+    next?.addEventListener('click', () => go(index + 1));
+
+    ticks.forEach((tick, i) => {
+      tick.addEventListener('click', (e) => {
+        e.preventDefault();   // move the rail, don't jump the page
+        go(i);
+      });
+    });
+
+    stage.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight') { e.preventDefault(); go(index + 1); }
+      if (e.key === 'ArrowLeft')  { e.preventDefault(); go(index - 1); }
+      if (e.key === 'Home')       { e.preventDefault(); go(0); }
+      if (e.key === 'End')        { e.preventDefault(); go(slides.length - 1); }
+    });
+
+    paint();
+  });
+</script>

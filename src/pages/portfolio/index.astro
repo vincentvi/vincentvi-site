@@ -15,7 +15,8 @@ import WorkTile from '../../components/WorkTile.astro';
 import { PORTFOLIO_TABS } from '../../config';
 import { getCollection } from 'astro:content';
 
-const work = await getCollection('portfolio');
+const work = (await getCollection('portfolio'))
+  .filter((item) => import.meta.env.DEV || !item.data.draft);
 
 // Group once, sort within each group by `order`.
 const groups = PORTFOLIO_TABS.map((tab) => ({

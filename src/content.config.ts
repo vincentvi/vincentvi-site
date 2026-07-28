@@ -31,8 +31,26 @@ const portfolio = defineCollection({
     // space before the image loads — no jumping as the wall fills in.
     coverWidth: z.number().default(800),
     coverHeight: z.number().default(600),
+    // Extra images for the project page carousel. The cover stays the hero and
+    // the wall thumbnail; these are everything else — spreads, mockups, the
+    // second angle. `src` is all that is required; caption is worth writing
+    // because it is the only text on the page a search engine or a language
+    // model can attach to the image.
+    gallery: z
+      .array(
+        z.object({
+          src: z.string(),
+          caption: z.string().optional(),
+        })
+      )
+      .default([]),
     year: z.number(),
     order: z.number().default(99), // lower = earlier WITHIN its tab
+    // Import 30 at once, publish them one at a time. Drafts are visible in
+    // `npm run dev` and excluded from the built site, so you can write the
+    // copy for each project at your own pace without hiding the images from
+    // yourself while you do it.
+    draft: z.boolean().default(false),
   }),
 });
 
