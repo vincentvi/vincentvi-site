@@ -20,6 +20,12 @@ const portfolio = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/portfolio' }),
   schema: z.object({
     title: z.string(),
+    // What the wall and the <h1> say. Keep it short — it is a display title.
+    // `seoTitle` is the long version that goes in <title> and the tab, where
+    // the words people actually search ("cover design", the author's name)
+    // matter more than elegance. Omit it and the page falls back to
+    // "Title — Category", which is fine for most work.
+    seoTitle: z.string().optional(),
     summary: z.string(),
     // Which tab the project lives under. Must match an id in PORTFOLIO_TABS
     // (src/config.ts) — anything else fails the build with a clear message.
@@ -44,6 +50,21 @@ const portfolio = defineCollection({
         })
       )
       .default([]),
+    // When the work was made FOR a published book, name it. This becomes a
+    // schema.org Book node hanging off the project's CreativeWork, which is
+    // the difference between a crawler seeing "a page with pictures" and
+    // "design work for this title, by this author". Omit for anything that
+    // is not a book.
+    book: z
+      .object({
+        title: z.string(),
+        author: z.string(),
+      })
+      .optional(),
+    // Terms this project should be findable by. Emitted as schema.org
+    // `keywords`, not as a meta tag — meta keywords have been ignored for
+    // twenty years, but structured keywords are still read.
+    keywords: z.array(z.string()).default([]),
     year: z.number(),
     order: z.number().default(99), // lower = earlier WITHIN its tab
     // Import 30 at once, publish them one at a time. Drafts are visible in

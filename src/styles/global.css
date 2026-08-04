@@ -103,6 +103,13 @@ hr { border: 0; border-top: 1px solid var(--hairline); margin: 3rem 0; }
 /* long-form article body */
 .prose { max-width: var(--measure); }
 .prose img { margin: 2rem 0; }
+/* section breaks need air above them, but not after a heading's own margin */
+.prose h2 { margin-top: 2.5rem; }
+.prose h3 { margin-top: 2rem; }
+.prose h2:first-child, .prose h3:first-child { margin-top: 0; }
+/* lists inherit the reading measure like paragraphs do */
+.prose ul, .prose ol { max-width: var(--measure); padding-left: 1.25rem; margin: 1rem 0; }
+.prose li { margin-bottom: 0.4rem; }
 .prose blockquote {
   margin: 2rem 0; padding-left: 1.25rem;
   border-left: 2px solid var(--foil);

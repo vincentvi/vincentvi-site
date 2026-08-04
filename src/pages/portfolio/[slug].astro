@@ -38,10 +38,22 @@ const workLd = {
     url: SITE.url,
     jobTitle: SITE.jobTitle,
   },
+  ...(item.data.keywords.length ? { keywords: item.data.keywords } : {}),
+  // The subject of the work. For book design this is the book itself — the
+  // one fact a crawler cannot infer from a title and a photograph.
+  ...(item.data.book
+    ? {
+        about: {
+          '@type': 'Book',
+          name: item.data.book.title,
+          author: { '@type': 'Person', name: item.data.book.author },
+        },
+      }
+    : {}),
 };
 ---
 <BaseLayout
-  title={`${item.data.title} — ${item.data.category}`}
+  title={item.data.seoTitle ?? `${item.data.title} — ${item.data.category}`}
   description={item.data.summary}
   ogType="article"
   ogImage={item.data.cover}

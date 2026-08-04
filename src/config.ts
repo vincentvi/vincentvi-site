@@ -47,7 +47,7 @@ export const PORTFOLIO_TABS = [
     id: 'book-design',
     label: 'Book Design',
     intro:
-      "I'm a book designer working with independent authors and small publishers — mostly interior layout and cover design for non-fiction: cookbooks, workbooks, memoirs, health and business titles. The brief is nearly always the same underneath: a manuscript that has to become something a reader will stay inside for two hundred pages. Readable first, handsome second.",
+      "I'm a book designer working with independent authors and small publishers — mostly interior layout and cover design for non-fiction: cookbooks, workbooks, memoirs, health and business titles. The brief is nearly always the same underneath: a manuscript that has to become something a reader will stay inside for two hundred pages. Readable first, handsome second. For a project written up end to end — cover, interior layout, and infographics — see <a href=\"/portfolio/fully-alive/\">the book design for <i>Fully Alive</i></a>.",
   },
   { id: 'hand-lettering', label: 'Hand Lettering', intro: '' },
   { id: 'logo-design', label: 'Logo Design', intro: '' },
