@@ -1,0 +1,104 @@
+---
+// TEMPORARY HOLDING HOMEPAGE — in use while the "it starts with one line"
+// hero is finalised with real hand lettering.
+//
+// The full homepage (selected work + blog) is preserved, unchanged, at
+//   src/_index.original.astro
+// To restore it, swap the two files back (see README note / git).
+//
+// When the hand-lettered "one line" is ready, it replaces the .drawn <span>.
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+<BaseLayout description="Book design and hand lettering for independent authors and small publishers. It starts with one line.">
+  <section class="hero holding">
+    <p class="folio eyebrow">Book design · Hand lettering · Ho Chi Minh City</p>
+
+    <h1 class="holding-line" aria-label="it starts with one line">
+      it starts with <span class="drawn" tabindex="0">one&nbsp;line</span>
+    </h1>
+
+    <p class="lede">
+      Book design and hand lettering for independent authors and small
+      publishers — one condensed line, set like a stone.
+    </p>
+  </section>
+</BaseLayout>
+
+<style>
+  /* navy panel on the paper page — matches the site's existing hero language */
+  .hero {
+    --navy: #14161d;
+    --green: var(--highlight-fill);   /* #a7f175 — the spring green, legible on dark */
+    --green-hi: #eaffd2;              /* foil highlight at the crest of the sweep */
+    background: radial-gradient(120% 130% at 50% 0%, #191c25 0%, var(--navy) 60%, #101218 100%);
+    border-radius: 12px;
+    padding: clamp(3.25rem, 9vw, 6.5rem) clamp(1.25rem, 4vw, 3rem);
+    text-align: center;
+    margin-block: 2rem 3.5rem;
+  }
+  .eyebrow {
+    color: rgba(205, 210, 225, 0.42);
+    max-width: none;
+    margin-inline: auto;
+  }
+
+  /* the headline: set in Fraunces, white, exactly as typed (lowercase) */
+  .holding-line {
+    font-family: var(--font-display);
+    font-variation-settings: 'opsz' 144, 'wght' 400;
+    font-weight: 400;
+    font-size: clamp(2.4rem, 8vw, 5rem);
+    line-height: 1.05;
+    letter-spacing: -0.015em;
+    color: var(--paper);
+    max-width: 18ch;
+    margin: 0 auto;
+  }
+
+  /* "one line": green with a foil highlight sweeping across; hover/tap adds weight */
+  .drawn {
+    white-space: nowrap;
+    color: var(--green);   /* fallback if background-clip text is unsupported */
+    background: linear-gradient(
+      100deg,
+      var(--green) 0%, var(--green) 42%,
+      var(--green-hi) 50%,
+      var(--green) 58%, var(--green) 100%
+    );
+    background-size: 250% 100%;
+    background-position: 120% 0;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: foil 4.5s cubic-bezier(.45, .05, .35, 1) infinite;
+    font-variation-settings: 'opsz' 144, 'wght' 400;
+    transition: font-variation-settings .35s cubic-bezier(.45, .05, .35, 1);
+  }
+  @keyframes foil {
+    0%, 15%   { background-position: 120% 0; }
+    55%, 100% { background-position: -20% 0; }
+  }
+  .drawn:hover,
+  .drawn.tapped { font-variation-settings: 'opsz' 144, 'wght' 560; }
+
+  .hero .lede {
+    font-size: var(--step-0);
+    line-height: 1.55;
+    color: #8d93a8;
+    max-width: 42ch;
+    margin: 1.75rem auto 0;
+  }
+
+  /* global.css already neutralises the foil animation under reduced-motion */
+</style>
+
+<script>
+  // Mobile tap mirrors the desktop hover: a momentary weight bump.
+  const w = document.querySelector('.drawn');
+  if (w) {
+    w.addEventListener('pointerdown', () => {
+      w.classList.add('tapped');
+      setTimeout(() => w.classList.remove('tapped'), 450);
+    });
+  }
+</script>

@@ -1,0 +1,137 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import WorkCard from '../components/WorkCard.astro';
+import { getCollection } from 'astro:content';
+import { SITE } from '../config';
+
+const work = (await getCollection('portfolio'))
+  .sort((a, b) => a.data.order - b.data.order)
+  .slice(0, 4);
+const posts = (await getCollection('blog', ({ data }) => !data.draft))
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+  .slice(0, 3);
+
+const headline = 'Letterforms, books, and the spaces between them.';
+---
+<BaseLayout>
+  <section class="hero">
+    <p class="folio eyebrow">Designer · Letterer · Ho Chi Minh City</p>
+    <h1 class="spotlight" id="spotlight">
+      <span class="base">{headline}</span>
+      <span class="beam" aria-hidden="true">{headline}</span>
+    </h1>
+    <p class="lede">
+      I'm {SITE.name} — a graphic designer working in typography, hand-lettering,
+      and book design.
+    </p>
+  </section>
+
+  <section>
+    <p class="folio">Selected work</p>
+    <div class="grid">
+      {work.map((item) => (
+        <WorkCard
+          href={`/portfolio/${item.id}/`}
+          title={item.data.title}
+          category={item.data.category}
+          year={item.data.year}
+          cover={item.data.cover}
+        />
+      ))}
+    </div>
+    <p class="more"><a href="/portfolio/">All projects →</a></p>
+  </section>
+
+  <hr />
+
+  <section>
+    <p class="folio">From the blog</p>
+    <ul class="postlist">
+      {posts.map((post) => (
+        <li>
+          <a href={`/blog/${post.id}/`}>{post.data.title}</a>
+        </li>
+      ))}
+    </ul>
+  </section>
+</BaseLayout>
+
+<style>
+  /* ---------- hero: dark navy panel, centered ---------- */
+  .hero {
+    --navy: #14161d;          /* panel */
+    --faded: #4d5366;         /* sleeping letters: slate blue-grey */
+    --glint-hot: #ffffff;               /* glint core: bright white */
+    --glint: rgba(255, 255, 255, 0.82);  /* glint body */
+    background: radial-gradient(120% 130% at 50% 0%, #191c25 0%, var(--navy) 60%, #101218 100%);
+    border-radius: 12px;
+    padding: clamp(2.5rem, 6vw, 4.5rem) clamp(1.25rem, 4vw, 3rem);
+    text-align: center;
+    margin-bottom: 3.5rem;
+  }
+  .eyebrow {
+    color: rgba(205, 210, 225, 0.42);
+    max-width: none;
+    margin-inline: auto;
+  }
+  .hero .lede {
+    font-size: var(--step-0);
+    line-height: 1.55;
+    color: #8d93a8;
+    max-width: 44ch;
+    margin-inline: auto;
+  }
+  /* ---------- spotlight headline: faded → gold glint ---------- */
+  .spotlight {
+    position: relative;
+    display: inline-block;
+    cursor: default;
+    font-size: clamp(1.7rem, 4.2vw, 2.7rem);
+    max-width: 24ch;
+    margin-inline: auto;
+    color: var(--faded);
+  }
+  .spotlight .beam {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    pointer-events: none;
+    color: transparent;
+    background-image: radial-gradient(
+      circle 190px at var(--mx, 50%) var(--my, 50%),
+      var(--glint-hot) 0%,
+      var(--glint) 34%,
+      rgba(255, 255, 255, 0.22) 62%,
+      transparent 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .spotlight:hover .beam { opacity: 1; }
+  }
+
+  .grid {
+    display: grid; gap: 3rem 2.25rem;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  }
+  .more { margin-top: 2rem; }
+  .postlist { list-style: none; padding: 0; display: grid; gap: 0.75rem; }
+  .postlist li { display: flex; gap: 1rem; align-items: baseline; justify-content: space-between; max-width: var(--measure); }
+</style>
+
+<script>
+  // Reports cursor position to CSS; CSS draws the light.
+  const el = document.getElementById('spotlight');
+  const fine = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (el && fine && !reduced) {
+    el.addEventListener('pointermove', (e) => {
+      const r = el.getBoundingClientRect();
+      el.style.setProperty('--mx', `${(e.clientX - r.left).toFixed(0)}px`);
+      el.style.setProperty('--my', `${(e.clientY - r.top).toFixed(0)}px`);
+    });
+  }
+</script>
