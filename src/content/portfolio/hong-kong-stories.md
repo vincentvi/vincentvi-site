@@ -9,7 +9,7 @@ coverWidth: 1000
 coverHeight: 1000
 gallery: []
 year: 2026
-order: 19
+order: 5
 draft: false
 book:
   title: "Collected Hong Kong Stories"
