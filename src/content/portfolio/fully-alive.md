@@ -9,7 +9,7 @@ coverWidth: 1000
 coverHeight: 800
 gallery: []
 year: 2026
-order: 15
+order: 2
 draft: false
 book:
   title: "Fully Alive: Using Your Individuality to Conquer Addiction"

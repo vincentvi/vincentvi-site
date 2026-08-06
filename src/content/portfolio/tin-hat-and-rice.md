@@ -13,7 +13,7 @@ gallery:
   - src: "/images/portfolio/tin-hat-and-rice/plate-02.webp"
     caption: "Barbara Anslow with her publisher, holding one of the original handwritten diaries the book was set from."
 year: 2026
-order: 40
+order: 3
 draft: false
 book:
   title: "Tin Hats and Rice: A Diary of Life as a Hong Kong Prisoner of War, 1941–1945"

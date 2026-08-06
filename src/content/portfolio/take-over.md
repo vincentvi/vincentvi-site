@@ -15,7 +15,7 @@ gallery:
   - src: "/images/portfolio/take-over/plate-03.webp"
     caption: "Stacked copies of The Takeover, showing the green spine and bottom-edge band."
 year: 2026
-order: 32
+order: 4
 draft: false
 book:
   title: "The Takeover: The Ultimate Mind Booster"

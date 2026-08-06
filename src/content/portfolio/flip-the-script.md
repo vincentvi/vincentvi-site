@@ -17,7 +17,7 @@ gallery:
   - src: "/images/portfolio/flip-the-script/plate-04.webp"
     caption: "The dust jacket opened flat, showing the dark grey front flap alongside the cover panel."
 year: 2026
-order: 14
+order: 1
 draft: false
 book:
   title: "Flip the Script: Train Your Brain to Breakthrough Your Biggest Barriers and Release Your Highest Potential"

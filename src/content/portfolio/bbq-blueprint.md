@@ -16,7 +16,7 @@ gallery:
   - src: "/images/portfolio/bbq-blueprint/plate-04.webp"
     caption: "" # book-interior-design-4 — describe it; this becomes the alt text
 year: 2026
-order: 4
+order: 40
 draft: false
 ---
 
