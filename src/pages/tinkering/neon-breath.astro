@@ -226,7 +226,8 @@ const SIGNS_JS = signs.map((s) => ({
   </div>
 
   <div class="stage">
-    <div class="viewport">
+    <div class="viewer">
+      <div class="viewport">
       {/* Two layers, not one per sign. The archive can hold hundreds of
          specimens; the frame only ever holds two images — the one showing
          and the one fading in behind it. */}
@@ -243,6 +244,17 @@ const SIGNS_JS = signs.map((s) => ({
       </figure>
       <button class="nav prev" id="prev" aria-label="Previous sign">‹</button>
       <button class="nav next" id="next" aria-label="Next sign">›</button>
+      </div>
+
+      <div class="viewer-foot">
+        <div class="thumbs" id="thumbs">
+          {signs.map((s, i) => (
+            <button class={`thumb${i === 0 ? ' current' : ''}`} data-i={i} aria-label={`Show ${s.title}`}>
+              <img src={s.thumb} alt="" width="240" height="180" loading="lazy" decoding="async" />
+            </button>
+          ))}
+        </div>
+      </div>
     </div>
 
     <aside class="panel">
@@ -264,19 +276,8 @@ const SIGNS_JS = signs.map((s) => ({
         </div>
       ))}
       <div id="minimap" aria-label="Map location of the current sign"></div>
+      <p class="folio map-hint">pin = this sign · link opens Google Maps</p>
     </aside>
-
-    <div class="viewer-foot">
-      <div class="thumbs" id="thumbs">
-        {signs.map((s, i) => (
-          <button class={`thumb${i === 0 ? ' current' : ''}`} data-i={i} aria-label={`Show ${s.title}`}>
-            <img src={s.thumb} alt="" width="240" height="180" loading="lazy" decoding="async" />
-          </button>
-        ))}
-      </div>
-    </div>
-
-    <p class="folio map-hint">pin = this sign · link opens Google Maps</p>
   </div>
 
   <section class="nominate">
@@ -493,43 +494,34 @@ const SIGNS_JS = signs.map((s) => ({
   .chip:disabled { opacity: 0.35; cursor: default; }
 
   /* ---- stage ---- */
-  /* 2×2 grid. Row 1 is the aligned pair — photo frame / specimen+map —
-     both stretched to the same height, with the map pinned to the cell
-     bottom, so frame and map share one bottom edge. Row 2 holds the
-     compact footers (thumbs+keys / map hint), outside the alignment. */
+  /* Two independent columns, not a 2×2 grid. The frame is now a fixed
+     4:3 block, so it is shorter than the specimen column — and in a
+     shared grid row the thumbs would have waited for the panel to end
+     before they could start, leaving a gap under the photo. Each column
+     now stacks on its own. */
   .stage {
     display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(280px, 1fr);
-    column-gap: clamp(1.5rem, 4vw, 3rem); row-gap: 0.75rem;
-    align-items: stretch;
+    column-gap: clamp(1.5rem, 4vw, 3rem); row-gap: 2rem;
+    align-items: start;
   }
-  .viewport { grid-column: 1; grid-row: 1; }
-  .panel { grid-column: 2; grid-row: 1; }
-  .viewer-foot { grid-column: 1; grid-row: 2; }
-  .map-hint { grid-column: 2; grid-row: 2; }
   @media (max-width: 820px) {
     .stage { grid-template-columns: 1fr; }
-    .viewport, .panel, .viewer-foot, .map-hint { grid-column: 1; grid-row: auto; }
-    .viewport { order: 1; } .viewer-foot { order: 2; }
-    .panel { order: 3; } .map-hint { order: 4; }
   }
+  .viewer-foot { margin-top: 0.75rem; }
 
-  /* No aspect-ratio on desktop: height comes from the grid row (the
-     panel+map column), and aspect-ratio would transfer that height
-     back into width, overflowing the column. Mobile has no row to
-     inherit from, so the ratio applies there instead. */
+  /* The frame is locked to 4:3 — the same ratio every specimen is cropped
+     to by `npm run import:signs`. Frame ratio and file ratio now agree, so
+     `cover` has nothing left to crop and the photo shows whole.
+
+     This has to be a padding-ratio spacer rather than `aspect-ratio`:
+     every child of the frame is absolutely positioned (zero content
+     height), and WebKit drops the aspect-ratio height transfer on grid
+     items in that case — the frame collapses to nothing. */
   .viewport {
-    position: relative; overflow: hidden; min-height: 380px;
+    position: relative; overflow: hidden;
     border: 1px solid #2a3654; background: #05070c;
   }
-  @media (max-width: 820px) {
-    /* padding-ratio instead of aspect-ratio: every child of the frame
-       is absolutely positioned (zero content height), and WebKit drops
-       the aspect-ratio height transfer on grid items in that case —
-       the frame collapses to nothing on phones. The ::before spacer
-       guarantees 4:3 from the width in every engine. */
-    .viewport { min-height: 0; }
-    .viewport::before { content: ''; display: block; padding-top: 75%; }
-  }
+  .viewport::before { content: ''; display: block; padding-top: 75%; }
   .shot {
     position: absolute; inset: 0; margin: 0;
     opacity: 0; transform: scale(1.015);
@@ -592,11 +584,11 @@ const SIGNS_JS = signs.map((s) => ({
   .spotted { margin: 0.75rem 0 0; }
 
   #minimap {
-    height: 340px; margin-top: auto; /* pin to the aligned bottom edge */
+    height: 340px; margin-top: 0.25rem;
     border: 1px solid var(--hairline);
     background: #05070c;
   }
-  .map-hint { margin: 0; }
+  .map-hint { margin: 0.75rem 0 0; }
 
   /* ---- nominate a sign ---- */
   .nominate {
