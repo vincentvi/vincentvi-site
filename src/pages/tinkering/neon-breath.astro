@@ -28,6 +28,10 @@ interface Sign {
   lat: number;
   lng: number;
   tags: string[];
+  /** what the sign is made of and how the letters behave — observation, not atmosphere */
+  spec: string;
+  /** optional — your own knowledge of the place. Only when you actually have some. */
+  note?: string;
   /** only when the sign is outside the archive's home city (see DEFAULT_PLACE) */
   city?: string;
   /** ISO 3166-1 alpha-2, only when outside the home country */
@@ -44,6 +48,7 @@ const signs: Sign[] = [
     thumb: '/signs/001-8ight-coffee-thumb.webp',
     lat: 10.76988, lng: 106.69261,
     tags: ['blackletter', 'display'],
+    spec: 'Warm red LED tubing, every stroke visibly built from individual diodes. Blackletter bones — broken strokes, angular spurs — loosened by script swashes, with the 8 drawn to double as the opening E.',
   },
   {
     num: '№ 002',
@@ -52,6 +57,7 @@ const signs: Sign[] = [
     thumb: '/signs/002-mr8-coffee-thumb.webp',
     lat: 10.77185, lng: 106.69336,
     tags: ['slab', 'display'],
+    spec: 'White face-lit channel letters, one storey up. Heavy slab serifs with bracketed terminals, a Clarendon cut sized to be read across four lanes of traffic rather than from the pavement.',
   },
   {
     num: '№ 003',
@@ -60,6 +66,7 @@ const signs: Sign[] = [
     thumb: '/signs/003-thuc-coffee-thumb.webp',
     lat: 10.76406, lng: 106.69058,
     tags: ['rounded', 'monoline'],
+    spec: 'Halo-lit letters standing off a dark panel, the glow spilling behind them in warm gold. Rounded geometric lowercase at a single stroke weight, set over a squared, tightly condensed COFFEE.',
   },
   {
     num: '№ 004',
@@ -68,6 +75,7 @@ const signs: Sign[] = [
     thumb: '/signs/004-vi-da-quan-thumb.webp',
     lat: 10.77501, lng: 106.69802,
     tags: ['monoline', 'condensed', 'display'],
+    spec: 'Yellow on black inside a square frame, the whole mark drawn on a grid. Every letter is built from rectangular strokes of one width, corners squared off, diacritics folded into the lattice.',
   },
   {
     num: '№ 005',
@@ -76,6 +84,7 @@ const signs: Sign[] = [
     thumb: '/signs/005-cerci-touch-thumb.webp',
     lat: 10.79166, lng: 106.68280,
     tags: ['serif', 'display'],
+    spec: 'Metal letters face-lit warm against a weathered painted panel. High-contrast Didone capitals with hairline serifs and vertical stress — a fashion-magazine face put outdoors and left to age with the wall.',
   },
   {
     num: '№ 006',
@@ -84,6 +93,7 @@ const signs: Sign[] = [
     thumb: '/signs/006-thinks-thumb.webp',
     lat: 10.79273, lng: 106.67649,
     tags: ['sans'],
+    spec: 'A printed panel inside an internally lit box, bulbs visible through the face. Plain geometric sans, lowercase i breaking the caps, an orange chevron standing in for the K. Studio work, not signwriting.',
   },
   {
     num: '№ 007',
@@ -92,6 +102,7 @@ const signs: Sign[] = [
     thumb: '/signs/007-microwave-milktea-thumb.webp',
     lat: 10.78393, lng: 106.67876,
     tags: ['condensed', 'display'],
+    spec: 'Dark letters halo-lit against pale teal, so the wordmark reads as silhouette rather than light. Condensed and angular, strokes broken at the joints, bowls squared — blackletter posture without blackletter weight.',
   },
   {
     num: '№ 008',
@@ -100,6 +111,7 @@ const signs: Sign[] = [
     thumb: '/signs/008-mame-chan-thumb.webp',
     lat: 10.93284, lng: 108.12071,
     tags: ['handwritten', 'monoline', 'rounded'],
+    spec: 'Bent glass tube in green — the first true neon in the archive, everything before it diode-built. Monoline handwritten letters with rounded terminals and a slight bounce off the baseline, repeated on the printed panel beside it.',
     city: 'Phan Thiết',
   },
 ];
@@ -170,7 +182,7 @@ const signsLd = {
       },
       image: abs(s.photo),
       keywords: s.tags.join(', '),
-      description: altFor(s),
+      description: s.note ? `${s.spec} ${s.note}` : s.spec,
     },
   })),
 };
@@ -196,7 +208,9 @@ const SIGNS_JS = signs.map((s) => ({
   <p class="folio crumb"><a href="/tinkering/">Tinkering</a> · experiment 004</p>
   <h1>Neon Breath</h1>
   <p class="lede">
-    A specimen archive of storefront neon, cataloged sign by sign.
+    A specimen archive of illuminated storefront signs in Vietnam — the
+    lettering that cafés and milk-tea shops draw for themselves, photographed
+    in {cities.join(' and ')} and cataloged sign by sign.
     Browse with the arrows, filter by letterform style —
     every specimen links to the exact corner it glows on.
   </p>
@@ -235,6 +249,8 @@ const SIGNS_JS = signs.map((s) => ({
         <div class={`spec${i === 0 ? ' active' : ''}`} data-i={i}>
           <p class="folio spec-num">Specimen · {s.num}</p>
           <h2>{s.title}</h2>
+          <p class="spec-desc">{s.spec}</p>
+          {s.note && <p class="spec-note">{s.note}</p>}
           <p class="spec-tags">
             {s.tags.map((t) => <span class="tag">{t}</span>)}
           </p>
@@ -553,7 +569,16 @@ const SIGNS_JS = signs.map((s) => ({
   @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
 
   .spec-num { margin: 0 0 0.6rem; }
-  .spec h2 { margin: 0 0 1rem; font-size: var(--step-2); }
+  .spec h2 { margin: 0 0 0.75rem; font-size: var(--step-2); }
+  .spec-desc {
+    color: var(--ink-muted); margin: 0 0 1rem; max-width: 42ch;
+    font-size: 0.94em; line-height: 1.55;
+  }
+  .spec-note {
+    font-style: italic; color: var(--ink-muted);
+    margin: 0 0 1rem; max-width: 42ch;
+    padding-left: 0.85rem; border-left: 1px solid var(--hairline);
+  }
   .spec-tags { margin: 0 0 1rem; display: flex; flex-wrap: wrap; gap: 0.4rem; }
   .tag {
     font-family: var(--font-utility); font-size: 0.68rem; letter-spacing: 0.08em;
