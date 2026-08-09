@@ -6,7 +6,7 @@ export const SITE = {
   name: 'Vincent Vi',
   title: 'Vincent Vi — Designer & Letterer',
   description:
-    'Graphic designer specializing in typography, hand-lettering, and book design. Based in Ho Chi Minh City, working worldwide.',
+    'Graphic designer specializing in typography, hand-lettering, and book design. Working worldwide.',
   url: 'https://vincentvi.me',
   locale: 'en',
   author: 'Vincent Vi',
@@ -24,6 +24,16 @@ export const SITE = {
   // via DNS instead.
   googleSiteVerification: '',
 };
+
+// Primary navigation. Order here = order on screen. Read by BOTH the shared
+// Header component and the standalone homepage (src/pages/index.astro), which
+// carries its own chrome — so the two can never drift apart again.
+export const NAV = [
+  { label: 'Portfolio', href: '/portfolio/' },
+  { label: 'Tinkering', href: '/tinkering/' },
+  { label: 'Blog', href: '/blog/' },
+  { label: 'Contact', href: '/contact/' },
+] as const;
 
 // Shown in the footer and on /contact. Replace # with real URLs,
 // remove any you do not use. Order here = order on screen.
