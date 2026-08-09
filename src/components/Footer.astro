@@ -4,7 +4,7 @@ const year = new Date().getFullYear();
 ---
 <footer>
   <div class="inner">
-    <p class="folio">{SITE.name} · Ho Chi Minh City · {year}</p>
+    <p class="folio">{SITE.name} · {year}</p>
     <nav aria-label="Social links">
       {SOCIALS.map((s) => (
         <a href={s.url} rel="me noopener" target="_blank">{s.label}</a>
