@@ -11,7 +11,8 @@
     "preview": "astro preview",
     "astro": "astro",
     "import:portfolio": "node scripts/import-portfolio.mjs",
-    "publish:portfolio": "node scripts/publish-portfolio.mjs"
+    "publish:portfolio": "node scripts/publish-portfolio.mjs",
+    "import:signs": "node scripts/import-signs.mjs"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.3",

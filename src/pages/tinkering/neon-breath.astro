@@ -1,18 +1,19 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { WEB3FORMS_ACCESS_KEY } from '../../config';
+import { SITE, WEB3FORMS_ACCESS_KEY } from '../../config';
 
 // ------------------------------------------------------------------
 // THE ARCHIVE. One entry per sign — add a sign by adding an object
-// here, nothing else changes. The photos below are generated SVG
-// placeholders (public/signs/sample-*.svg); swap `photo` for the real
-// image path. Coordinates come from Google Maps: right-click the
-// storefront, first menu item copies "lat, lng".
+// here, nothing else changes.
+//
+// Photos are produced by `npm run import:signs`, which crops every
+// specimen to a fixed 1080x810 and prints a stub object to paste in
+// below. Coordinates come from Google Maps: right-click the storefront
+// itself (not the search pin, which sits on the road centreline), and
+// the first menu item copies "lat, lng".
 //
 // Optional: `spottedBy: 'Mai N.'` credits a visitor who nominated the
 // sign through the form at the bottom of the page.
-//
-// ⚠ SAMPLE DATA — names/addresses/coords are stand-ins for review.
 // ------------------------------------------------------------------
 const STYLE_TAGS = [
   'blackletter', 'brush-script', 'condensed', 'display', 'handwritten',
@@ -23,11 +24,14 @@ interface Sign {
   num: string;
   title: string;
   photo: string;
-  address: string;
+  thumb: string;
   lat: number;
   lng: number;
   tags: string[];
-  note: string;
+  /** only when the sign is outside the archive's home city (see DEFAULT_PLACE) */
+  city?: string;
+  /** ISO 3166-1 alpha-2, only when outside the home country */
+  country?: string;
   /** credit for a visitor who nominated this sign */
   spottedBy?: string;
 }
@@ -35,57 +39,59 @@ interface Sign {
 const signs: Sign[] = [
   {
     num: '№ 001',
-    title: 'Phở Hòa',
-    photo: '/signs/sample-01.svg',
-    address: '260C Pasteur, Quận 3',
-    lat: 10.78337, lng: 106.68854,
-    tags: ['script'],
-    note: 'Steam-era script over the phở counter — the loops still carry the hand that drew them.',
+    title: '8ight Coffee',
+    photo: '/signs/001-8ight-coffee.webp',
+    thumb: '/signs/001-8ight-coffee-thumb.webp',
+    lat: 10.76988, lng: 106.69261,
+    tags: ['blackletter', 'display'],
   },
   {
     num: '№ 002',
-    title: 'Bánh mì Huỳnh Hoa',
-    photo: '/signs/sample-02.svg',
-    address: '26 Lê Thị Riêng, Quận 1',
-    lat: 10.77143, lng: 106.69175,
-    tags: ['sans', 'condensed'],
-    note: 'Condensed caps doing crowd control — the queue reads it before the smell arrives.',
+    title: 'Mr.8 Coffee',
+    photo: '/signs/002-mr8-coffee.webp',
+    thumb: '/signs/002-mr8-coffee-thumb.webp',
+    lat: 10.77185, lng: 106.69336,
+    tags: ['slab', 'display'],
   },
   {
     num: '№ 003',
-    title: 'Cà phê Cheo Leo',
-    photo: '/signs/sample-03.svg',
-    address: '36/7B Nguyễn Thiện Thuật, Quận 3',
-    lat: 10.77147, lng: 106.68159,
-    tags: ['handwritten'],
-    note: 'A hand that never met a grid — painted once, retouched for decades.',
+    title: 'thức coffee',
+    photo: '/signs/003-thuc-coffee.webp',
+    thumb: '/signs/003-thuc-coffee-thumb.webp',
+    lat: 10.76406, lng: 106.69058,
+    tags: ['rounded', 'monoline'],
   },
   {
     num: '№ 004',
-    title: 'Kem Bạch Đằng',
-    photo: '/signs/sample-04.svg',
-    address: '26–28 Lê Lợi, Quận 1',
-    lat: 10.77345, lng: 106.70142,
-    tags: ['display', 'rounded'],
-    note: 'Rounded terminals for ice cream — letterforms licked soft.',
+    title: 'Vỹ Dạ Quán',
+    photo: '/signs/004-vi-da-quan.webp',
+    thumb: '/signs/004-vi-da-quan-thumb.webp',
+    lat: 10.77501, lng: 106.69802,
+    tags: ['monoline', 'condensed', 'display'],
   },
   {
     num: '№ 005',
-    title: 'Nhà may Mỹ Hạnh',
-    photo: '/signs/sample-05.svg',
-    address: '91 Lý Tự Trọng, Quận 1',
-    lat: 10.77266, lng: 106.69769,
-    tags: ['brush-script'],
-    note: 'A tailor’s flourish — the brush stroke is already a fitting.',
+    title: 'Cerci Touch',
+    photo: '/signs/005-cerci-touch.webp',
+    thumb: '/signs/005-cerci-touch-thumb.webp',
+    lat: 10.79166, lng: 106.68280,
+    tags: ['serif', 'display'],
   },
   {
     num: '№ 006',
-    title: 'Saigon Hotel',
-    photo: '/signs/sample-06.svg',
-    address: '41–47 Đông Du, Quận 1',
-    lat: 10.77607, lng: 106.70431,
-    tags: ['slab', 'serif'],
-    note: 'Slab serifs holding up the façade since before the paint mattered.',
+    title: 'Thinks',
+    photo: '/signs/006-thinks.webp',
+    thumb: '/signs/006-thinks-thumb.webp',
+    lat: 10.79273, lng: 106.67649,
+    tags: ['sans'],
+  },
+  {
+    num: '№ 007',
+    title: 'MicroWave',
+    photo: '/signs/007-microwave-milktea.webp',
+    thumb: '/signs/007-microwave-milktea-thumb.webp',
+    lat: 10.78393, lng: 106.67876,
+    tags: ['condensed', 'display'],
   },
 ];
 
@@ -96,12 +102,87 @@ const mapsUrl = (s: Sign) =>
 // styles with no specimen yet — the archive asks for these by name
 const missing = STYLE_TAGS.filter((t) => tagCount(t) === 0);
 
-// minimal payload for the client script
-const SIGNS_JS = signs.map((s) => ({ lat: s.lat, lng: s.lng, tags: s.tags, title: s.title }));
+// ------------------------------------------------------------------
+// WHERE THE ARCHIVE IS, for machines.
+// The specimen cards carry no street address — that was a hundred lines
+// of typing for a hundred signs. But the Leaflet dot is drawn in JS,
+// so without this block nothing in the rendered HTML says these signs
+// are in Saigon at all, and the page becomes unfindable by anyone
+// searching for the city. This puts the coordinates back into the
+// document where a crawler can read them, with no visible text and no
+// repetition in the alt attributes.
+//
+// Signs default to the home city below. A sign photographed anywhere
+// else overrides it on its own object — `city: 'Hanoi'`, or
+// `city: 'Bangkok', country: 'TH'` — so travelling costs one line and
+// the other hundred entries stay untouched.
+// ------------------------------------------------------------------
+const DEFAULT_PLACE = { city: 'Ho Chí Minh City', country: 'VN' };
+
+// Every distinct city in the archive, for the page-level coverage line.
+const cities = [...new Set(signs.map((s) => s.city ?? DEFAULT_PLACE.city))];
+
+// The alt attribute is the only per-sign text Google Images reads, so it
+// is built from fields you already fill rather than written by hand:
+//   "Illuminated storefront sign for 8ight Coffee — blackletter and
+//    display lettering in Ho Chí Minh City"
+// ListFormat handles the joining, so one tag, two, or five all read as
+// English instead of a comma dump.
+const tagList = new Intl.ListFormat('en', { style: 'long', type: 'conjunction' });
+const altFor = (s: Sign) => {
+  const style = s.tags.length ? `${tagList.format(s.tags)} lettering` : 'hand-painted lettering';
+  return `Illuminated storefront sign for ${s.title} — ${style} in ${s.city ?? DEFAULT_PLACE.city}`;
+};
+
+const abs = (p: string) => new URL(p, SITE.url).href;
+
+const signsLd = {
+  '@context': 'https://schema.org',
+  '@type': 'ItemList',
+  name: 'Neon Breath — a specimen archive of storefront signs',
+  description: `Illuminated storefront signs in ${cities.join(', ')}, cataloged by letterform style and location.`,
+  url: abs('/tinkering/neon-breath/'),
+  numberOfItems: signs.length,
+  itemListElement: signs.map((s, i) => ({
+    '@type': 'ListItem',
+    position: i + 1,
+    item: {
+      '@type': 'Place',
+      name: s.title,
+      geo: {
+        '@type': 'GeoCoordinates',
+        latitude: s.lat,
+        longitude: s.lng,
+      },
+      address: {
+        '@type': 'PostalAddress',
+        addressLocality: s.city ?? DEFAULT_PLACE.city,
+        addressCountry: s.country ?? DEFAULT_PLACE.country,
+      },
+      image: abs(s.photo),
+      keywords: s.tags.join(', '),
+      description: altFor(s),
+    },
+  })),
+};
+
+// minimal payload for the client script. `photo` and `alt` are here
+// because the frame now swaps one <img> rather than stacking one per
+// sign — see the crossfade note in the script below.
+const SIGNS_JS = signs.map((s) => ({
+  lat: s.lat,
+  lng: s.lng,
+  tags: s.tags,
+  title: s.title,
+  photo: s.photo,
+  alt: altFor(s),
+}));
 ---
 <BaseLayout
   title="Neon Breath"
-  description="Neon Breath — a specimen archive of neon storefront signs. Browse the carousel, filter by letterform style, find each sign on the map."
+  description={`Neon Breath — a specimen archive of illuminated storefront signs in ${cities.join(', ')}. Browse the carousel, filter by letterform style, find each sign on the map.`}
+  ogImage={signs[0].photo}
+  jsonLd={signsLd}
 >
   <p class="folio crumb"><a href="/tinkering/">Tinkering</a> · experiment 004</p>
   <h1>Neon Breath</h1>
@@ -122,11 +203,20 @@ const SIGNS_JS = signs.map((s) => ({ lat: s.lat, lng: s.lng, tags: s.tags, title
 
   <div class="stage">
     <div class="viewport">
-      {signs.map((s, i) => (
-        <figure class={`shot${i === 0 ? ' active' : ''}`} data-i={i}>
-          <img src={s.photo} alt={`Neon sign of ${s.title} — placeholder illustration`} loading={i === 0 ? 'eager' : 'lazy'} />
-        </figure>
-      ))}
+      {/* Two layers, not one per sign. The archive can hold hundreds of
+         specimens; the frame only ever holds two images — the one showing
+         and the one fading in behind it. */}
+      <figure class="shot active" data-layer="0">
+        <img
+          id="layer-0"
+          src={signs[0].photo}
+          alt={altFor(signs[0])}
+          width="1080" height="810" fetchpriority="high"
+        />
+      </figure>
+      <figure class="shot" data-layer="1">
+        <img id="layer-1" alt="" width="1080" height="810" />
+      </figure>
       <button class="nav prev" id="prev" aria-label="Previous sign">‹</button>
       <button class="nav next" id="next" aria-label="Next sign">›</button>
     </div>
@@ -136,13 +226,12 @@ const SIGNS_JS = signs.map((s) => ({ lat: s.lat, lng: s.lng, tags: s.tags, title
         <div class={`spec${i === 0 ? ' active' : ''}`} data-i={i}>
           <p class="folio spec-num">Specimen · {s.num}</p>
           <h2>{s.title}</h2>
-          <p class="note">{s.note}</p>
           <p class="spec-tags">
             {s.tags.map((t) => <span class="tag">{t}</span>)}
           </p>
           <p class="address">
             <a href={mapsUrl(s)} target="_blank" rel="noopener">
-              {s.address} ↗
+              Find it on Google Maps ↗
             </a>
           </p>
           {s.spottedBy && <p class="folio spotted">Spotted by {s.spottedBy}</p>}
@@ -155,7 +244,7 @@ const SIGNS_JS = signs.map((s) => ({ lat: s.lat, lng: s.lng, tags: s.tags, title
       <div class="thumbs" id="thumbs">
         {signs.map((s, i) => (
           <button class={`thumb${i === 0 ? ' current' : ''}`} data-i={i} aria-label={`Show ${s.title}`}>
-            <img src={s.photo} alt="" loading="lazy" />
+            <img src={s.thumb} alt="" width="240" height="180" loading="lazy" decoding="async" />
           </button>
         ))}
       </div>
@@ -231,7 +320,8 @@ const SIGNS_JS = signs.map((s) => ({ lat: s.lat, lng: s.lng, tags: s.tags, title
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <script is:inline src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script is:inline define:vars={{ SIGNS: SIGNS_JS }}>
-  const shots = [...document.querySelectorAll('.shot')];
+  const layerFigs = [...document.querySelectorAll('.shot')];
+  const layerImgs = [document.getElementById('layer-0'), document.getElementById('layer-1')];
   const thumbs = [...document.querySelectorAll('.thumb')];
   const specs = [...document.querySelectorAll('.spec')];
   const chips = [...document.querySelectorAll('.chip')];
@@ -239,6 +329,8 @@ const SIGNS_JS = signs.map((s) => ({ lat: s.lat, lng: s.lng, tags: s.tags, title
   let activeTag = null;              // null = all
   let visible = SIGNS.map((_, i) => i);
   let current = 0;                   // index into SIGNS, always ∈ visible
+  let front = 0;                     // which layer is showing
+  let seq = 0;                       // guards against fast clicking racing
 
   // --- mini map -----------------------------------------------------
   let map = null, pin = null;
@@ -254,9 +346,46 @@ const SIGNS_JS = signs.map((s) => ({ lat: s.lat, lng: s.lng, tags: s.tags, title
     }).addTo(map);
   }
 
+  // --- the frame ----------------------------------------------------
+  // Only two <img> elements exist. Swapping means loading the new photo
+  // into whichever layer is currently hidden, waiting for it to decode,
+  // then crossfading. Nothing is ever shown half-loaded.
+  function showPhoto(i) {
+    const s = SIGNS[i];
+    if (layerImgs[front].getAttribute('src') === s.photo) return;
+
+    const token = ++seq;
+    const back = layerImgs[1 - front];
+    back.src = s.photo;
+    back.alt = s.alt;
+
+    const commit = () => {
+      if (token !== seq) return;     // a newer swap started; drop this one
+      layerFigs[1 - front].classList.add('active');
+      layerFigs[front].classList.remove('active');
+      layerImgs[front].alt = '';
+      front = 1 - front;
+    };
+
+    const ready = back.decode ? back.decode().catch(() => {}) : Promise.resolve();
+    ready.then(commit);
+  }
+
+  // Fetch the neighbours so arrow-pressing feels instant without paying
+  // for the whole archive up front.
+  function preloadNeighbours(i) {
+    const pos = visible.indexOf(i);
+    if (pos === -1 || visible.length < 2) return;
+    const next = visible[(pos + 1) % visible.length];
+    const prev = visible[(pos - 1 + visible.length) % visible.length];
+    for (const j of new Set([next, prev])) {
+      if (j !== i) new Image().src = SIGNS[j].photo;
+    }
+  }
+
   // --- render -------------------------------------------------------
   function render() {
-    shots.forEach((el, i) => el.classList.toggle('active', i === current));
+    showPhoto(current);
     specs.forEach((el, i) => el.classList.toggle('active', i === current));
     thumbs.forEach((el, i) => {
       el.classList.toggle('current', i === current);
@@ -267,6 +396,7 @@ const SIGNS_JS = signs.map((s) => ({ lat: s.lat, lng: s.lng, tags: s.tags, title
       pin.setLatLng([s.lat, s.lng]);
       map.panTo([s.lat, s.lng], { animate: true });
     }
+    preloadNeighbours(current);
   }
 
   function step(dir) {
@@ -294,6 +424,8 @@ const SIGNS_JS = signs.map((s) => ({ lat: s.lat, lng: s.lng, tags: s.tags, title
     if (e.key === 'ArrowLeft') { e.preventDefault(); step(-1); }
     if (e.key === 'ArrowRight') { e.preventDefault(); step(1); }
   });
+
+  preloadNeighbours(current);
 </script>
 
 <style>
@@ -412,11 +544,7 @@ const SIGNS_JS = signs.map((s) => ({ lat: s.lat, lng: s.lng, tags: s.tags, title
   @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
 
   .spec-num { margin: 0 0 0.6rem; }
-  .spec h2 { margin: 0 0 0.5rem; font-size: var(--step-2); }
-  .note {
-    font-style: italic; color: var(--ink-muted);
-    margin: 0 0 1rem; max-width: 40ch;
-  }
+  .spec h2 { margin: 0 0 1rem; font-size: var(--step-2); }
   .spec-tags { margin: 0 0 1rem; display: flex; flex-wrap: wrap; gap: 0.4rem; }
   .tag {
     font-family: var(--font-utility); font-size: 0.68rem; letter-spacing: 0.08em;
